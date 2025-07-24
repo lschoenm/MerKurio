@@ -1,0 +1,4 @@
+command,mean,stddev,median,user,system,min,max
+nice -20 taskset -c 0 ../fetch_reads ../data/frag_1.fastq ../data/frag_2.fastq ../patterns/fastq_100x31mers.fasta 31 ../results/fastq-paired/out-100x31mers-fetch,1.9182707179099998,0.030312583991485013,1.92149210996,0.4923750899999999,0.06462696,1.8349470139600002,1.99659231596
+nice -20 taskset -c 0 ../cookiecutter-extract-1.0.0 -1 ../data/frag_1.fastq -2 ../data/frag_2.fastq -f ../patterns/fastq_100x31mers_with_rc.txt -o ../results/fastq-paired/out-100x31mers-ck,8.233408937199997,0.1189409651341925,8.250342922959998,2.2413928400000005,0.2659055200000002,7.94842709096,8.49121022196
+nice -20 taskset -c 0 ../../target/release/merkurio extract -i ../data/frag_1.fastq -2 ../data/frag_2.fastq -f ../patterns/fastq_100x31mers.fasta -o ../results/fastq-paired/out-100x31mers -r,1.03337171955,0.0855509575920299,1.01685348846,0.36466073999999976,0.023690528399999997,0.9191968809600001,1.17209742096

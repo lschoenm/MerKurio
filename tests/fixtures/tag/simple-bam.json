@@ -1,0 +1,60 @@
+{
+  "matching_records": [
+    {
+      "file": "simple.bam",
+      "pattern": "CTC",
+      "position": "7",
+      "record_id": "ABC-1:1:100"
+    }
+,
+    {
+      "file": "simple.bam",
+      "pattern": "GAG",
+      "position": "4",
+      "record_id": "ABC-1:1:101"
+    }
+  ],
+  "meta_information": {
+    "case_insensitive": false,
+    "command_line": [
+      "target/debug/merkurio",
+      "tag",
+      "-i",
+      "tests/fixtures/input/simple.bam",
+      "-o",
+      "tests/fixtures/tag/simple.tagged.extracted.sam",
+      "-s",
+      "CTC",
+      "-r",
+      "-l",
+      "tests/fixtures/tag/simple-bam.log",
+      "-j",
+      "tests/fixtures/tag/simple-bam.json",
+      "-p",
+      "2"
+    ],
+    "input_files": {
+      "kmer_file": null,
+      "record_file_1": "simple.bam"
+    },
+    "inverted_matching": false,
+    "program": "merkurio",
+    "search_algorithm": "BNDMq",
+    "subcommand": "tag",
+    "tag": "km",
+    "timestamp": "2025-07-22T08:46:21+02:00[Europe/Vienna]",
+    "version": "3.1.1"
+  },
+  "pattern_hit_counts": {
+    "CTC": 1,
+    "GAG": 1
+  },
+  "summary_statistics": {
+    "number_of_characters_searched": 60,
+    "number_of_distinct_records_with_a_hit": 2,
+    "number_of_matches": 2,
+    "number_of_patterns_found": 2,
+    "number_of_patterns_searched": 2,
+    "number_of_records_searched": 3
+  }
+}

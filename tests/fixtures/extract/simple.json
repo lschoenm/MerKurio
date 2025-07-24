@@ -1,0 +1,94 @@
+{
+  "matching_records": [
+    {
+      "file": "simple.fasta",
+      "pattern": "ACG",
+      "position": "0",
+      "record_id": "seq1"
+    }
+,
+    {
+      "file": "simple.fasta",
+      "pattern": "ACG",
+      "position": "4",
+      "record_id": "seq1"
+    }
+,
+    {
+      "file": "simple.fasta",
+      "pattern": "CGT",
+      "position": "1",
+      "record_id": "seq1"
+    }
+,
+    {
+      "file": "simple.fasta",
+      "pattern": "CGT",
+      "position": "5",
+      "record_id": "seq1"
+    }
+,
+    {
+      "file": "simple.fasta",
+      "pattern": "ACG",
+      "position": "2",
+      "record_id": "seq3"
+    }
+,
+    {
+      "file": "simple.fasta",
+      "pattern": "CGT",
+      "position": "3",
+      "record_id": "seq3"
+    }
+  ],
+  "meta_information": {
+    "case_insensitive": false,
+    "command_line": [
+      "target/debug/merkurio",
+      "extract",
+      "-i",
+      "tests/fixtures/input/simple.fasta",
+      "-r",
+      "-s",
+      "ACG",
+      "-o",
+      "tests/fixtures/extract/simple.extracted.fasta",
+      "-l",
+      "tests/fixtures/extract/simple.log",
+      "-j",
+      "tests/fixtures/extract/simple.json"
+    ],
+    "input_files": {
+      "kmer_file": null,
+      "record_file_1": "simple.fasta",
+      "record_file_2": null
+    },
+    "inverted_matching": false,
+    "program": "merkurio",
+    "search_algorithm": "BNDMq",
+    "subcommand": "extract",
+    "timestamp": "2025-07-22T08:44:34+02:00[Europe/Vienna]",
+    "version": "3.1.1"
+  },
+  "paired_end_reads_statistics": {
+    "number_of_distinct_records_with_a_hit_in_file_1": 2,
+    "number_of_distinct_records_with_a_hit_in_file_2": null,
+    "number_of_extracted_records": 2,
+    "number_of_hits_in_file_1": 6,
+    "number_of_hits_in_file_2": null,
+    "searching_paired_end_reads": false
+  },
+  "pattern_hit_counts": {
+    "ACG": 2,
+    "CGT": 2
+  },
+  "summary_statistics": {
+    "number_of_characters_searched": 24,
+    "number_of_distinct_records_with_a_hit": 2,
+    "number_of_matches": 6,
+    "number_of_patterns_found": 2,
+    "number_of_patterns_searched": 2,
+    "number_of_records_searched": 3
+  }
+}

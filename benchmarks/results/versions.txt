@@ -1,0 +1,17 @@
+Versions used (Thu Jul 24 15:25:06 CEST 2025):
+* MerKurio: merkurio 3.1.1
+* seqtool: seqtool 0.4.0-beta.3 <https://github.com/markschl/seqtool>
+* fgrep: grep (GNU grep) 3.11
+Copyright (C) 2023 Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version 3 or later <https://gnu.org/licenses/gpl.html>.
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+
+Written by Mike Haertel and others; see
+<https://git.savannah.gnu.org/cgit/grep.git/tree/AUTHORS>.
+
+grep -P uses PCRE2 10.37 2021-05-26
+* fetch_reads: no official release <https://github.com/voichek/fetch_reads_with_kmers>
+* Cookiecutter: 1.0.0
+* seqkit: seqkit v2.10.0
+* back_to_sequences: back_to_sequences 0.7.0

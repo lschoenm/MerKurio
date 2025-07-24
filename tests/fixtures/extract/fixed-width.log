@@ -1,0 +1,18 @@
+#SeqKatcher extract log
+#2025-07-22T08:44:53+02:00[Europe/Vienna]
+#Running merkurio version 3.1.1
+#Command line: target/debug/merkurio extract -i tests/fixtures/input/fixed-width.faa -s DKAT -o tests/fixtures/extract/fixed-width.extracted.faa -l tests/fixtures/extract/fixed-width.log -j tests/fixtures/extract/fixed-width.json
+#Searching for 1 pattern 
+#
+#File	Record	Pattern	Position (zero-based)
+fixed-width.faa	protein1	DKAT	79
+fixed-width.faa	protein1	DKAT	272
+#
+#Number of patterns found: 1/1 (100.00 %)
+#Pattern	Count
+#DKAT	1
+#
+#Total number of records searched: 1
+#Total number of characters searched: 280
+#Total number of hits: 2
+#Number of distinct records with a hit: 1

@@ -1,0 +1,64 @@
+{
+  "matching_records": [
+    {
+      "file": "fixed-width.faa",
+      "pattern": "DKAT",
+      "position": "79",
+      "record_id": "protein1"
+    }
+,
+    {
+      "file": "fixed-width.faa",
+      "pattern": "DKAT",
+      "position": "272",
+      "record_id": "protein1"
+    }
+  ],
+  "meta_information": {
+    "case_insensitive": false,
+    "command_line": [
+      "target/debug/merkurio",
+      "extract",
+      "-i",
+      "tests/fixtures/input/fixed-width.faa",
+      "-s",
+      "DKAT",
+      "-o",
+      "tests/fixtures/extract/fixed-width.extracted.faa",
+      "-l",
+      "tests/fixtures/extract/fixed-width.log",
+      "-j",
+      "tests/fixtures/extract/fixed-width.json"
+    ],
+    "input_files": {
+      "kmer_file": null,
+      "record_file_1": "fixed-width.faa",
+      "record_file_2": null
+    },
+    "inverted_matching": false,
+    "program": "merkurio",
+    "search_algorithm": "BNDMq",
+    "subcommand": "extract",
+    "timestamp": "2025-07-22T08:44:53+02:00[Europe/Vienna]",
+    "version": "3.1.1"
+  },
+  "paired_end_reads_statistics": {
+    "number_of_distinct_records_with_a_hit_in_file_1": 1,
+    "number_of_distinct_records_with_a_hit_in_file_2": null,
+    "number_of_extracted_records": 1,
+    "number_of_hits_in_file_1": 2,
+    "number_of_hits_in_file_2": null,
+    "searching_paired_end_reads": false
+  },
+  "pattern_hit_counts": {
+    "DKAT": 1
+  },
+  "summary_statistics": {
+    "number_of_characters_searched": 280,
+    "number_of_distinct_records_with_a_hit": 1,
+    "number_of_matches": 2,
+    "number_of_patterns_found": 1,
+    "number_of_patterns_searched": 1,
+    "number_of_records_searched": 1
+  }
+}

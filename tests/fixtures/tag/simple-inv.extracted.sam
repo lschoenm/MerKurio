@@ -1,0 +1,4 @@
+@HD	VN:1.6	SO:coordinate
+@SQ	SN:1	LN:100000
+@PG	ID:merkurio	PN:merkurio	CL:target/debug/merkurio tag -i tests/fixtures/input/simple.sam -o tests/fixtures/tag/simple-inv.extracted.sam -s CTC -r -l tests/fixtures/tag/simple-inv.log -j tests/fixtures/tag/simple-inv.json -p 2 -v	VN:3.1.1
+ABC-1:1:100	147	1	1100	60	20M	=	1000	-120	TTCGATCGATCGATCGATCG	FFFFFFFFFFFFFFFFFFFF	NM:i:0	MD:Z:20	AS:i:20	km:Z:

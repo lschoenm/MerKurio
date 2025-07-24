@@ -1,0 +1,20 @@
+#SeqKatcher tag log
+#2025-07-22T08:46:21+02:00[Europe/Vienna]
+#Running merkurio version 3.1.1
+#Command line: target/debug/merkurio tag -i tests/fixtures/input/simple.bam -o tests/fixtures/tag/simple.tagged.extracted.sam -s CTC -r -l tests/fixtures/tag/simple-bam.log -j tests/fixtures/tag/simple-bam.json -p 2
+#Tag used for labeling records: km
+#Searching for 2 patterns 
+#
+#File	Record	Pattern	Position (zero-based)
+simple.bam	ABC-1:1:100	CTC	7
+simple.bam	ABC-1:1:101	GAG	4
+#
+#Number of patterns found: 2/2 (100.00 %)
+#Pattern	Count
+#CTC	1
+#GAG	1
+#
+#Total number of records searched: 3
+#Total number of characters searched: 60
+#Total number of hits: 2
+#Number of distinct records with a hit: 2

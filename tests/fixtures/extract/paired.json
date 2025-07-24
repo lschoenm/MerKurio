@@ -1,0 +1,66 @@
+{
+  "matching_records": [
+    {
+      "file": "paired-1.fastq",
+      "pattern": "CTT",
+      "position": "1",
+      "record_id": "seq1/1"
+    }
+,
+    {
+      "file": "paired-2.fastq",
+      "pattern": "CTT",
+      "position": "3",
+      "record_id": "seq2/2"
+    }
+  ],
+  "meta_information": {
+    "case_insensitive": false,
+    "command_line": [
+      "target/debug/merkurio",
+      "extract",
+      "-i",
+      "tests/fixtures/input/paired-1.fastq",
+      "-2",
+      "tests/fixtures/input/paired-2.fastq",
+      "-s",
+      "CTT",
+      "-o",
+      "tests/fixtures/extract/paired.extracted.fastq",
+      "-l",
+      "tests/fixtures/extract/paired.log",
+      "-j",
+      "tests/fixtures/extract/paired.json"
+    ],
+    "input_files": {
+      "kmer_file": null,
+      "record_file_1": "paired-1.fastq",
+      "record_file_2": "paired-2.fastq"
+    },
+    "inverted_matching": false,
+    "program": "merkurio",
+    "search_algorithm": "BNDMq",
+    "subcommand": "extract",
+    "timestamp": "2025-07-22T08:44:55+02:00[Europe/Vienna]",
+    "version": "3.1.1"
+  },
+  "paired_end_reads_statistics": {
+    "number_of_distinct_records_with_a_hit_in_file_1": 1,
+    "number_of_distinct_records_with_a_hit_in_file_2": 1,
+    "number_of_extracted_records": 4,
+    "number_of_hits_in_file_1": 1,
+    "number_of_hits_in_file_2": 1,
+    "searching_paired_end_reads": true
+  },
+  "pattern_hit_counts": {
+    "CTT": 2
+  },
+  "summary_statistics": {
+    "number_of_characters_searched": 32,
+    "number_of_distinct_records_with_a_hit": 2,
+    "number_of_matches": 2,
+    "number_of_patterns_found": 1,
+    "number_of_patterns_searched": 1,
+    "number_of_records_searched": 4
+  }
+}

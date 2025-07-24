@@ -1,0 +1,309 @@
+{
+  "matching_records": [
+    {
+      "file": "mutant_R2.fastq",
+      "pattern": "ATCTCAGCACATAAATAATGTGGCAGCACAA",
+      "position": "30",
+      "record_id": "mutant-no_snps.gff-23516/2"
+    }
+,
+    {
+      "file": "mutant_R2.fastq",
+      "pattern": "TCTCAGCACATAAATAATGTGGCAGCACAAT",
+      "position": "31",
+      "record_id": "mutant-no_snps.gff-23516/2"
+    }
+,
+    {
+      "file": "mutant_R2.fastq",
+      "pattern": "ATTGTGCTGCCACATTATTTATGTGCTGAGA",
+      "position": "52",
+      "record_id": "mutant-no_snps.gff-21992/2"
+    }
+,
+    {
+      "file": "mutant_R2.fastq",
+      "pattern": "TTGTGCTGCCACATTATTTATGTGCTGAGAT",
+      "position": "53",
+      "record_id": "mutant-no_snps.gff-21992/2"
+    }
+,
+    {
+      "file": "mutant_R2.fastq",
+      "pattern": "ATCTCAGCACATAAATAATGTGGCAGCACAA",
+      "position": "113",
+      "record_id": "mutant-no_snps.gff-21086/2"
+    }
+,
+    {
+      "file": "mutant_R2.fastq",
+      "pattern": "TCTCAGCACATAAATAATGTGGCAGCACAAT",
+      "position": "114",
+      "record_id": "mutant-no_snps.gff-21086/2"
+    }
+,
+    {
+      "file": "mutant_R2.fastq",
+      "pattern": "TCTTTTTTATCTTCGGTTAATTTATTATATT",
+      "position": "88",
+      "record_id": "mutant-no_snps.gff-21076/2"
+    }
+,
+    {
+      "file": "mutant_R2.fastq",
+      "pattern": "ATCTCAGCACATAAATAATGTGGCAGCACAA",
+      "position": "108",
+      "record_id": "mutant-no_snps.gff-20088/2"
+    }
+,
+    {
+      "file": "mutant_R2.fastq",
+      "pattern": "TCTCAGCACATAAATAATGTGGCAGCACAAT",
+      "position": "109",
+      "record_id": "mutant-no_snps.gff-20088/2"
+    }
+,
+    {
+      "file": "mutant_R2.fastq",
+      "pattern": "AATATAATAAATTAACCGAAGATAAAAAAGA",
+      "position": "35",
+      "record_id": "mutant-no_snps.gff-18432/2"
+    }
+,
+    {
+      "file": "mutant_R2.fastq",
+      "pattern": "TCTTTTTTATCTTCGGTTAATTTATTATATT",
+      "position": "29",
+      "record_id": "mutant-no_snps.gff-15850/2"
+    }
+,
+    {
+      "file": "mutant_R2.fastq",
+      "pattern": "AATATAATAAATTAACCGAAGATAAAAAAGA",
+      "position": "75",
+      "record_id": "mutant-no_snps.gff-14898/2"
+    }
+,
+    {
+      "file": "mutant_R1.fastq",
+      "pattern": "TCTTTTTTATCTTCGGTTAATTTATTATATT",
+      "position": "66",
+      "record_id": "mutant-no_snps.gff-14434/1"
+    }
+,
+    {
+      "file": "mutant_R2.fastq",
+      "pattern": "ATTGTGCTGCCACATTATTTATGTGCTGAGA",
+      "position": "113",
+      "record_id": "mutant-no_snps.gff-13984/2"
+    }
+,
+    {
+      "file": "mutant_R2.fastq",
+      "pattern": "TTGTGCTGCCACATTATTTATGTGCTGAGAT",
+      "position": "114",
+      "record_id": "mutant-no_snps.gff-13984/2"
+    }
+,
+    {
+      "file": "mutant_R1.fastq",
+      "pattern": "ATCTCAGCACATAAATAATGTGGCAGCACAA",
+      "position": "0",
+      "record_id": "mutant-no_snps.gff-12520/1"
+    }
+,
+    {
+      "file": "mutant_R1.fastq",
+      "pattern": "TCTCAGCACATAAATAATGTGGCAGCACAAT",
+      "position": "1",
+      "record_id": "mutant-no_snps.gff-12520/1"
+    }
+,
+    {
+      "file": "mutant_R1.fastq",
+      "pattern": "AATATAATAAATTAACCGAAGATAAAAAAGA",
+      "position": "3",
+      "record_id": "mutant-no_snps.gff-10584/1"
+    }
+,
+    {
+      "file": "mutant_R1.fastq",
+      "pattern": "TCTTTTTTATCTTCGGTTAATTTATTATATT",
+      "position": "25",
+      "record_id": "mutant-no_snps.gff-10384/1"
+    }
+,
+    {
+      "file": "mutant_R2.fastq",
+      "pattern": "ATTGTGCTGCCACATTATTTATGTGCTGAGA",
+      "position": "32",
+      "record_id": "mutant-no_snps.gff-8582/2"
+    }
+,
+    {
+      "file": "mutant_R2.fastq",
+      "pattern": "TTGTGCTGCCACATTATTTATGTGCTGAGAT",
+      "position": "33",
+      "record_id": "mutant-no_snps.gff-8582/2"
+    }
+,
+    {
+      "file": "mutant_R2.fastq",
+      "pattern": "TCTTTTTTATCTTCGGTTAATTTATTATATT",
+      "position": "14",
+      "record_id": "mutant-no_snps.gff-8390/2"
+    }
+,
+    {
+      "file": "mutant_R2.fastq",
+      "pattern": "TCTTTTTTATCTTCGGTTAATTTATTATATT",
+      "position": "14",
+      "record_id": "mutant-no_snps.gff-7378/2"
+    }
+,
+    {
+      "file": "mutant_R2.fastq",
+      "pattern": "ATTGTGCTGCCACATTATTTATGTGCTGAGA",
+      "position": "76",
+      "record_id": "mutant-no_snps.gff-6398/2"
+    }
+,
+    {
+      "file": "mutant_R2.fastq",
+      "pattern": "TTGTGCTGCCACATTATTTATGTGCTGAGAT",
+      "position": "77",
+      "record_id": "mutant-no_snps.gff-6398/2"
+    }
+,
+    {
+      "file": "mutant_R1.fastq",
+      "pattern": "ATCTCAGCACATAAATAATGTGGCAGCACAA",
+      "position": "62",
+      "record_id": "mutant-no_snps.gff-5520/1"
+    }
+,
+    {
+      "file": "mutant_R1.fastq",
+      "pattern": "TCTCAGCACATAAATAATGTGGCAGCACAAT",
+      "position": "63",
+      "record_id": "mutant-no_snps.gff-5520/1"
+    }
+,
+    {
+      "file": "mutant_R1.fastq",
+      "pattern": "TCTTTTTTATCTTCGGTTAATTTATTATATT",
+      "position": "0",
+      "record_id": "mutant-no_snps.gff-5480/1"
+    }
+,
+    {
+      "file": "mutant_R2.fastq",
+      "pattern": "AATATAATAAATTAACCGAAGATAAAAAAGA",
+      "position": "113",
+      "record_id": "mutant-no_snps.gff-4756/2"
+    }
+,
+    {
+      "file": "mutant_R1.fastq",
+      "pattern": "ATCTCAGCACATAAATAATGTGGCAGCACAA",
+      "position": "34",
+      "record_id": "mutant-no_snps.gff-3476/1"
+    }
+,
+    {
+      "file": "mutant_R1.fastq",
+      "pattern": "TCTCAGCACATAAATAATGTGGCAGCACAAT",
+      "position": "35",
+      "record_id": "mutant-no_snps.gff-3476/1"
+    }
+,
+    {
+      "file": "mutant_R1.fastq",
+      "pattern": "TCTTTTTTATCTTCGGTTAATTTATTATATT",
+      "position": "51",
+      "record_id": "mutant-no_snps.gff-2218/1"
+    }
+,
+    {
+      "file": "mutant_R2.fastq",
+      "pattern": "ATCTCAGCACATAAATAATGTGGCAGCACAA",
+      "position": "95",
+      "record_id": "mutant-no_snps.gff-2152/2"
+    }
+,
+    {
+      "file": "mutant_R2.fastq",
+      "pattern": "TCTCAGCACATAAATAATGTGGCAGCACAAT",
+      "position": "96",
+      "record_id": "mutant-no_snps.gff-2152/2"
+    }
+,
+    {
+      "file": "mutant_R1.fastq",
+      "pattern": "ATTGTGCTGCCACATTATTTATGTGCTGAGA",
+      "position": "8",
+      "record_id": "mutant-no_snps.gff-868/1"
+    }
+,
+    {
+      "file": "mutant_R1.fastq",
+      "pattern": "TTGTGCTGCCACATTATTTATGTGCTGAGAT",
+      "position": "9",
+      "record_id": "mutant-no_snps.gff-868/1"
+    }
+  ],
+  "meta_information": {
+    "case_insensitive": false,
+    "command_line": [
+      "merkurio",
+      "extract",
+      "-i",
+      "data/mutant_R1.fastq",
+      "-2",
+      "data/mutant_R2.fastq",
+      "-f",
+      "data/significant_kmers.txt",
+      "-r",
+      "-o",
+      "output/mutant_extracted",
+      "-l",
+      "-j",
+      "logs/mutant_extracted.stats.json"
+    ],
+    "input_files": {
+      "kmer_file": "data/significant_kmers.txt",
+      "record_file_1": "mutant_R1.fastq",
+      "record_file_2": "mutant_R2.fastq"
+    },
+    "inverted_matching": false,
+    "program": "merkurio",
+    "search_algorithm": "BNDMq",
+    "subcommand": "extract",
+    "timestamp": "2025-07-21T15:01:19+02:00[Europe/Vienna]",
+    "version": "1.0.0"
+  },
+  "paired_end_reads_statistics": {
+    "number_of_distinct_records_with_a_hit_in_file_1": 9,
+    "number_of_distinct_records_with_a_hit_in_file_2": 15,
+    "number_of_extracted_records": 48,
+    "number_of_hits_in_file_1": 13,
+    "number_of_hits_in_file_2": 23,
+    "searching_paired_end_reads": true
+  },
+  "pattern_hit_counts": {
+    "AATATAATAAATTAACCGAAGATAAAAAAGA": 4,
+    "ATCTCAGCACATAAATAATGTGGCAGCACAA": 7,
+    "ATTGTGCTGCCACATTATTTATGTGCTGAGA": 5,
+    "TCTCAGCACATAAATAATGTGGCAGCACAAT": 7,
+    "TCTTTTTTATCTTCGGTTAATTTATTATATT": 8,
+    "TTGTGCTGCCACATTATTTATGTGCTGAGAT": 5
+  },
+  "summary_statistics": {
+    "number_of_characters_searched": 3744000,
+    "number_of_distinct_records_with_a_hit": 24,
+    "number_of_matches": 36,
+    "number_of_patterns_found": 6,
+    "number_of_patterns_searched": 6,
+    "number_of_records_searched": 24960
+  }
+}

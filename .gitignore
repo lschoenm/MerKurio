@@ -1,0 +1,21 @@
+.DS_Store
+target/
+test-files/
+manual/book
+
+# Ignore benchmark data and programs
+benchmarks/data/
+benchmarks/cookiecutter-extract-1.0.0
+benchmarks/fetch_reads
+benchmarks/seqkit
+benchmarks/st-0.4.0-beta.3
+benchmarks/fgrep
+benchmarks/grep*
+
+# Keep only benchmark result tables but no output files
+benchmarks/results/fasta/*
+!benchmarks/results/fasta/*csv
+benchmarks/results/fastq/*
+!benchmarks/results/fastq/*csv
+benchmarks/results/fastq-paired/*
+!benchmarks/results/fastq-paired/*csv

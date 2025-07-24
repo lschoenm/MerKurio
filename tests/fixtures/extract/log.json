@@ -1,0 +1,734 @@
+{
+  "matching_records": [
+    {
+      "file": "simple.bam",
+      "pattern": "A",
+      "position": "0",
+      "record_id": "ABC-1:1:100"
+    }
+,
+    {
+      "file": "simple.bam",
+      "pattern": "AG",
+      "position": "0",
+      "record_id": "ABC-1:1:100"
+    }
+,
+    {
+      "file": "simple.bam",
+      "pattern": "G",
+      "position": "1",
+      "record_id": "ABC-1:1:100"
+    }
+,
+    {
+      "file": "simple.bam",
+      "pattern": "C",
+      "position": "2",
+      "record_id": "ABC-1:1:100"
+    }
+,
+    {
+      "file": "simple.bam",
+      "pattern": "CT",
+      "position": "2",
+      "record_id": "ABC-1:1:100"
+    }
+,
+    {
+      "file": "simple.bam",
+      "pattern": "T",
+      "position": "3",
+      "record_id": "ABC-1:1:100"
+    }
+,
+    {
+      "file": "simple.bam",
+      "pattern": "TT",
+      "position": "3",
+      "record_id": "ABC-1:1:100"
+    }
+,
+    {
+      "file": "simple.bam",
+      "pattern": "T",
+      "position": "4",
+      "record_id": "ABC-1:1:100"
+    }
+,
+    {
+      "file": "simple.bam",
+      "pattern": "A",
+      "position": "5",
+      "record_id": "ABC-1:1:100"
+    }
+,
+    {
+      "file": "simple.bam",
+      "pattern": "AG",
+      "position": "5",
+      "record_id": "ABC-1:1:100"
+    }
+,
+    {
+      "file": "simple.bam",
+      "pattern": "G",
+      "position": "6",
+      "record_id": "ABC-1:1:100"
+    }
+,
+    {
+      "file": "simple.bam",
+      "pattern": "C",
+      "position": "7",
+      "record_id": "ABC-1:1:100"
+    }
+,
+    {
+      "file": "simple.bam",
+      "pattern": "CT",
+      "position": "7",
+      "record_id": "ABC-1:1:100"
+    }
+,
+    {
+      "file": "simple.bam",
+      "pattern": "T",
+      "position": "8",
+      "record_id": "ABC-1:1:100"
+    }
+,
+    {
+      "file": "simple.bam",
+      "pattern": "CTC",
+      "position": "7",
+      "record_id": "ABC-1:1:100"
+    }
+,
+    {
+      "file": "simple.bam",
+      "pattern": "TC",
+      "position": "8",
+      "record_id": "ABC-1:1:100"
+    }
+,
+    {
+      "file": "simple.bam",
+      "pattern": "C",
+      "position": "9",
+      "record_id": "ABC-1:1:100"
+    }
+,
+    {
+      "file": "simple.bam",
+      "pattern": "G",
+      "position": "10",
+      "record_id": "ABC-1:1:100"
+    }
+,
+    {
+      "file": "simple.bam",
+      "pattern": "C",
+      "position": "11",
+      "record_id": "ABC-1:1:100"
+    }
+,
+    {
+      "file": "simple.bam",
+      "pattern": "CT",
+      "position": "11",
+      "record_id": "ABC-1:1:100"
+    }
+,
+    {
+      "file": "simple.bam",
+      "pattern": "T",
+      "position": "12",
+      "record_id": "ABC-1:1:100"
+    }
+,
+    {
+      "file": "simple.bam",
+      "pattern": "A",
+      "position": "13",
+      "record_id": "ABC-1:1:100"
+    }
+,
+    {
+      "file": "simple.bam",
+      "pattern": "AC",
+      "position": "13",
+      "record_id": "ABC-1:1:100"
+    }
+,
+    {
+      "file": "simple.bam",
+      "pattern": "C",
+      "position": "14",
+      "record_id": "ABC-1:1:100"
+    }
+,
+    {
+      "file": "simple.bam",
+      "pattern": "G",
+      "position": "15",
+      "record_id": "ABC-1:1:100"
+    }
+,
+    {
+      "file": "simple.bam",
+      "pattern": "GA",
+      "position": "15",
+      "record_id": "ABC-1:1:100"
+    }
+,
+    {
+      "file": "simple.bam",
+      "pattern": "A",
+      "position": "16",
+      "record_id": "ABC-1:1:100"
+    }
+,
+    {
+      "file": "simple.bam",
+      "pattern": "T",
+      "position": "17",
+      "record_id": "ABC-1:1:100"
+    }
+,
+    {
+      "file": "simple.bam",
+      "pattern": "TC",
+      "position": "17",
+      "record_id": "ABC-1:1:100"
+    }
+,
+    {
+      "file": "simple.bam",
+      "pattern": "C",
+      "position": "18",
+      "record_id": "ABC-1:1:100"
+    }
+,
+    {
+      "file": "simple.bam",
+      "pattern": "G",
+      "position": "19",
+      "record_id": "ABC-1:1:100"
+    }
+,
+    {
+      "file": "simple.bam",
+      "pattern": "T",
+      "position": "0",
+      "record_id": "ABC-1:1:100"
+    }
+,
+    {
+      "file": "simple.bam",
+      "pattern": "TT",
+      "position": "0",
+      "record_id": "ABC-1:1:100"
+    }
+,
+    {
+      "file": "simple.bam",
+      "pattern": "T",
+      "position": "1",
+      "record_id": "ABC-1:1:100"
+    }
+,
+    {
+      "file": "simple.bam",
+      "pattern": "TC",
+      "position": "1",
+      "record_id": "ABC-1:1:100"
+    }
+,
+    {
+      "file": "simple.bam",
+      "pattern": "C",
+      "position": "2",
+      "record_id": "ABC-1:1:100"
+    }
+,
+    {
+      "file": "simple.bam",
+      "pattern": "G",
+      "position": "3",
+      "record_id": "ABC-1:1:100"
+    }
+,
+    {
+      "file": "simple.bam",
+      "pattern": "GA",
+      "position": "3",
+      "record_id": "ABC-1:1:100"
+    }
+,
+    {
+      "file": "simple.bam",
+      "pattern": "A",
+      "position": "4",
+      "record_id": "ABC-1:1:100"
+    }
+,
+    {
+      "file": "simple.bam",
+      "pattern": "T",
+      "position": "5",
+      "record_id": "ABC-1:1:100"
+    }
+,
+    {
+      "file": "simple.bam",
+      "pattern": "TC",
+      "position": "5",
+      "record_id": "ABC-1:1:100"
+    }
+,
+    {
+      "file": "simple.bam",
+      "pattern": "C",
+      "position": "6",
+      "record_id": "ABC-1:1:100"
+    }
+,
+    {
+      "file": "simple.bam",
+      "pattern": "G",
+      "position": "7",
+      "record_id": "ABC-1:1:100"
+    }
+,
+    {
+      "file": "simple.bam",
+      "pattern": "GA",
+      "position": "7",
+      "record_id": "ABC-1:1:100"
+    }
+,
+    {
+      "file": "simple.bam",
+      "pattern": "A",
+      "position": "8",
+      "record_id": "ABC-1:1:100"
+    }
+,
+    {
+      "file": "simple.bam",
+      "pattern": "T",
+      "position": "9",
+      "record_id": "ABC-1:1:100"
+    }
+,
+    {
+      "file": "simple.bam",
+      "pattern": "TC",
+      "position": "9",
+      "record_id": "ABC-1:1:100"
+    }
+,
+    {
+      "file": "simple.bam",
+      "pattern": "C",
+      "position": "10",
+      "record_id": "ABC-1:1:100"
+    }
+,
+    {
+      "file": "simple.bam",
+      "pattern": "G",
+      "position": "11",
+      "record_id": "ABC-1:1:100"
+    }
+,
+    {
+      "file": "simple.bam",
+      "pattern": "GA",
+      "position": "11",
+      "record_id": "ABC-1:1:100"
+    }
+,
+    {
+      "file": "simple.bam",
+      "pattern": "A",
+      "position": "12",
+      "record_id": "ABC-1:1:100"
+    }
+,
+    {
+      "file": "simple.bam",
+      "pattern": "T",
+      "position": "13",
+      "record_id": "ABC-1:1:100"
+    }
+,
+    {
+      "file": "simple.bam",
+      "pattern": "TC",
+      "position": "13",
+      "record_id": "ABC-1:1:100"
+    }
+,
+    {
+      "file": "simple.bam",
+      "pattern": "C",
+      "position": "14",
+      "record_id": "ABC-1:1:100"
+    }
+,
+    {
+      "file": "simple.bam",
+      "pattern": "G",
+      "position": "15",
+      "record_id": "ABC-1:1:100"
+    }
+,
+    {
+      "file": "simple.bam",
+      "pattern": "GA",
+      "position": "15",
+      "record_id": "ABC-1:1:100"
+    }
+,
+    {
+      "file": "simple.bam",
+      "pattern": "A",
+      "position": "16",
+      "record_id": "ABC-1:1:100"
+    }
+,
+    {
+      "file": "simple.bam",
+      "pattern": "T",
+      "position": "17",
+      "record_id": "ABC-1:1:100"
+    }
+,
+    {
+      "file": "simple.bam",
+      "pattern": "TC",
+      "position": "17",
+      "record_id": "ABC-1:1:100"
+    }
+,
+    {
+      "file": "simple.bam",
+      "pattern": "C",
+      "position": "18",
+      "record_id": "ABC-1:1:100"
+    }
+,
+    {
+      "file": "simple.bam",
+      "pattern": "G",
+      "position": "19",
+      "record_id": "ABC-1:1:100"
+    }
+,
+    {
+      "file": "simple.bam",
+      "pattern": "C",
+      "position": "0",
+      "record_id": "ABC-1:1:101"
+    }
+,
+    {
+      "file": "simple.bam",
+      "pattern": "A",
+      "position": "1",
+      "record_id": "ABC-1:1:101"
+    }
+,
+    {
+      "file": "simple.bam",
+      "pattern": "AG",
+      "position": "1",
+      "record_id": "ABC-1:1:101"
+    }
+,
+    {
+      "file": "simple.bam",
+      "pattern": "G",
+      "position": "2",
+      "record_id": "ABC-1:1:101"
+    }
+,
+    {
+      "file": "simple.bam",
+      "pattern": "GT",
+      "position": "2",
+      "record_id": "ABC-1:1:101"
+    }
+,
+    {
+      "file": "simple.bam",
+      "pattern": "T",
+      "position": "3",
+      "record_id": "ABC-1:1:101"
+    }
+,
+    {
+      "file": "simple.bam",
+      "pattern": "G",
+      "position": "4",
+      "record_id": "ABC-1:1:101"
+    }
+,
+    {
+      "file": "simple.bam",
+      "pattern": "GA",
+      "position": "4",
+      "record_id": "ABC-1:1:101"
+    }
+,
+    {
+      "file": "simple.bam",
+      "pattern": "A",
+      "position": "5",
+      "record_id": "ABC-1:1:101"
+    }
+,
+    {
+      "file": "simple.bam",
+      "pattern": "GAG",
+      "position": "4",
+      "record_id": "ABC-1:1:101"
+    }
+,
+    {
+      "file": "simple.bam",
+      "pattern": "AG",
+      "position": "5",
+      "record_id": "ABC-1:1:101"
+    }
+,
+    {
+      "file": "simple.bam",
+      "pattern": "G",
+      "position": "6",
+      "record_id": "ABC-1:1:101"
+    }
+,
+    {
+      "file": "simple.bam",
+      "pattern": "GT",
+      "position": "6",
+      "record_id": "ABC-1:1:101"
+    }
+,
+    {
+      "file": "simple.bam",
+      "pattern": "T",
+      "position": "7",
+      "record_id": "ABC-1:1:101"
+    }
+,
+    {
+      "file": "simple.bam",
+      "pattern": "TC",
+      "position": "7",
+      "record_id": "ABC-1:1:101"
+    }
+,
+    {
+      "file": "simple.bam",
+      "pattern": "C",
+      "position": "8",
+      "record_id": "ABC-1:1:101"
+    }
+,
+    {
+      "file": "simple.bam",
+      "pattern": "A",
+      "position": "9",
+      "record_id": "ABC-1:1:101"
+    }
+,
+    {
+      "file": "simple.bam",
+      "pattern": "AG",
+      "position": "9",
+      "record_id": "ABC-1:1:101"
+    }
+,
+    {
+      "file": "simple.bam",
+      "pattern": "G",
+      "position": "10",
+      "record_id": "ABC-1:1:101"
+    }
+,
+    {
+      "file": "simple.bam",
+      "pattern": "GT",
+      "position": "10",
+      "record_id": "ABC-1:1:101"
+    }
+,
+    {
+      "file": "simple.bam",
+      "pattern": "T",
+      "position": "11",
+      "record_id": "ABC-1:1:101"
+    }
+,
+    {
+      "file": "simple.bam",
+      "pattern": "TC",
+      "position": "11",
+      "record_id": "ABC-1:1:101"
+    }
+,
+    {
+      "file": "simple.bam",
+      "pattern": "C",
+      "position": "12",
+      "record_id": "ABC-1:1:101"
+    }
+,
+    {
+      "file": "simple.bam",
+      "pattern": "A",
+      "position": "13",
+      "record_id": "ABC-1:1:101"
+    }
+,
+    {
+      "file": "simple.bam",
+      "pattern": "AG",
+      "position": "13",
+      "record_id": "ABC-1:1:101"
+    }
+,
+    {
+      "file": "simple.bam",
+      "pattern": "G",
+      "position": "14",
+      "record_id": "ABC-1:1:101"
+    }
+,
+    {
+      "file": "simple.bam",
+      "pattern": "GT",
+      "position": "14",
+      "record_id": "ABC-1:1:101"
+    }
+,
+    {
+      "file": "simple.bam",
+      "pattern": "T",
+      "position": "15",
+      "record_id": "ABC-1:1:101"
+    }
+,
+    {
+      "file": "simple.bam",
+      "pattern": "TC",
+      "position": "15",
+      "record_id": "ABC-1:1:101"
+    }
+,
+    {
+      "file": "simple.bam",
+      "pattern": "C",
+      "position": "16",
+      "record_id": "ABC-1:1:101"
+    }
+,
+    {
+      "file": "simple.bam",
+      "pattern": "A",
+      "position": "17",
+      "record_id": "ABC-1:1:101"
+    }
+,
+    {
+      "file": "simple.bam",
+      "pattern": "AG",
+      "position": "17",
+      "record_id": "ABC-1:1:101"
+    }
+,
+    {
+      "file": "simple.bam",
+      "pattern": "G",
+      "position": "18",
+      "record_id": "ABC-1:1:101"
+    }
+,
+    {
+      "file": "simple.bam",
+      "pattern": "GT",
+      "position": "18",
+      "record_id": "ABC-1:1:101"
+    }
+,
+    {
+      "file": "simple.bam",
+      "pattern": "T",
+      "position": "19",
+      "record_id": "ABC-1:1:101"
+    }
+  ],
+  "meta_information": {
+    "case_insensitive": false,
+    "command_line": [
+      "/mnt/c/Users/profs/Documents/Uni/Boku/MA-BT/work/inst-comp-bio/2023-11-30-bndm-rs/bndm-rs/target/debug/merkurio",
+      "tag",
+      "-i",
+      "../input/simple.bam",
+      "-S",
+      "-s",
+      "CTC",
+      "AC",
+      "CT",
+      "AA",
+      "T",
+      "A",
+      "C",
+      "G",
+      "GA",
+      "AG",
+      "-r",
+      "-j",
+      "log.json"
+    ],
+    "input_files": {
+      "kmer_file": null,
+      "record_file_1": "simple.bam"
+    },
+    "inverted_matching": false,
+    "program": "merkurio",
+    "search_algorithm": "Aho-Corasick",
+    "subcommand": "tag",
+    "tag": "km",
+    "timestamp": "2025-07-22T09:18:05+02:00[Europe/Vienna]",
+    "version": "3.1.1"
+  },
+  "pattern_hit_counts": {
+    "A": 13,
+    "AA": 0,
+    "AC": 1,
+    "AG": 7,
+    "C": 15,
+    "CT": 3,
+    "CTC": 1,
+    "G": 16,
+    "GA": 6,
+    "GAG": 1,
+    "GT": 5,
+    "T": 16,
+    "TC": 10,
+    "TT": 2
+  },
+  "summary_statistics": {
+    "number_of_characters_searched": 60,
+    "number_of_distinct_records_with_a_hit": 3,
+    "number_of_matches": 96,
+    "number_of_patterns_found": 13,
+    "number_of_patterns_searched": 14,
+    "number_of_records_searched": 3
+  }
+}

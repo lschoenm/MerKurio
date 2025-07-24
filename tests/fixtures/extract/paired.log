@@ -1,0 +1,24 @@
+#SeqKatcher extract log
+#2025-07-22T08:44:55+02:00[Europe/Vienna]
+#Running merkurio version 3.1.1
+#Command line: target/debug/merkurio extract -i tests/fixtures/input/paired-1.fastq -2 tests/fixtures/input/paired-2.fastq -s CTT -o tests/fixtures/extract/paired.extracted.fastq -l tests/fixtures/extract/paired.log -j tests/fixtures/extract/paired.json
+#Searching for 1 pattern 
+#
+#File	Record	Pattern	Position (zero-based)
+paired-1.fastq	seq1/1	CTT	1
+paired-2.fastq	seq2/2	CTT	3
+#
+#Number of patterns found: 1/1 (100.00 %)
+#Pattern	Count
+#CTT	2
+#
+#Total number of records searched: 4
+#Total number of characters searched: 32
+#Total number of hits: 2
+#Number of distinct records with a hit: 2
+#
+#Total number of hits in file 1: 1
+#Total number of hits in file 2: 1
+#Number of distinct records with a hit in file 1: 1
+#Number of distinct records with a hit in file 2: 1
+#Total number of extracted records: 4

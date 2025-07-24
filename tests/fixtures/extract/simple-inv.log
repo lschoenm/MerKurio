@@ -1,0 +1,23 @@
+#SeqKatcher extract log
+#2025-07-22T08:44:37+02:00[Europe/Vienna]
+#Running merkurio version 3.1.1
+#Command line: target/debug/merkurio extract -i tests/fixtures/input/simple.fasta -r -s ACG -v -o tests/fixtures/extract/simple-inv.extracted.fasta -l tests/fixtures/extract/simple-inv.log -j tests/fixtures/extract/simple-inv.json
+#Searching for 2 patterns (inverted matching)
+#
+#File	Record	Pattern	Position (zero-based)
+simple.fasta	seq1	ACG	0
+simple.fasta	seq1	ACG	4
+simple.fasta	seq1	CGT	1
+simple.fasta	seq1	CGT	5
+simple.fasta	seq3	ACG	2
+simple.fasta	seq3	CGT	3
+#
+#Number of patterns found: 2/2 (100.00 %)
+#Pattern	Count
+#ACG	2
+#CGT	2
+#
+#Total number of records searched: 3
+#Total number of characters searched: 24
+#Total number of hits: 6
+#Number of distinct records with a hit: 2

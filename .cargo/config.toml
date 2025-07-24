@@ -1,0 +1,3 @@
+# Build with the **nightly** -Zon-broken-pipe=kill flag to avoid broken pipe errors
+[build]
+rustflags = ["-Ctarget-cpu=native", "-Zon-broken-pipe=kill"]
