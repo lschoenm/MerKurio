@@ -91,7 +91,7 @@ Because we do not know from which of the two DNA strands the _k_-mers are coming
 Additionally, we would also like to generate detailed match statistics describing which _k_-mers were found and their exact locations in the reads, along with a few summary statistics. By providing the `-l` flag without an argument, a log in plain text format is written to the stdout channel of the terminal. Additionally, we can store a log in JSON format by using the `-j` flag with a file path.
 
 ```bash
-mkdir -o output
+mkdir -p output
 mkdir -p logs
 merkurio extract -i data/mutant_R1.fastq -2 data/mutant_R2.fastq -f data/significant_kmers.txt -r -o output/mutant_extracted -l -j logs/mutant_extracted.stats.json
 ```
