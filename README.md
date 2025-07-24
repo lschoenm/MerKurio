@@ -45,9 +45,11 @@ Both commands share additional features:
 
 ## Example Workflow
 
+Two examples are prepared in this repository for Unix-like systems:
+
 For a quick and minimal example, follow the steps [described here](https://github.com/lschoenm/MerKurio/tree/master/example-minimal).
 
-A more detailed practical example/tutorial can be found [in this repo](https://github.com/lschoenm/MerKurio/tree/master/example-workflow/).
+A more detailed practical example/tutorial can be found [in the repo](https://github.com/lschoenm/MerKurio/tree/master/example-workflow/) or [the docs](https://lschoenm.github.io/MerKurio/practical-tutorial.html).
 
 Although the tool is designed to be flexible and can be used in a variety of ways, it was designed with the following workflow in mind:
 

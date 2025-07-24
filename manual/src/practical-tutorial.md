@@ -11,7 +11,9 @@
 
 This is a brief demonstration and guide on how MerKurio can be used in practice.
 
-The guide is also available [in the repository](https://github.com/lschoenm/MerKurio/example-workflow), along with the input and output data. 
+Note: this tutorial is written for Unix-like systems.
+
+The guide is also available [in the repository](https://github.com/lschoenm/MerKurio/example-workflow), along with the input and output data.
 
 This tutorial assumes that you have already installed MerKurio on your system. If you haven't done this yet, please refer to the installation section in the documentation. Additionally, the following software is used in this example:
 
@@ -20,15 +22,15 @@ This tutorial assumes that you have already installed MerKurio on your system. I
 - samtools (v1.22)
 - IGV (v2.19.4)
 
-These dependencies are only necessary for parts of the tutorial after read extraction. 
+These dependencies are only necessary for parts of the tutorial after read extraction.
 
 In this guide, we will walk through the following scenario: we have a list of relevant _k_-mers which we have obtained from a fictional association test. We then want to extract all raw sequencing reads from a mutant strain which contain our _k_-mers of interest, using MerKurio. Next, we want to map them to the wildtype reference genome. With MerKurio, we can then tag the aligned reads with the _k_-mers they contain and visualize this information in a genome browser.
 
 ## Setup
 
-To install MerKurio, follow the installation instructions [in the Readme](https://github.com/lschoenm/MerKurio?tab=readme-ov-file#installation) or the [official documentation](https://lschoenm.github.io/MerKurio/installation.html). 
+To install MerKurio, follow the installation instructions [in the Readme](https://github.com/lschoenm/MerKurio?tab=readme-ov-file#installation) or the [official documentation](https://lschoenm.github.io/MerKurio/installation.html).
 
-If you have `cargo`/Rust installed, you can first clone the repository using `git`. This will download a local copy of the repository to your computer. Then you can install MerKurio from source, which will automatically add it to your PATH: 
+If you have `cargo`/Rust installed, you can first clone the repository using `git`. This will download a local copy of the repository to your computer. Then you can install MerKurio from source, which will automatically add it to your PATH:
 
 ```bash
 git clone https://github.com/lschoenm/MerKurio
@@ -36,13 +38,13 @@ cd MerKurio
 cargo install --path .
 ```
 
-Test the installation by running MerKurio: 
+Test the installation by running MerKurio:
 
 ```bash
 merkurio --help
 ```
 
-Alternatively, download a standalone binary from the [releases page](https://github.com/lschoenm/MerKurio/releases). If you don't add `merkurio` to your PATH, you have to call it using the path to the executable. 
+Alternatively, download a standalone binary from the [releases page](https://github.com/lschoenm/MerKurio/releases). If you don't add `merkurio` to your PATH, you have to call it using the path to the executable.
 
 ## Download the data
 
@@ -51,7 +53,7 @@ A full dataset of _Staphylococcus aureus_ is available from Zenodo/the Galaxy tr
 First, let's create a new directory `data` and download the files by entering the following commands in your terminal:
 
 ```bash
-mkdir -p data
+mkdir data
 curl https://zenodo.org/records/582600/files/mutant_R1.fastq > data/mutant_R1.fastq
 curl https://zenodo.org/records/582600/files/mutant_R2.fastq > data/mutant_R2.fastq
 curl https://zenodo.org/records/582600/files/wildtype.fna > data/wildtype.fna
@@ -91,8 +93,8 @@ Because we do not know from which of the two DNA strands the _k_-mers are coming
 Additionally, we would also like to generate detailed match statistics describing which _k_-mers were found and their exact locations in the reads, along with a few summary statistics. By providing the `-l` flag without an argument, a log in plain text format is written to the stdout channel of the terminal. Additionally, we can store a log in JSON format by using the `-j` flag with a file path.
 
 ```bash
-mkdir -p output
-mkdir -p logs
+mkdir output
+mkdir logs
 merkurio extract -i data/mutant_R1.fastq -2 data/mutant_R2.fastq -f data/significant_kmers.txt -r -o output/mutant_extracted -l -j logs/mutant_extracted.stats.json
 ```
 
@@ -106,7 +108,7 @@ Here, you can see the statistics log output:
 #2025-06-27T14:54:18+02:00[Europe/Vienna]
 #Running merkurio version 1.0.0
 #Command line: merkurio extract -i mutant_R1.fastq -2 mutant_R2.fastq -f significant_kmers.txt -r -o mutant_extracted -l -j logs/mutant_extracted.stats.json
-#Searching for 6 patterns 
+#Searching for 6 patterns
 #
 #File   Record  Pattern Position (zero-based)
 mutant_R2.fastq mutant-no_snps.gff-23516/2      ATCTCAGCACATAAATAATGTGGCAGCACAA 30
