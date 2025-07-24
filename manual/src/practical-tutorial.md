@@ -278,7 +278,7 @@ Now, zoom in on the region of interest by entering the coordinates and clicking 
 <!-- markdownlint-disable MD033 -->
 <details>
 
-![Detailed view of the mapped and tagged reads, colored by 'km' tag](../images/igv-detail-1.png "Detailed view of the mapped and tagged reads, colored by 'km' tag")
+![Detailed view of the mapped and tagged reads, colored by 'km' tag](igv-detail-1.png "Detailed view of the mapped and tagged reads, colored by 'km' tag")
 
 </details>
 
@@ -287,7 +287,7 @@ Clicking on a single read also shows us its _k_-mer tags. When looking for speci
 <!-- markdownlint-disable MD033 -->
 <details>
 
-![Detailed view of the mapped and tagged reads, grouped by 'km' tag](../images/igv-detail-2.png "Detailed view of the mapped and tagged reads, grouped by 'km' tag")
+![Detailed view of the mapped and tagged reads, grouped by 'km' tag](igv-detail-2.png "Detailed view of the mapped and tagged reads, grouped by 'km' tag")
 
 </details>
 
