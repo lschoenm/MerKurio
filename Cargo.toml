@@ -4,6 +4,13 @@ version = "1.0.0"
 edition = "2024"
 authors = ["Lukas Schönmann <lukas.schoenmann@boku.ac.at>"]
 repository = "https://github.com/lschoenm/MerKurio"
+license = "MIT"
+description = "Quick k-mer-based FASTA/FASTQ sequence record extraction, and SAM/BAM record filtering plus file annotation with k-mer tags."
+
+documentation = "https://lschoenm.github.io/MerKurio/"
+readme = "README.md"
+keywords = ["k-mer", "fasta", "fastq", "sam", "bam"]
+categories = ["science::bioinformatics", "command-line-utilities"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
