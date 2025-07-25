@@ -7,23 +7,19 @@ After sucessfully installing MerKurio (follow the [official documentation](https
 ```bash
 # Run MerKurio extract
 echo "Extracting sequences in sample.fasta containing the k-mer in kmers.txt:"
-cmd="merkurio extract -f kmers.txt -i sample.fasta"
-echo $cmd; eval $cmd
+merkurio extract -f kmers.txt -i sample.fasta
 
 # Run MerKurio tag
 echo "Tagging records in sample.sam with the k-mer in kmers.txt:"
-cmd="merkurio tag -f kmers.txt -i sample.sam"
-echo $cmd; eval $cmd
+merkurio tag -f kmers.txt -i sample.sam
 
 # Generate only a plain text log
 echo "Generating a plain text log of matching statistics:"
-cmd="merkurio tag -f kmers.txt -i sample.sam -S -l"
-echo $cmd; eval $cmd
+merkurio tag -f kmers.txt -i sample.sam -S -l
 
 # Generate only a JSON log
 echo "Generating a JSON log of matching statistics:"
-cmd="merkurio tag -f kmers.txt -i sample.sam -S -j"
-echo $cmd; eval $cmd
+merkurio tag -f kmers.txt -i sample.sam -S -j
 ```
 
 Explanation of the input files:
@@ -33,5 +29,7 @@ Explanation of the input files:
 - `sample.fasta`: a synthetic FASTA file, containing three sequences.
 
 In this minimal example, no output files are generated. The records and matching statistics are directly written to the terminal.
+
+In this minimal example, no output files are generated. The records and matching statistics are directly written to the terminal. For a description of the [plaint text log](./log.md) and [JSON log](./json.md), go to the official documentation.
 
 For a detailed explanation of the available parameters of the [`tag`](./tag.md) and [`extract`](./extract.md) subcommands visit their sections in the documentation.

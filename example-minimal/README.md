@@ -30,6 +30,6 @@ Explanation of the input files:
 - `sample.sam`: a synthetic example SAM file, containing three records.
 - `sample.fasta`: a synthetic FASTA file, containing three sequences.
 
-In this minimal example, no output files are generated. The records and matching statistics are directly written to the terminal.
+In this minimal example, no output files are generated. The records and matching statistics are directly written to the terminal. For a description of the [plaint text log](https://lschoenm.github.io/MerKurio/log.html) and [JSON log](https://lschoenm.github.io/MerKurio/json.html), go to the official documentation.
 
 For a detailed explanation of the available parameters of the [`tag`](https://lschoenm.github.io/MerKurio/tag.html) and [`extract`](https://lschoenm.github.io/MerKurio/extract.html) subcommands visit the documentation.
