@@ -1,6 +1,6 @@
 # Minimal Example
 
-Download the files `kmers.txt`, `sample.sam`, and `sample.fasta` from [the repository](https://github.com/lschoenm/MerKurio/example-minimal).
+Download the files `kmers.txt`, `sample.sam`, and `sample.fasta` from [the repository](https://github.com/lschoenm/MerKurio/tree/master/example-minimal).
 
 After sucessfully installing MerKurio (follow the [official documentation](https://lschoenm.github.io/MerKurio/installation.html)) and having it added to your PATH, run the following commands to test MerKurio:
 

@@ -13,7 +13,7 @@ This is a brief demonstration and guide on how MerKurio can be used in practice.
 
 Note: this tutorial is written for Unix-like systems.
 
-The guide is also available [in the repository](https://github.com/lschoenm/MerKurio/example-workflow), along with the input and output data.
+The guide is also available [in the repository](https://github.com/lschoenm/MerKurio/tree/master/example-workflow), along with the input and output data.
 
 This tutorial assumes that you have already installed MerKurio on your system. If you haven't done this yet, please refer to the installation section in the documentation. Additionally, the following software is used in this example:
 
