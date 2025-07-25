@@ -4,7 +4,8 @@
 <p align="center">    
     <a href="https://github.com/lschoenm/MerKurio/actions"><img alt="Build Status" src="https://img.shields.io/github/actions/workflow/status/lschoenm/MerKurio/tests.yml"></a>
     <a href="https://github.com/lschoenm/MerKurio/releases/latest"><img alt="GitHub Release" src="https://img.shields.io/github/v/release/lschoenm/MerKurio"></a>
-    <a href="https://github.com/lschoenm/MerKurio/blob/master/LICENSE"><img alt="License" src="https://img.shields.io/badge/license-MIT-blue"></a>
+    <a href="https://lschoenm.github.io/MerKurio/"><img alt="Docs" src="https://img.shields.io/badge/docs-online-purple"></a>
+    <a href="https://github.com/lschoenm/MerKurio/blob/master/LICENSE"><img alt="License" src="https://img.shields.io/badge/license-MIT-lightblue"></a>
 </p>
 
 MerKurio is a command line tool for extracting records from FASTA/FASTQ files based on _k_-mers, and for annotating and filtering aligned sequences in BAM/SAM format with _k_-mer tags.
