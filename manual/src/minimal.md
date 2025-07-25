@@ -1,8 +1,8 @@
 # Minimal Example
 
-Download the files `kmers.txt`, `sample.sam`, and `sample.fasta` from [the repository](https://github.com/lschoenm/MerKurio/example-minimal). 
+Download the files `kmers.txt`, `sample.sam`, and `sample.fasta` from [the repository](https://github.com/lschoenm/MerKurio/example-minimal).
 
-After sucessfully installing MerKurio (follow the [official documentation](https://lschoenm.github.io/MerKurio/installation.html)) and having it added to your PATH, run the following commands to test MerKurio: 
+After sucessfully installing MerKurio (follow the [official documentation](https://lschoenm.github.io/MerKurio/installation.html)) and having it added to your PATH, run the following commands to test MerKurio:
 
 ```bash
 # Run MerKurio extract
@@ -26,10 +26,12 @@ cmd="merkurio tag -f kmers.txt -i sample.sam -S -j"
 echo $cmd; eval $cmd
 ```
 
-Explanation of the input files: 
+Explanation of the input files:
 
-- `kmers.txt`: contains a single _k_-mer sequence. 
-- `sample.sam`: a synthetic example SAM file, containing three records. 
-- `sample.fasta`: a synthetic FASTA file, containing three sequences. 
+- `kmers.txt`: contains a single _k_-mer sequence.
+- `sample.sam`: a synthetic example SAM file, containing three records.
+- `sample.fasta`: a synthetic FASTA file, containing three sequences.
 
-In this minimal example, no output files are generated. The records and matching statistics are directly written to the terminal. 
+In this minimal example, no output files are generated. The records and matching statistics are directly written to the terminal.
+
+For a detailed explanation of the available parameters of the [`tag`](./tag.md) and [`extract`](./extract.md) subcommands visit their sections in the documentation.
