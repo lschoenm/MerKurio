@@ -1,58 +1,62 @@
 # Installation
 
-Different installation methods are available for **MerKurio**, depending on whether the user has `cargo`/Rust installed and wants to build from source, or only download the executable. 
+You can install MerKurio in several ways, depending on your system and whether you have Rust installed.
 
-You can test if the installation was successful by executing MerKurio: 
+[1. Precompiled Binaries (No Rust Needed)](#option-1-precompiled-binaries-no-rust-needed)\
+[2. Install via Cargo (Requiers Rust)](#option-2-install-via-cargo-requires-rust)\
+[3. Build Manually Without Installing (Requires Rust)](#option-3-build-manually-without-installing-requires-rust)
+
+After installation, verify if it works by running:
 
 ```bash
-# In case you downloaded the standalone executable
-./path/to/merkurio --help
-# If MerKurio is added to the PATH
 merkurio --help
 ```
 
-## Precompiled Binaries
+Or, if you didn't add it to your PATH:
 
-The most straightforward way with no external dependencies. 
+```bash
+./path/to/merkurio --help
+```
 
-Precompiled binaries for Linux, Windows, and MacOS are available on the [releases page](https://github.com/lschoenm/MerKurio/releases). Download the appropriate binary for your system, decompress and untar it. Optionally, add it to your PATH. The "musl" Linux version can be slower on some systems than the "gnu" version, but should be compatible with a wider range of systems.
+## Option 1: Precompiled Binaries (No Rust Needed)
 
-To decompress the gzipped tarball, run the following command:
+Download a binary for Linux, Windows, or macOS from the [releases page](https://github.com/lschoenm/MerKurio/releases), then extract the archive:
 
 ```bash
 tar -xzf path/to/release.tar.gz
 ```
 
-Then, add user permissions (`chmod u+x path/to/merkurio`) to be able to execute the program from this path. 
+On Linux/macOS, make it executable if needed:
 
-## Install a Release using `cargo`
+```bash
+chmod u+x path/to/merkurio
+```
 
-Alternatively, you can install a released version of **MerKurio** from source using `cargo`. This requires you to have Rust installed, [which is described here](https://doc.rust-lang.org/cargo/getting-started/installation.html). To install a specific version of MerKurio, run the following command (replace `X.X.X` with the version number):
+The `merkurio-x86_64-unknown-linux-musl` is compatible with a wider range of systems but can have worse performance.
+
+## Option 2: Install via Cargo (Requires Rust)
+
+If you have [Rust installed (edition 2024)](https://doc.rust-lang.org/cargo/getting-started/installation.html), the easiest way is:
+
+```bash
+cargo install merkurio
+```
+
+This pulls the latest version from [crates.io](https://crates.io/crates/merkurio).
+
+To install a tagged release from GitHub:
 
 ```bash
 cargo install --git https://github.com/lschoenm/MerKurio --tag vX.X.X
+
 ```
 
-### Install from Source
-
-To install from source, download the source code from the [releases page](https://github.com/lschoenm/MerKurio/releases): 
-
-```bash
-cargo install --path path/to/source/
-```
-
-Or clone the repo to get the latest version, decompress and untar it, and install MerKurio using `cargo`. This will automatically add it to your path:
+## Option 3: Build Manually Without Installing (Requires Rust)
 
 ```bash
 git clone https://github.com/lschoenm/MerKurio
 cd MerKurio
-cargo install --path .
-```
-
-### Build from Source
-
-In order to build the program from source without having it added to your PATH, clone the repository and run the following command in the root directory. The binary will be located in the `target/release` directory:
-
-```bash
 cargo build --release
 ```
+
+The binary will be in `target/release/`.
