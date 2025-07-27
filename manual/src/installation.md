@@ -3,7 +3,7 @@
 You can install MerKurio in several ways, depending on your system and whether you have Rust installed.
 
 [1. Precompiled Binaries (No Rust Needed)](#option-1-precompiled-binaries-no-rust-needed)\
-[2. Install via Cargo (Requiers Rust)](#option-2-install-via-cargo-requires-rust)\
+[2. Install via Cargo (Requires Rust)](#option-2-install-via-cargo-requires-rust)\
 [3. Build Manually Without Installing (Requires Rust)](#option-3-build-manually-without-installing-requires-rust)
 
 After installation, verify if it works by running:
