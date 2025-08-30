@@ -21,7 +21,7 @@ name = "merkurio"
 aho-corasick = "1.1.3"
 anyhow = "1.0.99"
 bam = "0.1.4"
-clap = { version = "4.5.45", features = ["derive", "cargo"] }
+clap = { version = "4.5.46", features = ["derive", "cargo"] }
 jiff = { version = "0.2.15", features = ["serde"] }
 needletail = { version = "0.6.3", features = ["compression"] }
 serde_json = "1.0.143"
