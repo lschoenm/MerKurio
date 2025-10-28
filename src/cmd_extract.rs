@@ -300,9 +300,13 @@ pub fn extract_records(args: CmdExtract) -> Result<()> {
         // the file format is determined by the input file
         let mut writer = match &args.out_fastx {
             Some(pathbuf) => {
-                let pathbuf =
-                    pathbuf.with_extension(identify_uncompressed_type(&args.in_fastx).unwrap());
-                let path = Path::new(&pathbuf);
+                let mut out_path = pathbuf.clone();
+                // Only add extension if not already present
+                if out_path.extension().is_none() {
+                   out_path =
+                    out_path.with_extension(identify_uncompressed_type(&args.in_fastx).unwrap());
+                }                 
+                let path = Path::new(&out_path);
                 let file = fs::File::create(path).with_context(|| {
                     format!(
                         "Error writing to output file; no such directory: {path:?}",
