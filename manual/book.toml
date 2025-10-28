@@ -1,7 +1,6 @@
 [book]
 authors = ["Lukas Schönmann"]
 language = "en"
-multilingual = false
 src = "src"
 title = "MerKurio Manual"
 description = "This is the manual for the MerKurio command line tool."
