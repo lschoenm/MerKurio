@@ -20,4 +20,6 @@ If you have found a bug or have a feature request, please open an issue on the [
 
 ## License
 
-MerKurio is licensed under the MIT license. See the [LICENSE](https://github.com/lschoenm/MerKurio/blob/master/LICENSE).
+The code in this repository is licensed under the [MIT license](https://github.com/lschoenm/MerKurio/tree/master/LICENSE). 
+
+Test data and example files in the `tests/` and `example-minimal/` directories are licensed under the [CC0 1.0 Universal license](https://github.com/lschoenm/MerKurio/tree/master/example-minimal/LICENSE). 
