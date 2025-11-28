@@ -327,7 +327,7 @@ pub fn tag_records(args: CmdTag) -> Result<()> {
     // Log the list of patterns and header line
     if logging_active {
         // Write header section
-        logger.write_header("#SeqKatcher tag log\n");
+        logger.write_header("#MerKurio tag log\n");
         logger.write_header(&format!("#{}\n", Zoned::now().round(Unit::Second)?));
         logger.write_header(&format!(
             "#Running {} version {}\n",

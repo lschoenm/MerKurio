@@ -1,4 +1,4 @@
-#SeqKatcher tag log
+#MerKurio tag log
 #2025-07-22T08:46:12+02:00[Europe/Vienna]
 #Running merkurio version 3.1.1
 #Command line: target/debug/merkurio tag -i tests/fixtures/input/simple.sam -o tests/fixtures/tag/simple-inv.extracted.sam -s CTC -r -l tests/fixtures/tag/simple-inv.log -j tests/fixtures/tag/simple-inv.json -p 2 -v

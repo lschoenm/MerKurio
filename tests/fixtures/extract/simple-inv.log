@@ -1,4 +1,4 @@
-#SeqKatcher extract log
+#MerKurio extract log
 #2025-07-22T08:44:37+02:00[Europe/Vienna]
 #Running merkurio version 3.1.1
 #Command line: target/debug/merkurio extract -i tests/fixtures/input/simple.fasta -r -s ACG -v -o tests/fixtures/extract/simple-inv.extracted.fasta -l tests/fixtures/extract/simple-inv.log -j tests/fixtures/extract/simple-inv.json

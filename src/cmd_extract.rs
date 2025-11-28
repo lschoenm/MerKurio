@@ -229,7 +229,7 @@ pub fn extract_records(args: CmdExtract) -> Result<()> {
     // Log the list of patterns and header line
     if logging_active {
         // Write header section
-        logger.write_header("#SeqKatcher extract log\n");
+        logger.write_header("#MerKurio extract log\n");
         logger.write_header(&format!("#{}\n", Zoned::now().round(Unit::Second)?));
         logger.write_header(&format!(
             "#Running {} version {}\n",
