@@ -11,7 +11,7 @@ merkurio tag -f kmers.txt -i sample.sam
 echo ""
 
 # Generate a plain text log
-merkurio tag -f kmers.txt -i sample.sam -S -l
+merkurio extract -f kmers.txt -i sample.fasta -S -l
 
 echo ""
 
