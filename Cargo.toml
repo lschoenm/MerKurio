@@ -21,14 +21,14 @@ name = "merkurio"
 aho-corasick = "1.1.4"
 anyhow = "1.0.101"
 bam = "0.1.4"
-clap = { version = "4.5.57", features = ["derive", "cargo"] }
-jiff = { version = "0.2.19", features = ["serde"] }
+clap = { version = "4.5.58", features = ["derive", "cargo"] }
+jiff = { version = "0.2.20", features = ["serde"] }
 needletail = { version = "0.6.3", features = ["compression"] }
 serde_json = "1.0.149"
 thiserror = "2.0.18"
 
 [dev-dependencies]
-tempfile = "3.24.0"
+tempfile = "3.25.0"
 
 # May improve performance
 [profile.release]
