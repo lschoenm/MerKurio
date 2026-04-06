@@ -25,6 +25,32 @@ SEQKIT="../seqkit"
 # back_to_sequences: https://github.com/pierrepeterlongo/back_to_sequences
 BACK_TO_SEQUENCES="back_to_sequences"
 
+check_tool_existence() {
+    local tool_name="$1"
+    local tool_command="$2"
+
+    if [[ "$tool_command" == */* ]]; then
+        if [[ ! -x "$tool_command" ]]; then
+            echo "Missing required tool: $tool_name ($tool_command)" >&2
+            exit 1
+        fi
+    elif ! command -v "$tool_command" >/dev/null 2>&1; then
+        echo "Missing required tool: $tool_name ($tool_command)" >&2
+        exit 1
+    fi
+}
+
+check_tool_existence "hyperfine" "hyperfine"
+check_tool_existence "nice" "nice"
+check_tool_existence "taskset" "taskset"
+check_tool_existence "MerKurio" "$MERKURIO"
+check_tool_existence "seqtool" "$ST"
+check_tool_existence "grep" "$GREP"
+check_tool_existence "fetch_reads" "$FETCH_READS"
+check_tool_existence "Cookiecutter" "$CK"
+check_tool_existence "seqkit" "$SEQKIT"
+check_tool_existence "back_to_sequences" "$BACK_TO_SEQUENCES"
+
 # Print system information and tool versions
 echo "Machine running benchmarks:"
 uname -a
@@ -64,12 +90,12 @@ run_fasta_benchmarks() {
     mkdir -p "$output_dir"
     
     echo -e "\n>>> Running benchmarks for ${num_kmers} x ${k} bp for FASTA"
-    hyperfine --style color --warmup "$WARMUP" --runs "$RUNS" --export-csv "$output_dir/${num_kmers}x${k}mers-results.csv" \
-        "nice -20 taskset -c 0 \"$ST\" find -t 1 file:\"$pattern_file\" \"$data_file\" -o \"$output_dir/out-${num_kmers}x${k}mers-st.fasta\" -f" \
-        "nice -20 taskset -c 0 \"$GREP\" -f \"$pattern_txt\" \"$data_file\" -B 1 --no-group-separator > \"$output_dir/out-${num_kmers}x${k}mers-fgrep.fasta\"" \
-        "nice -20 taskset -c 0 \"$SEQKIT\" grep -j 1 -P -s -f \"$pattern_txt\" \"$data_file\" > \"$output_dir/out-${num_kmers}x${k}mers-seqkit.fasta\"" \
-        "nice -20 taskset -c 0 \"$BACK_TO_SEQUENCES\" --in-kmers \"$pattern_file\" --in-sequences \"$data_file\" --out-sequences \"$output_dir/out-${num_kmers}x${k}mers-back_to_sequences.fasta\" --out-kmers \"$output_dir/out-${num_kmers}x${k}mers-back_to_sequences.kmers.fasta\" -k \"$k\" --stranded -t 1" \
-        "nice -20 taskset -c 0 \"$MERKURIO\" extract -i \"$data_file\" -f \"$pattern_file\" > \"$output_dir/out-${num_kmers}x${k}mers-merkurio.fasta\""
+    hyperfine --style color --warmup $WARMUP --runs $RUNS --export-csv $output_dir/${num_kmers}x${k}mers-results.csv \
+        "nice -20 taskset -c 0 $ST find -t 1 file:$pattern_file $data_file -o $output_dir/out-${num_kmers}x${k}mers-st.fasta -f" \
+        "nice -20 taskset -c 0 $GREP -f $pattern_txt $data_file -B 1 --no-group-separator > $output_dir/out-${num_kmers}x${k}mers-fgrep.fasta" \
+        "nice -20 taskset -c 0 $SEQKIT grep -j 1 -P -s -f $pattern_txt $data_file > $output_dir/out-${num_kmers}x${k}mers-seqkit.fasta" \
+        "nice -20 taskset -c 0 $BACK_TO_SEQUENCES --in-kmers $pattern_file --in-sequences $data_file --out-sequences $output_dir/out-${num_kmers}x${k}mers-back_to_sequences.fasta --out-kmers $output_dir/out-${num_kmers}x${k}mers-back_to_sequences.kmers.fasta -k $k --stranded -t 1" \
+        "nice -20 taskset -c 0 $MERKURIO extract -i $data_file -f $pattern_file > $output_dir/out-${num_kmers}x${k}mers-merkurio.fasta"
 }
 
 # Runs benchmark on a single FASTQ file (only first mates)
@@ -85,13 +111,13 @@ run_fastq_benchmarks() {
     
     # Use `--seqtype other` to strictly match N characters
     echo -e "\n>>> Running benchmarks for ${num_kmers} x ${k} bp for FASTQ"
-    hyperfine --style color --warmup "$WARMUP" --runs "$RUNS" --export-csv "$output_dir/${num_kmers}x${k}mers-results.csv" \
-        "nice -20 taskset -c 0 \"$ST\" find -t 1 file:\"$pattern_file\" \"$data_file\" -o \"$output_dir/out-${num_kmers}x${k}mers-st.fastq\" --seqtype other -f" \
-        "nice -20 taskset -c 0 \"$GREP\" -f \"$pattern_txt\" \"$data_file\" -B 1 -A 2 --no-group-separator > \"$output_dir/out-${num_kmers}x${k}mers-fgrep.fastq\"" \
-        "nice -20 taskset -c 0 \"$CK\" -i \"$data_file\" -f \"$pattern_txt\" -o \"$output_dir/out-${num_kmers}x${k}mers-ck\"" \
-        "nice -20 taskset -c 0 \"$SEQKIT\" grep -j 1 -P -s -f \"$pattern_txt\" \"$data_file\" > \"$output_dir/out-${num_kmers}x${k}mers-seqkit.fastq\"" \
-        "nice -20 taskset -c 0 \"$BACK_TO_SEQUENCES\" --in-kmers \"$pattern_file\" --in-sequences \"$data_file\" --out-sequences \"$output_dir/out-${num_kmers}x${k}mers-back_to_sequences.fastq\" --out-kmers \"$output_dir/out-${num_kmers}x${k}mers-back_to_sequences.kmers.fasta\" -k \"$k\" --stranded -t 1" \
-        "nice -20 taskset -c 0 \"$MERKURIO\" extract -i \"$data_file\" -f \"$pattern_file\" > \"$output_dir/out-${num_kmers}x${k}mers-merkurio.fastq\""
+    hyperfine --style color --warmup $WARMUP --runs $RUNS --export-csv $output_dir/${num_kmers}x${k}mers-results.csv \
+        "nice -20 taskset -c 0 $ST find -t 1 file:$pattern_file $data_file -o $output_dir/out-${num_kmers}x${k}mers-st.fastq --seqtype other -f" \
+        "nice -20 taskset -c 0 $GREP -f $pattern_txt $data_file -B 1 -A 2 --no-group-separator > $output_dir/out-${num_kmers}x${k}mers-fgrep.fastq" \
+        "nice -20 taskset -c 0 $CK -i $data_file -f $pattern_txt -o $output_dir/out-${num_kmers}x${k}mers-ck" \
+        "nice -20 taskset -c 0 $SEQKIT grep -j 1 -P -s -f $pattern_txt $data_file > $output_dir/out-${num_kmers}x${k}mers-seqkit.fastq" \
+        "nice -20 taskset -c 0 $BACK_TO_SEQUENCES --in-kmers $pattern_file --in-sequences $data_file --out-sequences $output_dir/out-${num_kmers}x${k}mers-back_to_sequences.fastq --out-kmers $output_dir/out-${num_kmers}x${k}mers-back_to_sequences.kmers.fasta -k $k --stranded -t 1" \
+        "nice -20 taskset -c 0 $MERKURIO extract -i $data_file -f $pattern_file > $output_dir/out-${num_kmers}x${k}mers-merkurio.fastq"
 }
 
 # Runs benchmarks on paired-end FASTQ files (only for 31-mers), with reverse complements
@@ -107,10 +133,10 @@ run_paired_end_benchmarks() {
     mkdir -p "$output_dir"
     
     echo -e "\n>>> Running benchmarks for ${num_kmers} x 31 bp for paired-end FASTQ"
-    hyperfine --style color --warmup "$WARMUP" --runs "$RUNS" --export-csv "$output_dir/${num_kmers}x31mers-results.csv" \
-        "nice -20 taskset -c 0 \"$FETCH_READS\" \"$data_file\" \"$data_file2\" \"$pattern_file\" 31 \"$output_dir/out-${num_kmers}x31mers-fetch\"" \
-        "nice -20 taskset -c 0 \"$CK\" -1 \"$data_file\" -2 \"$data_file2\" -f \"$pattern_txt_rc\" -o \"$output_dir/out-${num_kmers}x31mers-ck\"" \
-        "nice -20 taskset -c 0 \"$MERKURIO\" extract -i \"$data_file\" -2 \"$data_file2\" -f \"$pattern_file\" -o \"$output_dir/out-${num_kmers}x31mers\" -r"
+    hyperfine --style color --warmup $WARMUP --runs $RUNS --export-csv $output_dir/${num_kmers}x31mers-results.csv \
+        "nice -20 taskset -c 0 $FETCH_READS $data_file $data_file2 $pattern_file 31 $output_dir/out-${num_kmers}x31mers-fetch" \
+        "nice -20 taskset -c 0 $CK -1 $data_file -2 $data_file2 -f $pattern_txt_rc -o $output_dir/out-${num_kmers}x31mers-ck" \
+        "nice -20 taskset -c 0 $MERKURIO extract -i $data_file -2 $data_file2 -f $pattern_file -o $output_dir/out-${num_kmers}x31mers -r"
 }
 
 
