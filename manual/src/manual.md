@@ -21,3 +21,5 @@ Both commands share additional features:
 - Query _k_-mers can be provided as command line arguments or in a file (FASTA or plain text). 
 - File types are inferred automatically. 
 - Record output can be suppressed to only record statistics. 
+- All letters (DNA, proteins, text) are supported.
+  - `N` characters are interpreted literally (no wildcard, not skipped). 
