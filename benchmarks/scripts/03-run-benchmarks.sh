@@ -1,6 +1,7 @@
 #!/bin/bash
 
-set -e  # Exit on error
+# Strict error handling
+set -euo pipefail
 
 # Create results directory if it doesn't exist
 mkdir -p ../results
@@ -71,14 +72,13 @@ run_fasta_benchmarks() {
         "nice -20 taskset -c 0 $MERKURIO extract -i $data_file -f $pattern_file > $output_dir/out-${num_kmers}x${k}mers-merkurio.fasta"
 }
 
-# Function to run FASTQ benchmarks
+# Runs benchmark on a single FASTQ file (only first mates)
 run_fastq_benchmarks() {
     local k=$1
     local num_kmers=$2
     local pattern_file="../patterns/fastq_${num_kmers}x${k}mers.fasta"
     local pattern_txt="../patterns/fastq_${num_kmers}x${k}mers.txt"
     local data_file="../data/frag_1.fastq"
-    local data_file2="../data/frag_2.fastq"
     local output_dir="../results/fastq"
     
     mkdir -p $output_dir
@@ -94,7 +94,7 @@ run_fastq_benchmarks() {
         "nice -20 taskset -c 0 $MERKURIO extract -i $data_file -f $pattern_file > $output_dir/out-${num_kmers}x${k}mers-merkurio.fastq"
 }
 
-# Function to run paired-end FASTQ benchmarks (only for 31-mers) with reverse complements!
+# Runs benchmarks on paired-end FASTQ files (only for 31-mers), with reverse complements
 run_paired_end_benchmarks() {
     local num_kmers=$1
     local pattern_file="../patterns/fastq_${num_kmers}x31mers.fasta"
@@ -114,13 +114,13 @@ run_paired_end_benchmarks() {
 }
 
 
-# Run FASTA benchmarks
+# Run FASTA benchmarks (skipped)
 # run_fasta_benchmarks 31 1
 # run_fasta_benchmarks 31 100
 # run_fasta_benchmarks 100 1
 # run_fasta_benchmarks 100 100
 
-# Run FASTQ benchmarks
+# Run single-file FASTQ benchmarks
 run_fastq_benchmarks 31 1
 run_fastq_benchmarks 31 100
 
