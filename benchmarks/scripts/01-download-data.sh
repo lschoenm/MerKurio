@@ -1,6 +1,7 @@
 #!/bin/bash
 
-set -e  # Exit on error
+# Strict error handling
+set -euo pipefail
 
 # Create data directory if it doesn't exist
 mkdir -p ../data

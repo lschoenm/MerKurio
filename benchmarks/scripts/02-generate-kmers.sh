@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# Exit on error
-set -e  
+# Strict error handling
+set -euo pipefail
 
 # Create patterns directory if it doesn't exist
 mkdir -p ../patterns
