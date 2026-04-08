@@ -24,7 +24,7 @@ merkurio tag -f kmers.txt -i sample.sam -S -j
 
 Explanation of the input files:
 
-- `kmers.txt`: contains a single _k_-mer sequence.
+- `kmers.txt`: contains five _k_-mer sequences of length k=31.
 - `sample.sam`: a synthetic example SAM file, containing five records.
 - `sample.fasta`: a synthetic FASTA file, containing two sequences.
 
