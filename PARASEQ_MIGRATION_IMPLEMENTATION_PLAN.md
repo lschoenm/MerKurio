@@ -383,6 +383,14 @@ Important:
 
 Parallel workers will complete out of order. Add an ordered aggregation layer.
 
+Status:
+
+- Added `OrderedResultBuffer<T>` in `src/extract_processing.rs`.
+- Added `IndexedResult` implementations for single-end and paired-end worker results.
+- Added `ExtractSummary` for merging record counts, base counts, hit counts, distinct-hit counts, extracted-record counts, and per-pattern counts.
+- Added tests for out-of-order result draining and summary merging.
+- Current `extract` command still uses direct serial aggregation; this layer is ready for the parallel pipeline.
+
 Ordering mechanism:
 
 - Assign monotonically increasing record or pair indices.
