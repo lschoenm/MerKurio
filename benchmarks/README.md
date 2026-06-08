@@ -34,7 +34,7 @@ cd benchmarks/scripts
 ./06-realistic-extract-parallel-benchmarks.sh
 ```
 
-By default this generates `300,000` paired-end reads at `150 bp`, searches `250` deterministic `31 bp` patterns, and compares `--threads 1`, `--threads 2`, `--threads 4`, and `--threads 0`.
+By default this generates `1,000,000` paired-end reads at `150 bp`, searches `250` deterministic `31 bp` patterns, and compares `--threads 1`, `--threads 2`, `--threads 4`, and `--threads 0`. The generated FASTQ input is about `319 MB` per mate file, or about `638 MB` for both files together.
 
 The realistic benchmark separates three modes:
 

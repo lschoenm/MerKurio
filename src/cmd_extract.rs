@@ -36,7 +36,7 @@ use crate::helpers::{
 use crate::logger::{BufferedLogger, JsonLogger};
 use crate::pattern_matching::PatternMatcher;
 
-const EXTRACT_PARALLEL_CHUNK_SIZE: usize = 512;
+const EXTRACT_PARALLEL_CHUNK_SIZE: usize = 8192;
 
 #[derive(Debug, PartialEq, Eq)]
 struct ThreadResolution {
