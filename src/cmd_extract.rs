@@ -72,36 +72,6 @@ fn resolve_extract_threads(requested_threads: usize) -> ThreadResolution {
     resolve_extract_threads_with_available(requested_threads, available_threads)
 }
 
-#[derive(Debug)]
-#[allow(dead_code)]
-struct OwnedRecordInput {
-    index: u64,
-    id: Vec<u8>,
-    seq: Vec<u8>,
-    qual: Option<Vec<u8>>,
-    format: FastxFormat,
-}
-
-#[derive(Debug)]
-#[allow(dead_code)]
-struct SingleWorkChunk {
-    records: Vec<OwnedRecordInput>,
-}
-
-#[derive(Debug)]
-#[allow(dead_code)]
-struct OwnedPairedInput {
-    index: u64,
-    read_1: OwnedRecordInput,
-    read_2: OwnedRecordInput,
-}
-
-#[derive(Debug)]
-#[allow(dead_code)]
-struct PairedWorkChunk {
-    pairs: Vec<OwnedPairedInput>,
-}
-
 struct SingleRecordSetWorkChunk {
     start_index: u64,
     record_set: fastx::RecordSet,
@@ -291,56 +261,6 @@ fn process_paired_record_set_chunk(
             )?
         }
     })
-}
-
-#[allow(dead_code)]
-fn process_single_work_chunk(
-    processor: &ExtractProcessor,
-    chunk: SingleWorkChunk,
-) -> Vec<SingleResult> {
-    chunk
-        .records
-        .iter()
-        .map(|record| {
-            processor.process_single_record(
-                record.index,
-                RecordInput {
-                    id: &record.id,
-                    seq: &record.seq,
-                    qual: record.qual.as_deref(),
-                    format: record.format,
-                },
-            )
-        })
-        .collect()
-}
-
-#[allow(dead_code)]
-fn process_paired_work_chunk(
-    processor: &ExtractProcessor,
-    chunk: PairedWorkChunk,
-) -> Vec<PairedResult> {
-    chunk
-        .pairs
-        .iter()
-        .map(|pair| {
-            processor.process_paired_record(
-                pair.index,
-                RecordInput {
-                    id: &pair.read_1.id,
-                    seq: &pair.read_1.seq,
-                    qual: pair.read_1.qual.as_deref(),
-                    format: pair.read_1.format,
-                },
-                RecordInput {
-                    id: &pair.read_2.id,
-                    seq: &pair.read_2.seq,
-                    qual: pair.read_2.qual.as_deref(),
-                    format: pair.read_2.format,
-                },
-            )
-        })
-        .collect()
 }
 
 fn output_record_view(record: &OutputRecord) -> FastxRecordView<'_> {
