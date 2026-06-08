@@ -320,6 +320,14 @@ Acceptance criteria:
 
 Use `paraseq`'s parallel processor traits for the parallel path.
 
+Status:
+
+- Added `src/extract_processing.rs` with owned worker-result types and pure record-processing helpers.
+- Added `ExtractProcessor`, `SingleResult`, `PairedResult`, `RecordHit`, `RecordStats`, `OutputRecord`, and `RecordInput`.
+- The helper preserves separate non-verbose first-hit and verbose all-hit paths.
+- The helper does not write output/logs; it returns owned results suitable for Phase 8 ordered aggregation.
+- Current `extract` command still uses the serial implementation directly until aggregation is introduced.
+
 Shared processor state:
 
 ```rust
