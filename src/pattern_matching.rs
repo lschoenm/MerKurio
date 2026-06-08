@@ -41,7 +41,6 @@ pub enum PatternError {
 pub struct MatchHit {
     pub pattern_index: usize,
     pub position: usize,
-    pub count_pattern_hit: bool,
 }
 
 /// Parser-independent pattern matcher used by FASTX and alignment commands.
@@ -95,23 +94,16 @@ impl PatternMatcher {
                     on_match(MatchHit {
                         pattern_index: mat.pattern().as_usize(),
                         position: mat.start(),
-                        // Preserve the current Aho-Corasick summary-count behavior.
-                        count_pattern_hit: true,
                     });
                 }
             }
             Self::Bndmq { matchers } => {
                 for (pattern_index, bndmq) in matchers.iter().enumerate() {
-                    let mut count_pattern_hit = true;
                     for position in bndmq.find_iter(seq) {
                         on_match(MatchHit {
                             pattern_index,
                             position,
-                            // Preserve the current BNDMq summary-count behavior:
-                            // one pattern count per matching record, not per occurrence.
-                            count_pattern_hit,
                         });
-                        count_pattern_hit = false;
                     }
                 }
             }
@@ -596,12 +588,10 @@ mod tests {
                 MatchHit {
                     pattern_index: 0,
                     position: 0,
-                    count_pattern_hit: true,
                 },
                 MatchHit {
                     pattern_index: 0,
                     position: 3,
-                    count_pattern_hit: false,
                 },
             ]
         );
@@ -625,12 +615,10 @@ mod tests {
                 MatchHit {
                     pattern_index: 0,
                     position: 0,
-                    count_pattern_hit: true,
                 },
                 MatchHit {
                     pattern_index: 0,
                     position: 3,
-                    count_pattern_hit: true,
                 },
             ]
         );

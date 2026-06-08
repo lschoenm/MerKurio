@@ -424,12 +424,12 @@ pub fn tag_records(args: CmdTag) -> Result<()> {
                             jl.log_fields(in_records_filename, record.name(), pattern, o);
                         }
                         *nb_hits_tot += 1;
-                    }
-                    if found_any {
-                        kmers_found.push(pattern.clone());
                         if let Some(count) = pattern_hit_counts.get_mut(idx) {
                             *count += 1;
                         }
+                    }
+                    if found_any {
+                        kmers_found.push(pattern.clone());
                     }
                 }
             // If logging disabled, only search for a match and break if found

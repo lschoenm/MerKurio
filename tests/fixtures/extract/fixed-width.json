@@ -51,7 +51,7 @@
     "searching_paired_end_reads": false
   },
   "pattern_hit_counts": {
-    "DKAT": 1
+    "DKAT": 2
   },
   "summary_statistics": {
     "number_of_characters_searched": 280,

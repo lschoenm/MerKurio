@@ -332,9 +332,7 @@ pub fn extract_records(args: CmdExtract) -> Result<()> {
                             hit.position,
                         );
                     }
-                    if hit.count_pattern_hit {
-                        pattern_hit_counts[hit.pattern_index] += 1;
-                    }
+                    pattern_hit_counts[hit.pattern_index] += 1;
                     nb_hits_tot.0 += 1;
                 });
                 if found_occ {
@@ -438,9 +436,7 @@ pub fn extract_records(args: CmdExtract) -> Result<()> {
                             hit.position,
                         );
                     }
-                    if hit.count_pattern_hit {
-                        pattern_hit_counts[hit.pattern_index] += 1;
-                    }
+                    pattern_hit_counts[hit.pattern_index] += 1;
                     record_hit.0 = 1;
                     nb_hits_tot.0 += 1;
                     found_occ = true;
@@ -460,9 +456,7 @@ pub fn extract_records(args: CmdExtract) -> Result<()> {
                             hit.position,
                         );
                     }
-                    if hit.count_pattern_hit {
-                        pattern_hit_counts[hit.pattern_index] += 1;
-                    }
+                    pattern_hit_counts[hit.pattern_index] += 1;
                     record_hit.1 = 1;
                     nb_hits_tot.1 += 1;
                     found_occ = true;

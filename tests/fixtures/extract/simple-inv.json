@@ -81,8 +81,8 @@
     "searching_paired_end_reads": false
   },
   "pattern_hit_counts": {
-    "ACG": 2,
-    "CGT": 2
+    "ACG": 3,
+    "CGT": 3
   },
   "summary_statistics": {
     "number_of_characters_searched": 24,
