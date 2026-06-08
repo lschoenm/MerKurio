@@ -10,24 +10,23 @@
 //! manually set the size of the _q_-grams. If the number of patterns is high or
 //! the patterns are long, the Aho-Corasick algorithm is used.
 
-use aho_corasick::AhoCorasick;
 use anyhow::{Context, Result};
 use clap::{ArgAction, ArgGroup, Args, crate_name, crate_version};
 use jiff::{Unit, Zoned};
 use serde_json;
 
 use std::collections::HashMap;
-use std::{fs, env};
 use std::io::{self, BufWriter};
 use std::path::{Path, PathBuf};
 use std::string::String;
+use std::{env, fs};
 
 use crate::helpers::{
-    add_suffix_to_file_prefix, check_log_flag_conflict, identify_uncompressed_type,
-    parse_pattern_list, recommend_aho_corasick, error_if_directory,
+    add_suffix_to_file_prefix, check_log_flag_conflict, error_if_directory,
+    identify_uncompressed_type, parse_pattern_list, recommend_aho_corasick,
 };
 use crate::logger::{BufferedLogger, JsonLogger};
-use crate::pattern_matching::{BNDMq, tune_q_value};
+use crate::pattern_matching::PatternMatcher;
 
 #[derive(Args)]
 #[clap(group(
@@ -53,7 +52,7 @@ group(
         .required(false)
         .multiple(false)
         .args(&["case_insensitive", "lowercase", "uppercase"]),
-), 
+),
 group(
     ArgGroup::new("kmer-preprocessing")
         .required(false)
@@ -200,9 +199,9 @@ pub fn extract_records(args: CmdExtract) -> Result<()> {
     let in_fastx_filename = args.in_fastx.file_name().unwrap().to_str().unwrap();
     let in_fastq_2_filename = match &args.in_fastq_2 {
         Some(p) => {
-            error_if_directory(p, "Second read file path")?; 
+            error_if_directory(p, "Second read file path")?;
             p.file_name().unwrap().to_str().unwrap()
-        },
+        }
         None => "",
     };
 
@@ -254,27 +253,12 @@ pub fn extract_records(args: CmdExtract) -> Result<()> {
         logger.flush(); // Ensure header is written before records
     }
 
-    // Initialize algorithm instances for each pattern. Only construct the Aho-
-    // Corasick automaton when requested.
-    let (ac, bndmq_collection): (Option<AhoCorasick>, Vec<(String, BNDMq)>) = if args.aho_corasick {
-        let ac = AhoCorasick::builder()
-            // Use DFA for better search performance at higher memory cost
-            .kind(Some(aho_corasick::AhoCorasickKind::DFA))
-            .ascii_case_insensitive(args.case_insensitive)
-            .build(pattern_list.clone())
-            .unwrap();
-        (Some(ac), Vec::new())
-    } else {
-        let mut bndmq_collection = Vec::with_capacity(pattern_list.len());
-        for pattern in &pattern_list {
-            // Tune q value for BNDMq based on the pattern length if not provided
-            let q = args
-                .q_size
-                .unwrap_or_else(|| tune_q_value(pattern).unwrap());
-            bndmq_collection.push((pattern.clone(), BNDMq::new(pattern.as_bytes(), q)?));
-        }
-        (None, bndmq_collection)
-    };
+    let matcher = PatternMatcher::new(
+        &pattern_list,
+        args.aho_corasick,
+        args.case_insensitive,
+        args.q_size,
+    )?;
 
     // Uses a gzip decoder or regular file reader to read FASTQ/A records,
     // depending on the file extension
@@ -303,15 +287,12 @@ pub fn extract_records(args: CmdExtract) -> Result<()> {
                 let mut out_path = pathbuf.clone();
                 // Only add extension if not already present
                 if out_path.extension().is_none() {
-                   out_path =
-                    out_path.with_extension(identify_uncompressed_type(&args.in_fastx).unwrap());
-                }                 
+                    out_path = out_path
+                        .with_extension(identify_uncompressed_type(&args.in_fastx).unwrap());
+                }
                 let path = Path::new(&out_path);
                 let file = fs::File::create(path).with_context(|| {
-                    format!(
-                        "Error writing to output file; no such directory: {path:?}",
-                        
-                    )
+                    format!("Error writing to output file; no such directory: {path:?}",)
                 })?;
                 Box::new(BufWriter::new(file)) as Box<dyn io::Write>
             }
@@ -331,73 +312,37 @@ pub fn extract_records(args: CmdExtract) -> Result<()> {
                 nb_bases += record.num_bases();
             }
 
-            // Get occurrences of k-mers in the sequence using Aho-Corasick
-            if let Some(ac) = ac.as_ref() {
-                for mat in ac.find_overlapping_iter(&record.seq()) {
-                    if !logging_active {
-                        found_occ = true;
-                        break;
-                    } else {
-                        if logging_active {
-                            logger.log_fields(
-                                in_fastx_filename,
-                                record.id(),
-                                &pattern_list[mat.pattern().as_usize()],
-                                mat.start(),
-                            );
-                            if let Some(jl) = &mut json_logger {
-                                jl.log_fields(
-                                    in_fastx_filename,
-                                    record.id(),
-                                    &pattern_list[mat.pattern().as_usize()],
-                                    mat.start(),
-                                );
-                            }
-                        }
-                        pattern_hit_counts[mat.pattern().as_usize()] += 1;
-                        nb_hits_tot.0 += 1;
-                        found_occ = true;
+            let seq = record.seq();
+
+            // Report all matches when logging is active.
+            if logging_active {
+                matcher.for_each_match(&seq, |hit| {
+                    found_occ = true;
+                    logger.log_fields(
+                        in_fastx_filename,
+                        record.id(),
+                        &pattern_list[hit.pattern_index],
+                        hit.position,
+                    );
+                    if let Some(jl) = &mut json_logger {
+                        jl.log_fields(
+                            in_fastx_filename,
+                            record.id(),
+                            &pattern_list[hit.pattern_index],
+                            hit.position,
+                        );
                     }
-                }
+                    if hit.count_pattern_hit {
+                        pattern_hit_counts[hit.pattern_index] += 1;
+                    }
+                    nb_hits_tot.0 += 1;
+                });
                 if found_occ {
                     nb_records_hit.0 += 1;
                 }
-            // Or use BNDMq
+            // Or use the fast first-match path when no per-match reporting is needed.
             } else {
-                // If logging active, search for matching positions and print them
-                if logging_active {
-                    for (idx, (pattern, bndmq)) in bndmq_collection.iter().enumerate() {
-                        let mut found_any = false;
-                        for o in bndmq.find_iter(&record.seq()) {
-                            found_any = true;
-                            logger.log_fields(
-                                in_fastx_filename,
-                                record.id(),
-                                pattern,
-                                o,
-                            );
-                            if let Some(jl) = &mut json_logger {
-                                jl.log_fields(in_fastx_filename, record.id(), pattern, o);
-                            }
-                            nb_hits_tot.0 += 1;
-                        }
-                        if found_any {
-                            found_occ = true;
-                            pattern_hit_counts[idx] += 1;
-                        }
-                    }
-                    if found_occ {
-                        nb_records_hit.0 += 1;
-                    }
-                // If logging disabled, only search for a match and break if found
-                } else {
-                    for (_, bndmq) in &bndmq_collection {
-                        if bndmq.find_match(&record.seq()) {
-                            found_occ = true;
-                            break;
-                        }
-                    }
-                }
+                found_occ = matcher.find_any(&seq);
             }
 
             // Write record to file or stdout if any k-mer has been found
@@ -431,10 +376,7 @@ pub fn extract_records(args: CmdExtract) -> Result<()> {
                 let pathbuf = add_suffix_to_file_prefix(&pathbuf, "_1");
                 let path = Path::new(&pathbuf);
                 let file = fs::File::create(path).with_context(|| {
-                    format!(
-                        "Error writing to paired-end file; no such directory: {path:?}",
-                        
-                    )
+                    format!("Error writing to paired-end file; no such directory: {path:?}",)
                 })?;
                 Box::new(BufWriter::new(file)) as Box<dyn io::Write>
             }
@@ -450,10 +392,7 @@ pub fn extract_records(args: CmdExtract) -> Result<()> {
                 let pathbuf = add_suffix_to_file_prefix(&pathbuf, "_2");
                 let path = Path::new(&pathbuf);
                 let file = fs::File::create(path).with_context(|| {
-                    format!(
-                        "Error writing second paired-end file; no such directory: {path:?}",
-                        
-                    )
+                    format!("Error writing second paired-end file; no such directory: {path:?}",)
                 })?;
                 Box::new(BufWriter::new(file)) as Box<dyn io::Write>
             }
@@ -478,126 +417,61 @@ pub fn extract_records(args: CmdExtract) -> Result<()> {
                 nb_bases += record_2.num_bases();
             }
 
-            // Get occurrences of patterns in the sequence using Aho-Corasick
-            if let Some(ac) = ac.as_ref() {
+            let seq_1 = record_1.seq();
+            let seq_2 = record_2.seq();
+
+            // Report all matches when logging is active.
+            if logging_active {
                 let mut record_hit: (usize, usize) = (0, 0);
-                for mat in ac.find_overlapping_iter(&record_1.seq()) {
-                    if !logging_active {
-                        found_occ = true;
-                        break;
-                    } else {
-                        if logging_active {
-                            logger.log_fields(
-                                in_fastx_filename,
-                                record_1.id(),
-                                &pattern_list[mat.pattern().as_usize()],
-                                mat.start(),
-                            );
-                            if let Some(jl) = &mut json_logger {
-                                jl.log_fields(
-                                    in_fastx_filename,
-                                    record_1.id(),
-                                    &pattern_list[mat.pattern().as_usize()],
-                                    mat.start(),
-                                );
-                            }
-                        }
-                        pattern_hit_counts[mat.pattern().as_usize()] += 1;
-                        record_hit.0 = 1;
-                        nb_hits_tot.0 += 1;
-                        found_occ = true;
+                matcher.for_each_match(&seq_1, |hit| {
+                    logger.log_fields(
+                        in_fastx_filename,
+                        record_1.id(),
+                        &pattern_list[hit.pattern_index],
+                        hit.position,
+                    );
+                    if let Some(jl) = &mut json_logger {
+                        jl.log_fields(
+                            in_fastx_filename,
+                            record_1.id(),
+                            &pattern_list[hit.pattern_index],
+                            hit.position,
+                        );
                     }
-                }
-                for mat in ac.find_overlapping_iter(&record_2.seq()) {
-                    if !logging_active {
-                        found_occ = true;
-                        break;
-                    } else {
-                        if logging_active {
-                            logger.log_fields(
-                                in_fastq_2_filename,
-                                record_2.id(),
-                                &pattern_list[mat.pattern().as_usize()],
-                                mat.start(),
-                            );
-                            if let Some(jl) = &mut json_logger {
-                                jl.log_fields(
-                                    in_fastq_2_filename,
-                                    record_2.id(),
-                                    &pattern_list[mat.pattern().as_usize()],
-                                    mat.start(),
-                                );
-                            }
-                        }
-                        pattern_hit_counts[mat.pattern().as_usize()] += 1;
-                        record_hit.1 = 1;
-                        nb_hits_tot.1 += 1;
-                        found_occ = true;
+                    if hit.count_pattern_hit {
+                        pattern_hit_counts[hit.pattern_index] += 1;
                     }
-                }
-                if logging_active {
-                    nb_records_hit.0 += record_hit.0;
-                    nb_records_hit.1 += record_hit.1;
-                }
-            // Or use BNDMq
+                    record_hit.0 = 1;
+                    nb_hits_tot.0 += 1;
+                    found_occ = true;
+                });
+                matcher.for_each_match(&seq_2, |hit| {
+                    logger.log_fields(
+                        in_fastq_2_filename,
+                        record_2.id(),
+                        &pattern_list[hit.pattern_index],
+                        hit.position,
+                    );
+                    if let Some(jl) = &mut json_logger {
+                        jl.log_fields(
+                            in_fastq_2_filename,
+                            record_2.id(),
+                            &pattern_list[hit.pattern_index],
+                            hit.position,
+                        );
+                    }
+                    if hit.count_pattern_hit {
+                        pattern_hit_counts[hit.pattern_index] += 1;
+                    }
+                    record_hit.1 = 1;
+                    nb_hits_tot.1 += 1;
+                    found_occ = true;
+                });
+                nb_records_hit.0 += record_hit.0;
+                nb_records_hit.1 += record_hit.1;
+            // Or use the fast first-match path when no per-match reporting is needed.
             } else {
-                // If logging active, search for matching positions and print them
-                if logging_active {
-                    let mut record_hit: (usize, usize) = (0, 0);
-                    for (idx, (pattern, bndmq)) in bndmq_collection.iter().enumerate() {
-                        let mut found_any1 = false;
-                        let mut found_any2 = false;
-
-                        for o in bndmq.find_iter(&record_1.seq()) {
-                            found_any1 = true;
-                            logger.log_fields(
-                                in_fastx_filename,
-                                record_1.id(),
-                                pattern,
-                                o,
-                            );
-                            if let Some(jl) = &mut json_logger {
-                                jl.log_fields(in_fastx_filename, record_1.id(), pattern, o);
-                            }
-                            nb_hits_tot.0 += 1;
-                        }
-
-                        for o in bndmq.find_iter(&record_2.seq()) {
-                            found_any2 = true;
-                            logger.log_fields(
-                                in_fastq_2_filename,
-                                record_2.id(),
-                                pattern,
-                                o,
-                            );
-                            if let Some(jl) = &mut json_logger {
-                                jl.log_fields(in_fastq_2_filename, record_2.id(), pattern, o);
-                            }
-                            nb_hits_tot.1 += 1;
-                        }
-
-                        if found_any1 {
-                            found_occ = true;
-                            record_hit.0 = 1;
-                            pattern_hit_counts[idx] += 1;
-                        }
-                        if found_any2 {
-                            found_occ = true;
-                            record_hit.1 = 1;
-                            pattern_hit_counts[idx] += 1;
-                        }
-                    }
-                    nb_records_hit.0 += record_hit.0;
-                    nb_records_hit.1 += record_hit.1;
-                // If logging disabled, only search for a match and break if found
-                } else {
-                    for (_, bndmq) in &bndmq_collection {
-                        if bndmq.find_match(&record_1.seq()) || bndmq.find_match(&record_2.seq()) {
-                            found_occ = true;
-                            break;
-                        }
-                    }
-                }
+                found_occ = matcher.find_any(&seq_1) || matcher.find_any(&seq_2);
             }
 
             // Write records to file or stdout if any patterns have been matched
@@ -680,15 +554,18 @@ pub fn extract_records(args: CmdExtract) -> Result<()> {
             "record_file_1": in_fastx_filename,
             "record_file_2": if args.in_fastq_2.is_some() { Some(in_fastq_2_filename) } else { None },
         });
-        let pattern_hit_counts_map: HashMap<String, u32> =
-            pattern_list.iter().cloned().zip(pattern_hit_counts.iter().copied()).collect();
+        let pattern_hit_counts_map: HashMap<String, u32> = pattern_list
+            .iter()
+            .cloned()
+            .zip(pattern_hit_counts.iter().copied())
+            .collect();
         let meta_information = serde_json::json!({
             "program": crate_name!(),
             "version": crate_version!(),
             "timestamp": Zoned::now().round(Unit::Second).unwrap(),
             "subcommand": "extract",
             "command_line": env::args().collect::<Vec<String>>(),
-            "search_algorithm": if args.aho_corasick { "Aho-Corasick" } else { "BNDMq" },
+            "search_algorithm": matcher.algorithm_name(),
             "inverted_matching": args.invert_match,
             "case_insensitive": args.case_insensitive,
             "input_files": input_files_json,

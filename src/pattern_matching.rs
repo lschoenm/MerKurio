@@ -22,6 +22,7 @@
 //! ```
 
 use crate::pattern_preprocessing::generate_masks;
+use aho_corasick::AhoCorasick;
 use anyhow::Result;
 
 /// Error type for pattern matching operations
@@ -33,6 +34,96 @@ pub enum PatternError {
     EmptyPattern,
     #[error("Pattern length {0} is too large for this architecture when using BNDM (max {1}).")]
     PatternTooLong(usize, usize),
+}
+
+/// A single pattern match within one searched record.
+#[derive(Debug, Clone, Copy, Eq, PartialEq)]
+pub struct MatchHit {
+    pub pattern_index: usize,
+    pub position: usize,
+    pub count_pattern_hit: bool,
+}
+
+/// Parser-independent pattern matcher used by FASTX and alignment commands.
+#[derive(Debug)]
+pub enum PatternMatcher {
+    AhoCorasick { ac: AhoCorasick },
+    Bndmq { matchers: Vec<BNDMq> },
+}
+
+impl PatternMatcher {
+    /// Build the requested matcher implementation from the preprocessed pattern list.
+    pub fn new(
+        pattern_list: &[String],
+        use_aho_corasick: bool,
+        case_insensitive: bool,
+        q_size: Option<usize>,
+    ) -> Result<Self> {
+        if use_aho_corasick {
+            let ac = AhoCorasick::builder()
+                // Use DFA for better search performance at higher memory cost.
+                .kind(Some(aho_corasick::AhoCorasickKind::DFA))
+                .ascii_case_insensitive(case_insensitive)
+                .build(pattern_list)?;
+            Ok(Self::AhoCorasick { ac })
+        } else {
+            let mut matchers = Vec::with_capacity(pattern_list.len());
+            for pattern in pattern_list {
+                let q = q_size.unwrap_or_else(|| tune_q_value(pattern).unwrap());
+                matchers.push(BNDMq::new(pattern.as_bytes(), q)?);
+            }
+            Ok(Self::Bndmq { matchers })
+        }
+    }
+
+    /// Search for any match and return as soon as one is found.
+    pub fn find_any(&self, seq: &[u8]) -> bool {
+        match self {
+            Self::AhoCorasick { ac } => ac.find_overlapping_iter(seq).next().is_some(),
+            Self::Bndmq { matchers } => matchers.iter().any(|bndmq| bndmq.find_match(seq)),
+        }
+    }
+
+    /// Stream all matches in the implementation's native order.
+    pub fn for_each_match<F>(&self, seq: &[u8], mut on_match: F)
+    where
+        F: FnMut(MatchHit),
+    {
+        match self {
+            Self::AhoCorasick { ac } => {
+                for mat in ac.find_overlapping_iter(seq) {
+                    on_match(MatchHit {
+                        pattern_index: mat.pattern().as_usize(),
+                        position: mat.start(),
+                        // Preserve the current Aho-Corasick summary-count behavior.
+                        count_pattern_hit: true,
+                    });
+                }
+            }
+            Self::Bndmq { matchers } => {
+                for (pattern_index, bndmq) in matchers.iter().enumerate() {
+                    let mut count_pattern_hit = true;
+                    for position in bndmq.find_iter(seq) {
+                        on_match(MatchHit {
+                            pattern_index,
+                            position,
+                            // Preserve the current BNDMq summary-count behavior:
+                            // one pattern count per matching record, not per occurrence.
+                            count_pattern_hit,
+                        });
+                        count_pattern_hit = false;
+                    }
+                }
+            }
+        }
+    }
+
+    pub fn algorithm_name(&self) -> &'static str {
+        match self {
+            Self::AhoCorasick { .. } => "Aho-Corasick",
+            Self::Bndmq { .. } => "BNDMq",
+        }
+    }
 }
 
 /// Backwards Non-deterministic Dawg String Matching algorithm, tuned to use _q_-grams.
@@ -485,5 +576,63 @@ mod tests {
     fn test_tune_q_value() {
         let q = tune_q_value("AAAAAAAACCCCCCCCGGGGGGGGTTTTTTT").unwrap();
         assert_eq!(q, 5);
+    }
+
+    #[test]
+    fn test_pattern_matcher_bndmq() {
+        let patterns = vec!["abc".to_string()];
+        let matcher = PatternMatcher::new(&patterns, false, false, Some(2)).unwrap();
+
+        assert!(matcher.find_any(b"abcabc"));
+        assert!(!matcher.find_any(b"defdef"));
+        assert_eq!(matcher.algorithm_name(), "BNDMq");
+
+        let mut hits = Vec::new();
+        matcher.for_each_match(b"abcabc", |hit| hits.push(hit));
+
+        assert_eq!(
+            hits,
+            vec![
+                MatchHit {
+                    pattern_index: 0,
+                    position: 0,
+                    count_pattern_hit: true,
+                },
+                MatchHit {
+                    pattern_index: 0,
+                    position: 3,
+                    count_pattern_hit: false,
+                },
+            ]
+        );
+    }
+
+    #[test]
+    fn test_pattern_matcher_aho_corasick() {
+        let patterns = vec!["abc".to_string()];
+        let matcher = PatternMatcher::new(&patterns, true, false, None).unwrap();
+
+        assert!(matcher.find_any(b"abcabc"));
+        assert!(!matcher.find_any(b"defdef"));
+        assert_eq!(matcher.algorithm_name(), "Aho-Corasick");
+
+        let mut hits = Vec::new();
+        matcher.for_each_match(b"abcabc", |hit| hits.push(hit));
+
+        assert_eq!(
+            hits,
+            vec![
+                MatchHit {
+                    pattern_index: 0,
+                    position: 0,
+                    count_pattern_hit: true,
+                },
+                MatchHit {
+                    pattern_index: 0,
+                    position: 3,
+                    count_pattern_hit: true,
+                },
+            ]
+        );
     }
 }
