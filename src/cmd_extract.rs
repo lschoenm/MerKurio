@@ -21,6 +21,9 @@ use std::path::{Path, PathBuf};
 use std::string::String;
 use std::{env, fs};
 
+use paraseq::{Record, fastx};
+
+use crate::fastx_output::{FastxFormat, FastxRecordView, write_fastx_record};
 use crate::helpers::{
     add_suffix_to_file_prefix, check_log_flag_conflict, error_if_directory,
     identify_uncompressed_type, parse_pattern_list, recommend_aho_corasick,
@@ -260,11 +263,6 @@ pub fn extract_records(args: CmdExtract) -> Result<()> {
         args.q_size,
     )?;
 
-    // Uses a gzip decoder or regular file reader to read FASTQ/A records,
-    // depending on the file extension
-    let mut reader = needletail::parse_fastx_file(&args.in_fastx)
-        .with_context(|| format!("Invalid FASTQ/A input path or file: {:?}", &args.in_fastx))?;
-
     // Initialize counters for logging information
     let mut nb_records_tot = 0;
     let mut nb_bases = 0;
@@ -280,6 +278,13 @@ pub fn extract_records(args: CmdExtract) -> Result<()> {
     //
     // If no second file is provided, process single file
     if args.in_fastq_2.is_none() {
+        let mut reader = fastx::Reader::from_path(&args.in_fastx)
+            .with_context(|| format!("Invalid FASTQ/A input path or file: {:?}", &args.in_fastx))?;
+        let output_format = match reader.format() {
+            fastx::Format::Fasta => FastxFormat::Fasta,
+            fastx::Format::Fastq => FastxFormat::Fastq,
+        };
+
         // Either write to file or stdout if no output path is provided;
         // the file format is determined by the input file
         let mut writer = match &args.out_fastx {
@@ -303,51 +308,64 @@ pub fn extract_records(args: CmdExtract) -> Result<()> {
         };
 
         // Iterate over FASTA/Q records and check for k-mer presence
-        while let Some(r) = reader.next() {
-            let record = r.with_context(|| "Error during FASTQ/A record parsing.")?;
-            let mut found_occ = false;
+        let mut record_set = reader.new_record_set();
+        while record_set
+            .fill(&mut reader)
+            .with_context(|| "Error during FASTQ/A record parsing.")?
+        {
+            for record in record_set.iter() {
+                let record = record.with_context(|| "Error during FASTQ/A record parsing.")?;
+                let mut found_occ = false;
+                let seq = record.seq();
 
-            if logging_active {
-                nb_records_tot += 1;
-                nb_bases += record.num_bases();
-            }
+                if logging_active {
+                    nb_records_tot += 1;
+                    nb_bases += seq.len();
+                }
 
-            let seq = record.seq();
-
-            // Report all matches when logging is active.
-            if logging_active {
-                matcher.for_each_match(&seq, |hit| {
-                    found_occ = true;
-                    logger.log_fields(
-                        in_fastx_filename,
-                        record.id(),
-                        &pattern_list[hit.pattern_index],
-                        hit.position,
-                    );
-                    if let Some(jl) = &mut json_logger {
-                        jl.log_fields(
+                // Report all matches when logging is active.
+                if logging_active {
+                    matcher.for_each_match(&seq, |hit| {
+                        found_occ = true;
+                        logger.log_fields(
                             in_fastx_filename,
                             record.id(),
                             &pattern_list[hit.pattern_index],
                             hit.position,
                         );
+                        if let Some(jl) = &mut json_logger {
+                            jl.log_fields(
+                                in_fastx_filename,
+                                record.id(),
+                                &pattern_list[hit.pattern_index],
+                                hit.position,
+                            );
+                        }
+                        pattern_hit_counts[hit.pattern_index] += 1;
+                        nb_hits_tot.0 += 1;
+                    });
+                    if found_occ {
+                        nb_records_hit.0 += 1;
                     }
-                    pattern_hit_counts[hit.pattern_index] += 1;
-                    nb_hits_tot.0 += 1;
-                });
-                if found_occ {
-                    nb_records_hit.0 += 1;
+                // Or use the fast first-match path when no per-match reporting is needed.
+                } else {
+                    found_occ = matcher.find_any(&seq);
                 }
-            // Or use the fast first-match path when no per-match reporting is needed.
-            } else {
-                found_occ = matcher.find_any(&seq);
-            }
 
-            // Write record to file or stdout if any k-mer has been found
-            if found_occ != args.invert_match {
-                nb_records_extracted += 1;
-                if !args.suppress_output {
-                    record.write(&mut writer, None).unwrap();
+                // Write record to file or stdout if any k-mer has been found
+                if found_occ != args.invert_match {
+                    nb_records_extracted += 1;
+                    if !args.suppress_output {
+                        write_fastx_record(
+                            &mut writer,
+                            FastxRecordView {
+                                id: record.id(),
+                                seq: &seq,
+                                qual: record.qual(),
+                                format: output_format,
+                            },
+                        )?;
+                    }
                 }
             }
         }
@@ -356,6 +374,8 @@ pub fn extract_records(args: CmdExtract) -> Result<()> {
     ////
     // If a second file is provided, process paired-end reads
     } else {
+        let mut reader = needletail::parse_fastx_file(&args.in_fastx)
+            .with_context(|| format!("Invalid FASTQ/A input path or file: {:?}", &args.in_fastx))?;
         let mut reader_2 = needletail::parse_fastx_file(args.in_fastq_2.clone().unwrap())
             .with_context(|| {
                 format!(

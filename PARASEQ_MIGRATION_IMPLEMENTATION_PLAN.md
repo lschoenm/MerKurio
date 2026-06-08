@@ -226,6 +226,14 @@ Recommendation:
 
 Implement a serial single-end path first.
 
+Status:
+
+- Implemented for single-end `extract`.
+- Single-end input now uses `paraseq::fastx::Reader`.
+- Single-end output now uses the normalized writer from `src/fastx_output.rs`.
+- Paired-end input remains on `needletail` until Phase 6.
+- The fixed-width FASTA output fixture was updated because multiline FASTA output is now normalized to one sequence line.
+
 Flow:
 
 ```rust
