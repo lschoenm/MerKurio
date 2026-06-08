@@ -32,16 +32,14 @@ pub struct RecordStats {
     pub num_bases: usize,
     pub hit_count: usize,
     pub distinct_record_hit: bool,
-    pub pattern_hit_counts: Vec<u32>,
 }
 
 impl RecordStats {
-    fn new(num_bases: usize, pattern_count: usize) -> Self {
+    fn new(num_bases: usize) -> Self {
         Self {
             num_bases,
             hit_count: 0,
             distinct_record_hit: false,
-            pattern_hit_counts: vec![0; pattern_count],
         }
     }
 }
@@ -107,7 +105,7 @@ impl ExtractProcessor {
         record_index: u64,
         record: RecordInput<'_>,
     ) -> SingleResult {
-        let mut stats = RecordStats::new(record.seq.len(), self.pattern_count);
+        let mut stats = RecordStats::new(record.seq.len());
         let mut hits = Vec::new();
         let matched =
             self.process_record_matches(FileSlot::SingleOrFirst, record, &mut stats, &mut hits);
@@ -130,8 +128,8 @@ impl ExtractProcessor {
         read_1: RecordInput<'_>,
         read_2: RecordInput<'_>,
     ) -> PairedResult {
-        let mut stats_1 = RecordStats::new(read_1.seq.len(), self.pattern_count);
-        let mut stats_2 = RecordStats::new(read_2.seq.len(), self.pattern_count);
+        let mut stats_1 = RecordStats::new(read_1.seq.len());
+        let mut stats_2 = RecordStats::new(read_2.seq.len());
         let mut hits = Vec::new();
 
         let matched_1 =
@@ -169,7 +167,6 @@ impl ExtractProcessor {
             self.matcher.for_each_match(record.seq, |hit| {
                 stats.hit_count += 1;
                 stats.distinct_record_hit = true;
-                stats.pattern_hit_counts[hit.pattern_index] += 1;
                 hits.push(RecordHit {
                     file_slot,
                     record_id: record.id.to_vec(),
@@ -512,6 +509,7 @@ impl ExtractSummary {
 
     pub fn merge_single(&mut self, result: &SingleResult) {
         self.merge_stats(FileSlot::SingleOrFirst, &result.stats);
+        self.merge_pattern_hits(&result.hits);
         if result.extracted {
             self.nb_records_extracted += 1;
         }
@@ -520,6 +518,7 @@ impl ExtractSummary {
     pub fn merge_paired(&mut self, result: &PairedResult) {
         self.merge_stats(FileSlot::SingleOrFirst, &result.stats_1);
         self.merge_stats(FileSlot::Second, &result.stats_2);
+        self.merge_pattern_hits(&result.hits);
         if result.extracted {
             self.nb_records_extracted += 2;
         }
@@ -542,12 +541,11 @@ impl ExtractSummary {
                 }
             }
         }
-        for (total, count) in self
-            .pattern_hit_counts
-            .iter_mut()
-            .zip(stats.pattern_hit_counts.iter())
-        {
-            *total += count;
+    }
+
+    fn merge_pattern_hits(&mut self, hits: &[RecordHit]) {
+        for hit in hits {
+            self.pattern_hit_counts[hit.pattern_index] += 1;
         }
     }
 }
@@ -610,7 +608,6 @@ mod tests {
         assert!(result.extracted);
         assert_eq!(result.stats.hit_count, 2);
         assert!(result.stats.distinct_record_hit);
-        assert_eq!(result.stats.pattern_hit_counts, vec![2]);
         assert_eq!(
             result.hits,
             vec![
