@@ -275,13 +275,23 @@ Acceptance criteria:
 
 Implement paired-end processing using `fastx::Collection`.
 
+Status:
+
+- Implemented for paired-end `extract` with explicit synchronized `paraseq::fastx::Reader` record sets.
+- The built-in `fastx::Collection`/processor API remains deferred because current output/log aggregation is serial and order-sensitive.
+- Paired-end output now uses the normalized writer from `src/fastx_output.rs`.
+- Added a direct `extract_records` test for mismatched paired-end file lengths.
+
 Flow:
 
 ```rust
-let collection = paraseq::fastx::Collection::from_paths(
-    &[args.in_fastx.as_path(), args.in_fastq_2.as_ref().unwrap().as_path()],
-    paraseq::fastx::CollectionType::Paired,
-)?;
+let mut reader_1 = paraseq::fastx::Reader::from_path(&args.in_fastx)?;
+let mut reader_2 = paraseq::fastx::Reader::from_path(args.in_fastq_2.as_ref().unwrap())?;
+
+let mut record_set_1 = reader_1.new_record_set();
+let mut record_set_2 = reader_2.new_record_set();
+
+// Fill both record sets, verify both advanced together, then zip records in order.
 ```
 
 Rules:

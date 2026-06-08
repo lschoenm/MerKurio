@@ -374,15 +374,23 @@ pub fn extract_records(args: CmdExtract) -> Result<()> {
     ////
     // If a second file is provided, process paired-end reads
     } else {
-        let mut reader = needletail::parse_fastx_file(&args.in_fastx)
+        let mut reader = fastx::Reader::from_path(&args.in_fastx)
             .with_context(|| format!("Invalid FASTQ/A input path or file: {:?}", &args.in_fastx))?;
-        let mut reader_2 = needletail::parse_fastx_file(args.in_fastq_2.clone().unwrap())
+        let output_format_1 = match reader.format() {
+            fastx::Format::Fasta => FastxFormat::Fasta,
+            fastx::Format::Fastq => FastxFormat::Fastq,
+        };
+        let mut reader_2 = fastx::Reader::from_path(args.in_fastq_2.clone().unwrap())
             .with_context(|| {
                 format!(
                     "Invalid second FASTQ input path or file: {:?}",
                     &args.in_fastq_2
                 )
             })?;
+        let output_format_2 = match reader_2.format() {
+            fastx::Format::Fasta => FastxFormat::Fasta,
+            fastx::Format::Fastq => FastxFormat::Fastq,
+        };
 
         // Either write to file or stdout if no output path is provided;
         // the file format is determined by the input file;
@@ -421,86 +429,127 @@ pub fn extract_records(args: CmdExtract) -> Result<()> {
         };
 
         // Iterate over FASTQ records and check for k-mer presence
-        while let Some(r) = reader.next() {
-            let record_1 = r.with_context(|| "Error during FASTQ record parsing of first file.")?;
-            let record_2 = reader_2
-                .next()
-                .with_context(|| "Error during FASTQ record parsing of second file. Do the two input files contain the same number of records?")?
-                .unwrap();
-            let mut found_occ = false;
+        let mut record_set_1 = reader.new_record_set();
+        let mut record_set_2 = reader_2.new_record_set();
+        loop {
+            let filled_1 = record_set_1
+                .fill(&mut reader)
+                .with_context(|| "Error during FASTQ record parsing of first file.")?;
+            let filled_2 = record_set_2
+                .fill(&mut reader_2)
+                .with_context(|| "Error during FASTQ record parsing of second file.")?;
 
-            if logging_active {
-                nb_records_tot += 2;
-                nb_bases += record_1.num_bases();
-                nb_bases += record_2.num_bases();
+            match (filled_1, filled_2) {
+                (false, false) => break,
+                (true, true) => {}
+                _ => {
+                    anyhow::bail!(
+                        "The two input files have a different number of records. Please provide valid paired-end read files."
+                    );
+                }
             }
 
-            let seq_1 = record_1.seq();
-            let seq_2 = record_2.seq();
+            let records_1 = record_set_1
+                .iter()
+                .collect::<std::result::Result<Vec<_>, _>>()
+                .with_context(|| "Error during FASTQ record parsing of first file.")?;
+            let records_2 = record_set_2
+                .iter()
+                .collect::<std::result::Result<Vec<_>, _>>()
+                .with_context(|| "Error during FASTQ record parsing of second file.")?;
 
-            // Report all matches when logging is active.
-            if logging_active {
-                let mut record_hit: (usize, usize) = (0, 0);
-                matcher.for_each_match(&seq_1, |hit| {
-                    logger.log_fields(
-                        in_fastx_filename,
-                        record_1.id(),
-                        &pattern_list[hit.pattern_index],
-                        hit.position,
-                    );
-                    if let Some(jl) = &mut json_logger {
-                        jl.log_fields(
+            if records_1.len() != records_2.len() {
+                anyhow::bail!(
+                    "The two input files have a different number of records. Please provide valid paired-end read files."
+                );
+            }
+
+            for (record_1, record_2) in records_1.into_iter().zip(records_2.into_iter()) {
+                let mut found_occ = false;
+                let seq_1 = record_1.seq();
+                let seq_2 = record_2.seq();
+
+                if logging_active {
+                    nb_records_tot += 2;
+                    nb_bases += seq_1.len();
+                    nb_bases += seq_2.len();
+                }
+
+                // Report all matches when logging is active.
+                if logging_active {
+                    let mut record_hit: (usize, usize) = (0, 0);
+                    matcher.for_each_match(&seq_1, |hit| {
+                        logger.log_fields(
                             in_fastx_filename,
                             record_1.id(),
                             &pattern_list[hit.pattern_index],
                             hit.position,
                         );
-                    }
-                    pattern_hit_counts[hit.pattern_index] += 1;
-                    record_hit.0 = 1;
-                    nb_hits_tot.0 += 1;
-                    found_occ = true;
-                });
-                matcher.for_each_match(&seq_2, |hit| {
-                    logger.log_fields(
-                        in_fastq_2_filename,
-                        record_2.id(),
-                        &pattern_list[hit.pattern_index],
-                        hit.position,
-                    );
-                    if let Some(jl) = &mut json_logger {
-                        jl.log_fields(
+                        if let Some(jl) = &mut json_logger {
+                            jl.log_fields(
+                                in_fastx_filename,
+                                record_1.id(),
+                                &pattern_list[hit.pattern_index],
+                                hit.position,
+                            );
+                        }
+                        pattern_hit_counts[hit.pattern_index] += 1;
+                        record_hit.0 = 1;
+                        nb_hits_tot.0 += 1;
+                        found_occ = true;
+                    });
+                    matcher.for_each_match(&seq_2, |hit| {
+                        logger.log_fields(
                             in_fastq_2_filename,
                             record_2.id(),
                             &pattern_list[hit.pattern_index],
                             hit.position,
                         );
-                    }
-                    pattern_hit_counts[hit.pattern_index] += 1;
-                    record_hit.1 = 1;
-                    nb_hits_tot.1 += 1;
-                    found_occ = true;
-                });
-                nb_records_hit.0 += record_hit.0;
-                nb_records_hit.1 += record_hit.1;
-            // Or use the fast first-match path when no per-match reporting is needed.
-            } else {
-                found_occ = matcher.find_any(&seq_1) || matcher.find_any(&seq_2);
-            }
+                        if let Some(jl) = &mut json_logger {
+                            jl.log_fields(
+                                in_fastq_2_filename,
+                                record_2.id(),
+                                &pattern_list[hit.pattern_index],
+                                hit.position,
+                            );
+                        }
+                        pattern_hit_counts[hit.pattern_index] += 1;
+                        record_hit.1 = 1;
+                        nb_hits_tot.1 += 1;
+                        found_occ = true;
+                    });
+                    nb_records_hit.0 += record_hit.0;
+                    nb_records_hit.1 += record_hit.1;
+                // Or use the fast first-match path when no per-match reporting is needed.
+                } else {
+                    found_occ = matcher.find_any(&seq_1) || matcher.find_any(&seq_2);
+                }
 
-            // Write records to file or stdout if any patterns have been matched
-            if found_occ != args.invert_match {
-                nb_records_extracted += 2;
-                if !args.suppress_output {
-                    record_1.write(&mut writer, None).unwrap();
-                    record_2.write(&mut writer2, None).unwrap();
+                // Write records to file or stdout if any patterns have been matched
+                if found_occ != args.invert_match {
+                    nb_records_extracted += 2;
+                    if !args.suppress_output {
+                        write_fastx_record(
+                            &mut writer,
+                            FastxRecordView {
+                                id: record_1.id(),
+                                seq: &seq_1,
+                                qual: record_1.qual(),
+                                format: output_format_1,
+                            },
+                        )?;
+                        write_fastx_record(
+                            &mut writer2,
+                            FastxRecordView {
+                                id: record_2.id(),
+                                seq: &seq_2,
+                                qual: record_2.qual(),
+                                format: output_format_2,
+                            },
+                        )?;
+                    }
                 }
             }
-        }
-        if reader_2.next().is_some() {
-            anyhow::bail!(
-                "The two input files have a different number of records. Please provide valid paired-end read files."
-            );
         }
     }
 
@@ -946,6 +995,46 @@ mod tests {
         )?;
         compare_log_output(&out_log, "tests/fixtures/extract/paired.log")?;
         compare_json_output(&out_json, "tests/fixtures/extract/paired.json")?;
+
+        Ok(())
+    }
+
+    #[test]
+    fn test_extract_paired_fastq_length_mismatch_errors() -> Result<()> {
+        let temp_dir = tempfile::tempdir()?;
+        let read_1 = temp_dir.path().join("read_1.fastq");
+        let read_2 = temp_dir.path().join("read_2.fastq");
+        fs::write(
+            &read_1,
+            b"@seq1/1\nACTTACGT\n+\nIIIIIIII\n@seq2/1\nTTTTTTTT\n+\nIIIIIIII\n",
+        )?;
+        fs::write(&read_2, b"@seq1/2\nGCTATAAT\n+\nIIIIIIII\n")?;
+
+        let args = CmdExtract {
+            in_fastx: read_1,
+            in_fastq_2: Some(read_2),
+            kmer_seq: Some(vec!["CTT".to_string()]),
+            kmer_file: None,
+            out_fastx: None,
+            q_size: None,
+            aho_corasick: false,
+            reverse_complement: false,
+            canonical: false,
+            out_log: None,
+            suppress_output: false,
+            json_log: None,
+            invert_match: false,
+            case_insensitive: false,
+            lowercase: false,
+            uppercase: false,
+        };
+
+        let error = extract_records(args).unwrap_err();
+        assert!(
+            error
+                .to_string()
+                .contains("The two input files have a different number of records")
+        );
 
         Ok(())
     }
