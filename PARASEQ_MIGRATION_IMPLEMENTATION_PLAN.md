@@ -136,6 +136,19 @@ Audit items:
 - Ability to reconstruct output records exactly enough for existing fixtures.
 - Paired-end unequal-length error behavior.
 
+Audit status:
+
+- Completed in `PARASEQ_COMPATIBILITY_AUDIT.md`.
+- Added guardrail tests in `tests/paraseq_compatibility.rs`.
+
+Confirmed findings:
+
+- `record.seq()` is the correct matching input.
+- `record.seq_raw()` includes FASTA line endings and must not be used for matching.
+- gz, bz2, and xz compressed FASTA inputs work through default `niffler` support.
+- Two-file paired-end processing works through `fastx::Collection`.
+- Paired-end unequal lengths produce a `paraseq` error that MerKurio should map to its current user-facing error text.
+
 Expected issue:
 
 - Exact output formatting may differ if `paraseq` reconstructs records instead of exposing original full record bytes. This must be tested against fixtures.
@@ -201,7 +214,7 @@ Risk:
 Recommendation:
 
 - Use normalized output if performance is the priority and document this as acceptable.
-- If exact fixture preservation is mandatory, first check whether `paraseq` exposes raw record bytes or equivalent write support.
+- `paraseq::Record` does not expose a public `needletail`-style full-record `all()` method, so exact multiline FASTA layout preservation should not be assumed.
 
 ## Phase 5: Serial Single-End `paraseq` Extract
 
@@ -246,16 +259,15 @@ Acceptance criteria:
 
 ## Phase 6: Serial Paired-End `paraseq` Extract
 
-Implement paired-end processing with `process_parallel_paired` deferred until serial behavior is proven.
+Implement paired-end processing using `fastx::Collection`.
 
 Flow:
 
 ```rust
-let reader_1 = paraseq::fastx::Reader::from_path(&args.in_fastx)?;
-let reader_2 = paraseq::fastx::Reader::from_path(&args.in_fastq_2)?;
-
-// Use paraseq paired record-set iteration if available serially,
-// or process paired record sets with equal record counts.
+let collection = paraseq::fastx::Collection::from_paths(
+    &[args.in_fastx.as_path(), args.in_fastq_2.as_ref().unwrap().as_path()],
+    paraseq::fastx::CollectionType::Paired,
+)?;
 ```
 
 Rules:
@@ -277,7 +289,7 @@ matched = file_1_matched || file_2_matched;
 Acceptance criteria:
 
 - Existing paired-end fixture passes.
-- If file lengths differ, return an error equivalent to the current behavior.
+- If file lengths differ, map the `paraseq` incompatible record-set-size error to MerKurio's current paired-end length error.
 - Output files still use `_1` and `_2` suffixes.
 
 ## Phase 7: Parallel Processor Design
@@ -520,4 +532,3 @@ After validation:
 - Keep `needletail` fallback until parity is proven.
 - Add fixture tests for exact output and log behavior.
 - Benchmark before changing defaults.
-
