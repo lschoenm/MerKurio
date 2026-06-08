@@ -122,6 +122,178 @@ fn record_set_len(record_set: &fastx::RecordSet) -> usize {
     }
 }
 
+fn process_borrowed_single_record<R: Record>(
+    processor: &ExtractProcessor,
+    record_index: u64,
+    record: R,
+    format: FastxFormat,
+) -> SingleResult {
+    let seq = record.seq();
+    processor.process_single_record(
+        record_index,
+        RecordInput {
+            id: record.id(),
+            seq: &seq,
+            qual: record.qual(),
+            format,
+        },
+    )
+}
+
+fn process_borrowed_paired_record<R1: Record, R2: Record>(
+    processor: &ExtractProcessor,
+    pair_index: u64,
+    record_1: R1,
+    format_1: FastxFormat,
+    record_2: R2,
+    format_2: FastxFormat,
+) -> PairedResult {
+    let seq_1 = record_1.seq();
+    let seq_2 = record_2.seq();
+    processor.process_paired_record(
+        pair_index,
+        RecordInput {
+            id: record_1.id(),
+            seq: &seq_1,
+            qual: record_1.qual(),
+            format: format_1,
+        },
+        RecordInput {
+            id: record_2.id(),
+            seq: &seq_2,
+            qual: record_2.qual(),
+            format: format_2,
+        },
+    )
+}
+
+#[allow(dead_code)]
+fn process_single_record_set_chunk(
+    processor: &ExtractProcessor,
+    chunk: SingleRecordSetWorkChunk,
+) -> Result<Vec<SingleResult>> {
+    let mut results = Vec::with_capacity(record_set_len(&chunk.record_set));
+    match &chunk.record_set {
+        fastx::RecordSet::Fasta(records) => {
+            for (offset, record) in records.iter().enumerate() {
+                let record = record.with_context(|| "Error during FASTQ/A record parsing.")?;
+                results.push(process_borrowed_single_record(
+                    processor,
+                    chunk.start_index + offset as u64,
+                    record,
+                    chunk.format,
+                ));
+            }
+        }
+        fastx::RecordSet::Fastq(records) => {
+            for (offset, record) in records.iter().enumerate() {
+                let record = record.with_context(|| "Error during FASTQ/A record parsing.")?;
+                results.push(process_borrowed_single_record(
+                    processor,
+                    chunk.start_index + offset as u64,
+                    record,
+                    chunk.format,
+                ));
+            }
+        }
+    }
+    Ok(results)
+}
+
+fn process_paired_record_iters<R1, R2, I1, I2>(
+    processor: &ExtractProcessor,
+    start_index: u64,
+    capacity: usize,
+    records_1: I1,
+    format_1: FastxFormat,
+    records_2: I2,
+    format_2: FastxFormat,
+) -> Result<Vec<PairedResult>>
+where
+    R1: Record,
+    R2: Record,
+    I1: Iterator<Item = std::result::Result<R1, paraseq::Error>>,
+    I2: Iterator<Item = std::result::Result<R2, paraseq::Error>>,
+{
+    let mut results = Vec::with_capacity(capacity);
+    for (offset, (record_1, record_2)) in records_1.zip(records_2).enumerate() {
+        let record_1 =
+            record_1.with_context(|| "Error during FASTQ record parsing of first file.")?;
+        let record_2 =
+            record_2.with_context(|| "Error during FASTQ record parsing of second file.")?;
+        results.push(process_borrowed_paired_record(
+            processor,
+            start_index + offset as u64,
+            record_1,
+            format_1,
+            record_2,
+            format_2,
+        ));
+    }
+    Ok(results)
+}
+
+#[allow(dead_code)]
+fn process_paired_record_set_chunk(
+    processor: &ExtractProcessor,
+    chunk: PairedRecordSetWorkChunk,
+) -> Result<Vec<PairedResult>> {
+    let len_1 = record_set_len(&chunk.record_set_1);
+    let len_2 = record_set_len(&chunk.record_set_2);
+    if len_1 != len_2 {
+        anyhow::bail!(
+            "The two input files have a different number of records. Please provide valid paired-end read files."
+        );
+    }
+
+    Ok(match (&chunk.record_set_1, &chunk.record_set_2) {
+        (fastx::RecordSet::Fasta(records_1), fastx::RecordSet::Fasta(records_2)) => {
+            process_paired_record_iters(
+                processor,
+                chunk.start_index,
+                len_1,
+                records_1.iter(),
+                chunk.format_1,
+                records_2.iter(),
+                chunk.format_2,
+            )?
+        }
+        (fastx::RecordSet::Fasta(records_1), fastx::RecordSet::Fastq(records_2)) => {
+            process_paired_record_iters(
+                processor,
+                chunk.start_index,
+                len_1,
+                records_1.iter(),
+                chunk.format_1,
+                records_2.iter(),
+                chunk.format_2,
+            )?
+        }
+        (fastx::RecordSet::Fastq(records_1), fastx::RecordSet::Fasta(records_2)) => {
+            process_paired_record_iters(
+                processor,
+                chunk.start_index,
+                len_1,
+                records_1.iter(),
+                chunk.format_1,
+                records_2.iter(),
+                chunk.format_2,
+            )?
+        }
+        (fastx::RecordSet::Fastq(records_1), fastx::RecordSet::Fastq(records_2)) => {
+            process_paired_record_iters(
+                processor,
+                chunk.start_index,
+                len_1,
+                records_1.iter(),
+                chunk.format_1,
+                records_2.iter(),
+                chunk.format_2,
+            )?
+        }
+    })
+}
+
 fn process_single_work_chunk(
     processor: &ExtractProcessor,
     chunk: SingleWorkChunk,
