@@ -98,6 +98,30 @@ struct PairedWorkChunk {
     pairs: Vec<OwnedPairedInput>,
 }
 
+#[allow(dead_code)]
+struct SingleRecordSetWorkChunk {
+    start_index: u64,
+    record_set: fastx::RecordSet,
+    format: FastxFormat,
+}
+
+#[allow(dead_code)]
+struct PairedRecordSetWorkChunk {
+    start_index: u64,
+    record_set_1: fastx::RecordSet,
+    record_set_2: fastx::RecordSet,
+    format_1: FastxFormat,
+    format_2: FastxFormat,
+}
+
+#[allow(dead_code)]
+fn record_set_len(record_set: &fastx::RecordSet) -> usize {
+    match record_set {
+        fastx::RecordSet::Fasta(records) => records.n_records(),
+        fastx::RecordSet::Fastq(records) => records.n_records(),
+    }
+}
+
 fn process_single_work_chunk(
     processor: &ExtractProcessor,
     chunk: SingleWorkChunk,
