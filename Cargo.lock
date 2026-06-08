@@ -475,6 +475,7 @@ dependencies = [
  "anyhow",
  "bam",
  "clap",
+ "crossbeam-channel",
  "jiff",
  "needletail",
  "paraseq",

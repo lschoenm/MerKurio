@@ -1,7 +1,9 @@
 use crate::fastx_output::FastxFormat;
 use crate::pattern_matching::PatternMatcher;
+use crossbeam_channel::bounded;
 use std::collections::BTreeMap;
 use std::sync::Arc;
+use std::thread;
 
 #[derive(Debug, Clone, Copy, Eq, PartialEq)]
 pub enum FileSlot {
@@ -273,6 +275,129 @@ pub struct ExtractSummary {
     pub pattern_hit_counts: Vec<u32>,
 }
 
+#[derive(Debug, Clone, Copy, Eq, PartialEq)]
+pub struct PipelineConfig {
+    pub worker_count: usize,
+    pub work_queue_bound: usize,
+    pub result_queue_bound: usize,
+}
+
+impl PipelineConfig {
+    pub fn new(worker_count: usize) -> Self {
+        Self {
+            worker_count,
+            work_queue_bound: worker_count.saturating_mul(2).max(1),
+            result_queue_bound: worker_count.saturating_mul(2).max(1),
+        }
+    }
+}
+
+pub fn run_bounded_ordered_pipeline<W, R, P, C>(
+    work_items: Vec<W>,
+    config: PipelineConfig,
+    process_work: P,
+    mut consume_ready: C,
+) -> anyhow::Result<()>
+where
+    W: Send + 'static,
+    R: IndexedResult + Send + 'static,
+    P: Fn(W) -> anyhow::Result<Vec<R>> + Send + Sync + 'static,
+    C: FnMut(R) -> anyhow::Result<()>,
+{
+    if config.worker_count == 0 {
+        anyhow::bail!("Pipeline worker count must be greater than zero.");
+    }
+    if config.work_queue_bound == 0 {
+        anyhow::bail!("Pipeline work queue bound must be greater than zero.");
+    }
+    if config.result_queue_bound == 0 {
+        anyhow::bail!("Pipeline result queue bound must be greater than zero.");
+    }
+
+    let (work_tx, work_rx) = bounded::<W>(config.work_queue_bound);
+    let (result_tx, result_rx) = bounded::<R>(config.result_queue_bound);
+
+    let producer = thread::spawn(move || -> anyhow::Result<()> {
+        for work in work_items {
+            work_tx.send(work).map_err(|_| {
+                anyhow::anyhow!("Pipeline work queue closed before all work was sent.")
+            })?;
+        }
+        Ok(())
+    });
+
+    let process_work = Arc::new(process_work);
+    let mut workers = Vec::with_capacity(config.worker_count);
+    for _ in 0..config.worker_count {
+        let work_rx = work_rx.clone();
+        let result_tx = result_tx.clone();
+        let process_work = Arc::clone(&process_work);
+        workers.push(thread::spawn(move || -> anyhow::Result<()> {
+            while let Ok(work) = work_rx.recv() {
+                for result in process_work(work)? {
+                    result_tx.send(result).map_err(|_| {
+                        anyhow::anyhow!(
+                            "Pipeline result queue closed before all results were sent."
+                        )
+                    })?;
+                }
+            }
+            Ok(())
+        }));
+    }
+    drop(result_tx);
+
+    let mut ordered_results = OrderedResultBuffer::new();
+    let mut consume_error = None;
+    while let Ok(result) = result_rx.recv() {
+        ordered_results.push(result);
+        for ready in ordered_results.drain_ready() {
+            if let Err(error) = consume_ready(ready) {
+                consume_error = Some(error);
+                break;
+            }
+        }
+        if consume_error.is_some() {
+            break;
+        }
+    }
+    drop(result_rx);
+
+    let producer_result = producer
+        .join()
+        .map_err(|_| anyhow::anyhow!("Pipeline producer thread panicked."))?;
+
+    let mut worker_error = None;
+    for worker in workers {
+        match worker.join() {
+            Ok(Ok(())) => {}
+            Ok(Err(error)) if worker_error.is_none() => worker_error = Some(error),
+            Ok(Err(_)) => {}
+            Err(_) if worker_error.is_none() => {
+                worker_error = Some(anyhow::anyhow!("Pipeline worker thread panicked."));
+            }
+            Err(_) => {}
+        }
+    }
+
+    producer_result?;
+    if let Some(error) = worker_error {
+        return Err(error);
+    }
+    if let Some(error) = consume_error {
+        return Err(error);
+    }
+    if ordered_results.pending_len() > 0 {
+        anyhow::bail!(
+            "Pipeline completed with {} out-of-order result(s) still pending; missing result index {}.",
+            ordered_results.pending_len(),
+            ordered_results.next_expected_index()
+        );
+    }
+
+    Ok(())
+}
+
 impl ExtractSummary {
     pub fn new(pattern_count: usize) -> Self {
         Self {
@@ -331,6 +456,7 @@ impl ExtractSummary {
 mod tests {
     use super::*;
     use crate::pattern_matching::PatternMatcher;
+    use std::time::Duration;
 
     fn bndmq_processor(logging_active: bool, suppress_output: bool) -> ExtractProcessor {
         let patterns = vec!["ACG".to_string()];
@@ -535,5 +661,63 @@ mod tests {
         assert_eq!(summary.nb_records_hit, (1, 0));
         assert_eq!(summary.nb_records_extracted, 2);
         assert_eq!(summary.pattern_hit_counts, vec![1]);
+    }
+
+    #[test]
+    fn bounded_pipeline_consumes_out_of_order_results_in_order() {
+        let processor = bndmq_processor(false, true);
+        let work_items = vec![0_u64, 1, 2, 3];
+        let config = PipelineConfig {
+            worker_count: 3,
+            work_queue_bound: 2,
+            result_queue_bound: 2,
+        };
+        let mut consumed = Vec::new();
+
+        run_bounded_ordered_pipeline(
+            work_items,
+            config,
+            move |index| {
+                if index == 0 {
+                    thread::sleep(Duration::from_millis(30));
+                }
+                Ok(vec![processor.process_single_record(
+                    index,
+                    RecordInput {
+                        id: b"seq",
+                        seq: b"ACG",
+                        qual: None,
+                        format: FastxFormat::Fasta,
+                    },
+                )])
+            },
+            |result| {
+                consumed.push(result.record_index);
+                Ok(())
+            },
+        )
+        .unwrap();
+
+        assert_eq!(consumed, vec![0, 1, 2, 3]);
+    }
+
+    #[test]
+    fn bounded_pipeline_rejects_zero_workers() {
+        let error = run_bounded_ordered_pipeline::<u64, SingleResult, _, _>(
+            Vec::new(),
+            PipelineConfig {
+                worker_count: 0,
+                work_queue_bound: 1,
+                result_queue_bound: 1,
+            },
+            |_| unreachable!(),
+            |_| Ok(()),
+        )
+        .unwrap_err();
+
+        assert_eq!(
+            error.to_string(),
+            "Pipeline worker count must be greater than zero."
+        );
     }
 }

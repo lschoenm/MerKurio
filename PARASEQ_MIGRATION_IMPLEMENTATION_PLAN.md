@@ -420,6 +420,13 @@ Indexing rule:
 
 If `paraseq`'s built-in parallel processor cannot preserve ordered output cleanly, use `paraseq` record sets manually with a bounded pipeline.
 
+Status:
+
+- Added `PipelineConfig` and `run_bounded_ordered_pipeline` in `src/extract_processing.rs`.
+- The pipeline uses bounded work/result queues, producer and worker threads, and `OrderedResultBuffer` for deterministic draining.
+- Added tests proving out-of-order worker completion is consumed in input order.
+- Current `extract` command is not wired to this pipeline yet; Phase 10 will add thread control and the parallel path.
+
 Pipeline:
 
 ```text
