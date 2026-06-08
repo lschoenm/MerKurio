@@ -73,6 +73,7 @@ fn resolve_extract_threads(requested_threads: usize) -> ThreadResolution {
 }
 
 #[derive(Debug)]
+#[allow(dead_code)]
 struct OwnedRecordInput {
     index: u64,
     id: Vec<u8>,
@@ -82,11 +83,13 @@ struct OwnedRecordInput {
 }
 
 #[derive(Debug)]
+#[allow(dead_code)]
 struct SingleWorkChunk {
     records: Vec<OwnedRecordInput>,
 }
 
 #[derive(Debug)]
+#[allow(dead_code)]
 struct OwnedPairedInput {
     index: u64,
     read_1: OwnedRecordInput,
@@ -94,18 +97,17 @@ struct OwnedPairedInput {
 }
 
 #[derive(Debug)]
+#[allow(dead_code)]
 struct PairedWorkChunk {
     pairs: Vec<OwnedPairedInput>,
 }
 
-#[allow(dead_code)]
 struct SingleRecordSetWorkChunk {
     start_index: u64,
     record_set: fastx::RecordSet,
     format: FastxFormat,
 }
 
-#[allow(dead_code)]
 struct PairedRecordSetWorkChunk {
     start_index: u64,
     record_set_1: fastx::RecordSet,
@@ -114,7 +116,6 @@ struct PairedRecordSetWorkChunk {
     format_2: FastxFormat,
 }
 
-#[allow(dead_code)]
 fn record_set_len(record_set: &fastx::RecordSet) -> usize {
     match record_set {
         fastx::RecordSet::Fasta(records) => records.n_records(),
@@ -167,7 +168,6 @@ fn process_borrowed_paired_record<R1: Record, R2: Record>(
     )
 }
 
-#[allow(dead_code)]
 fn process_single_record_set_chunk(
     processor: &ExtractProcessor,
     chunk: SingleRecordSetWorkChunk,
@@ -233,7 +233,6 @@ where
     Ok(results)
 }
 
-#[allow(dead_code)]
 fn process_paired_record_set_chunk(
     processor: &ExtractProcessor,
     chunk: PairedRecordSetWorkChunk,
@@ -294,6 +293,7 @@ fn process_paired_record_set_chunk(
     })
 }
 
+#[allow(dead_code)]
 fn process_single_work_chunk(
     processor: &ExtractProcessor,
     chunk: SingleWorkChunk,
@@ -315,6 +315,7 @@ fn process_single_work_chunk(
         .collect()
 }
 
+#[allow(dead_code)]
 fn process_paired_work_chunk(
     processor: &ExtractProcessor,
     chunk: PairedWorkChunk,
@@ -731,49 +732,30 @@ pub fn extract_records(args: CmdExtract) -> Result<()> {
             run_bounded_ordered_pipeline_with_producer(
                 PipelineConfig::new(worker_threads),
                 move |work_tx| {
-                    let mut record_set = reader.new_record_set();
-                    let mut chunk = SingleWorkChunk {
-                        records: Vec::with_capacity(EXTRACT_PARALLEL_CHUNK_SIZE),
-                    };
-                    let mut record_index = 0_u64;
+                    let mut start_index = 0_u64;
+                    let mut record_set =
+                        reader.new_record_set_with_size(EXTRACT_PARALLEL_CHUNK_SIZE);
                     while record_set
                         .fill(&mut reader)
                         .with_context(|| "Error during FASTQ/A record parsing.")?
                     {
-                        for record in record_set.iter() {
-                            let record =
-                                record.with_context(|| "Error during FASTQ/A record parsing.")?;
-                            let seq = record.seq();
-                            chunk.records.push(OwnedRecordInput {
-                                index: record_index,
-                                id: record.id().to_vec(),
-                                seq: seq.into_owned(),
-                                qual: record.qual().map(|qual| qual.to_vec()),
-                                format: output_format,
-                            });
-                            record_index += 1;
-                            if chunk.records.len() == EXTRACT_PARALLEL_CHUNK_SIZE {
-                                work_tx.send(chunk).map_err(|_| {
-                                    anyhow::anyhow!(
-                                        "Pipeline work queue closed before all single-end work was sent."
-                                    )
-                                })?;
-                                chunk = SingleWorkChunk {
-                                    records: Vec::with_capacity(EXTRACT_PARALLEL_CHUNK_SIZE),
-                                };
-                            }
-                        }
-                    }
-                    if !chunk.records.is_empty() {
+                        let len = record_set_len(&record_set);
+                        let chunk = SingleRecordSetWorkChunk {
+                            start_index,
+                            record_set,
+                            format: output_format,
+                        };
                         work_tx.send(chunk).map_err(|_| {
                             anyhow::anyhow!(
                                 "Pipeline work queue closed before all single-end work was sent."
                             )
                         })?;
+                        start_index += len as u64;
+                        record_set = reader.new_record_set_with_size(EXTRACT_PARALLEL_CHUNK_SIZE);
                     }
                     Ok(())
                 },
-                move |chunk| Ok(process_single_work_chunk(&worker_processor, chunk)),
+                move |chunk| process_single_record_set_chunk(&worker_processor, chunk),
                 |result| {
                     consume_single_result(
                         result,
@@ -928,12 +910,11 @@ pub fn extract_records(args: CmdExtract) -> Result<()> {
             run_bounded_ordered_pipeline_with_producer(
                 PipelineConfig::new(worker_threads),
                 move |work_tx| {
-                    let mut record_set_1 = reader.new_record_set();
-                    let mut record_set_2 = reader_2.new_record_set();
-                    let mut chunk = PairedWorkChunk {
-                        pairs: Vec::with_capacity(EXTRACT_PARALLEL_CHUNK_SIZE),
-                    };
-                    let mut pair_index = 0_u64;
+                    let mut start_index = 0_u64;
+                    let mut record_set_1 =
+                        reader.new_record_set_with_size(EXTRACT_PARALLEL_CHUNK_SIZE);
+                    let mut record_set_2 =
+                        reader_2.new_record_set_with_size(EXTRACT_PARALLEL_CHUNK_SIZE);
 
                     loop {
                         let filled_1 = record_set_1
@@ -953,66 +934,34 @@ pub fn extract_records(args: CmdExtract) -> Result<()> {
                             }
                         }
 
-                        let records_1 = record_set_1
-                            .iter()
-                            .collect::<std::result::Result<Vec<_>, _>>()
-                            .with_context(|| "Error during FASTQ record parsing of first file.")?;
-                        let records_2 = record_set_2
-                            .iter()
-                            .collect::<std::result::Result<Vec<_>, _>>()
-                            .with_context(|| "Error during FASTQ record parsing of second file.")?;
-
-                        if records_1.len() != records_2.len() {
+                        let len_1 = record_set_len(&record_set_1);
+                        let len_2 = record_set_len(&record_set_2);
+                        if len_1 != len_2 {
                             anyhow::bail!(
                                 "The two input files have a different number of records. Please provide valid paired-end read files."
                             );
                         }
 
-                        for (record_1, record_2) in records_1.into_iter().zip(records_2.into_iter())
-                        {
-                            let seq_1 = record_1.seq();
-                            let seq_2 = record_2.seq();
-                            chunk.pairs.push(OwnedPairedInput {
-                                index: pair_index,
-                                read_1: OwnedRecordInput {
-                                    index: pair_index,
-                                    id: record_1.id().to_vec(),
-                                    seq: seq_1.into_owned(),
-                                    qual: record_1.qual().map(|qual| qual.to_vec()),
-                                    format: output_format_1,
-                                },
-                                read_2: OwnedRecordInput {
-                                    index: pair_index,
-                                    id: record_2.id().to_vec(),
-                                    seq: seq_2.into_owned(),
-                                    qual: record_2.qual().map(|qual| qual.to_vec()),
-                                    format: output_format_2,
-                                },
-                            });
-                            pair_index += 1;
-                            if chunk.pairs.len() == EXTRACT_PARALLEL_CHUNK_SIZE {
-                                work_tx.send(chunk).map_err(|_| {
-                                    anyhow::anyhow!(
-                                        "Pipeline work queue closed before all paired-end work was sent."
-                                    )
-                                })?;
-                                chunk = PairedWorkChunk {
-                                    pairs: Vec::with_capacity(EXTRACT_PARALLEL_CHUNK_SIZE),
-                                };
-                            }
-                        }
-                    }
-
-                    if !chunk.pairs.is_empty() {
+                        let chunk = PairedRecordSetWorkChunk {
+                            start_index,
+                            record_set_1,
+                            record_set_2,
+                            format_1: output_format_1,
+                            format_2: output_format_2,
+                        };
                         work_tx.send(chunk).map_err(|_| {
                             anyhow::anyhow!(
                                 "Pipeline work queue closed before all paired-end work was sent."
                             )
                         })?;
+                        start_index += len_1 as u64;
+                        record_set_1 = reader.new_record_set_with_size(EXTRACT_PARALLEL_CHUNK_SIZE);
+                        record_set_2 =
+                            reader_2.new_record_set_with_size(EXTRACT_PARALLEL_CHUNK_SIZE);
                     }
                     Ok(())
                 },
-                move |chunk| Ok(process_paired_work_chunk(&worker_processor, chunk)),
+                move |chunk| process_paired_record_set_chunk(&worker_processor, chunk),
                 |result| {
                     consume_paired_result(
                         result,
