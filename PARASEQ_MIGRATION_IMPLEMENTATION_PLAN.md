@@ -538,6 +538,19 @@ Compression tests:
 
 ## Phase 12: Benchmarks
 
+Status:
+
+- Added `benchmarks/scripts/05-quick-extract-parallel-benchmarks.sh` for quick MerKurio-only `extract` comparisons.
+- The quick script generates local synthetic FASTA and paired-end FASTQ data, then compares `--threads 1`, `--threads 2`, `--threads 4`, and `--threads 0`.
+- Covered quick scenarios include single-end suppress-output JSON logging, single-end output writing with many patterns, paired-end suppress-output JSON logging, and paired-end output writing with many patterns.
+- The script uses `hyperfine` when available and falls back to `/usr/bin/time` otherwise.
+- Updated `benchmarks/README.md` with quick benchmark usage and environment overrides.
+- A local `RUNS=2 WARMUP=1` smoke run completed successfully; on these intentionally small generated inputs, serial execution was faster than parallel execution, which indicates thread/chunk overhead dominates below realistic workload sizes.
+- Added `benchmarks/scripts/06-realistic-extract-parallel-benchmarks.sh` for a larger paired-end workload: default `300,000` read pairs, `150 bp` reads, `250` deterministic `31 bp` patterns, sparse embedded hits, and `--threads 1/2/4/0`.
+- The realistic script benchmarks three modes: fast output without logging, JSON output with all-match reporting, and JSON suppress with all-match reporting.
+- Current CLI semantics require logging when `--suppress-output` is used, so suppress-output timings should be compared against JSON output timings, not against the fast no-log output path.
+- The realistic script supports `RECORDS`, `READ_LEN`, `PATTERNS`, `HIT_EVERY`, `THREADS`, `RUNS`, and `WARMUP` overrides.
+
 Benchmark these implementations:
 
 - Current `needletail` serial.

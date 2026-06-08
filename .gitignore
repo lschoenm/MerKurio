@@ -19,3 +19,5 @@ benchmarks/results/fastq/*
 !benchmarks/results/fastq/*csv
 benchmarks/results/fastq-paired/*
 !benchmarks/results/fastq-paired/*csv
+benchmarks/results/quick-extract/
+benchmarks/results/realistic-extract/
