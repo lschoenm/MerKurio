@@ -200,6 +200,10 @@ impl ExtractProcessor {
 
 pub trait IndexedResult {
     fn index(&self) -> u64;
+
+    fn index_span(&self) -> u64 {
+        1
+    }
 }
 
 impl IndexedResult for SingleResult {
@@ -249,7 +253,7 @@ impl<T: IndexedResult> OrderedResultBuffer<T> {
     pub fn drain_ready(&mut self) -> Vec<T> {
         let mut ready = Vec::new();
         while let Some(result) = self.pending.remove(&self.next_expected_index) {
-            self.next_expected_index += 1;
+            self.next_expected_index += result.index_span();
             ready.push(result);
         }
         ready
@@ -259,6 +263,22 @@ impl<T: IndexedResult> OrderedResultBuffer<T> {
 impl<T> Default for OrderedResultBuffer<T> {
     fn default() -> Self {
         Self::new()
+    }
+}
+
+#[derive(Debug)]
+struct ResultChunk<R> {
+    start_index: u64,
+    results: Vec<R>,
+}
+
+impl<R> IndexedResult for ResultChunk<R> {
+    fn index(&self) -> u64 {
+        self.start_index
+    }
+
+    fn index_span(&self) -> u64 {
+        self.results.len() as u64
     }
 }
 
@@ -312,7 +332,7 @@ where
     }
 
     let (work_tx, work_rx) = bounded::<W>(config.work_queue_bound);
-    let (result_tx, result_rx) = bounded::<R>(config.result_queue_bound);
+    let (result_tx, result_rx) = bounded::<ResultChunk<R>>(config.result_queue_bound);
 
     let producer = thread::spawn(move || -> anyhow::Result<()> {
         for work in work_items {
@@ -331,12 +351,18 @@ where
         let process_work = Arc::clone(&process_work);
         workers.push(thread::spawn(move || -> anyhow::Result<()> {
             while let Ok(work) = work_rx.recv() {
-                for result in process_work(work)? {
-                    result_tx.send(result).map_err(|_| {
-                        anyhow::anyhow!(
-                            "Pipeline result queue closed before all results were sent."
-                        )
-                    })?;
+                let results = process_work(work)?;
+                if let Some(first_result) = results.first() {
+                    result_tx
+                        .send(ResultChunk {
+                            start_index: first_result.index(),
+                            results,
+                        })
+                        .map_err(|_| {
+                            anyhow::anyhow!(
+                                "Pipeline result queue closed before all result chunks were sent."
+                            )
+                        })?;
                 }
             }
             Ok(())
@@ -346,11 +372,16 @@ where
 
     let mut ordered_results = OrderedResultBuffer::new();
     let mut consume_error = None;
-    while let Ok(result) = result_rx.recv() {
-        ordered_results.push(result);
-        for ready in ordered_results.drain_ready() {
-            if let Err(error) = consume_ready(ready) {
-                consume_error = Some(error);
+    while let Ok(result_chunk) = result_rx.recv() {
+        ordered_results.push(result_chunk);
+        for ready_chunk in ordered_results.drain_ready() {
+            for ready in ready_chunk.results {
+                if let Err(error) = consume_ready(ready) {
+                    consume_error = Some(error);
+                    break;
+                }
+            }
+            if consume_error.is_some() {
                 break;
             }
         }
@@ -386,7 +417,7 @@ where
     }
     if ordered_results.pending_len() > 0 {
         anyhow::bail!(
-            "Pipeline completed with {} out-of-order result(s) still pending; missing result index {}.",
+            "Pipeline completed with {} out-of-order result chunk(s) still pending; missing result index {}.",
             ordered_results.pending_len(),
             ordered_results.next_expected_index()
         );
@@ -419,7 +450,7 @@ where
     }
 
     let (work_tx, work_rx) = bounded::<W>(config.work_queue_bound);
-    let (result_tx, result_rx) = bounded::<R>(config.result_queue_bound);
+    let (result_tx, result_rx) = bounded::<ResultChunk<R>>(config.result_queue_bound);
 
     let producer = thread::spawn(move || produce_work(work_tx));
 
@@ -431,12 +462,18 @@ where
         let process_work = Arc::clone(&process_work);
         workers.push(thread::spawn(move || -> anyhow::Result<()> {
             while let Ok(work) = work_rx.recv() {
-                for result in process_work(work)? {
-                    result_tx.send(result).map_err(|_| {
-                        anyhow::anyhow!(
-                            "Pipeline result queue closed before all results were sent."
-                        )
-                    })?;
+                let results = process_work(work)?;
+                if let Some(first_result) = results.first() {
+                    result_tx
+                        .send(ResultChunk {
+                            start_index: first_result.index(),
+                            results,
+                        })
+                        .map_err(|_| {
+                            anyhow::anyhow!(
+                                "Pipeline result queue closed before all result chunks were sent."
+                            )
+                        })?;
                 }
             }
             Ok(())
@@ -446,11 +483,16 @@ where
 
     let mut ordered_results = OrderedResultBuffer::new();
     let mut consume_error = None;
-    while let Ok(result) = result_rx.recv() {
-        ordered_results.push(result);
-        for ready in ordered_results.drain_ready() {
-            if let Err(error) = consume_ready(ready) {
-                consume_error = Some(error);
+    while let Ok(result_chunk) = result_rx.recv() {
+        ordered_results.push(result_chunk);
+        for ready_chunk in ordered_results.drain_ready() {
+            for ready in ready_chunk.results {
+                if let Err(error) = consume_ready(ready) {
+                    consume_error = Some(error);
+                    break;
+                }
+            }
+            if consume_error.is_some() {
                 break;
             }
         }
@@ -486,7 +528,7 @@ where
     }
     if ordered_results.pending_len() > 0 {
         anyhow::bail!(
-            "Pipeline completed with {} out-of-order result(s) still pending; missing result index {}.",
+            "Pipeline completed with {} out-of-order result chunk(s) still pending; missing result index {}.",
             ordered_results.pending_len(),
             ordered_results.next_expected_index()
         );
@@ -787,6 +829,48 @@ mod tests {
                         format: FastxFormat::Fasta,
                     },
                 )])
+            },
+            |result| {
+                consumed.push(result.record_index);
+                Ok(())
+            },
+        )
+        .unwrap();
+
+        assert_eq!(consumed, vec![0, 1, 2, 3]);
+    }
+
+    #[test]
+    fn bounded_pipeline_consumes_chunked_results_in_order() {
+        let processor = bndmq_processor(false, true);
+        let work_items = vec![2_u64, 0];
+        let config = PipelineConfig {
+            worker_count: 2,
+            work_queue_bound: 2,
+            result_queue_bound: 2,
+        };
+        let mut consumed = Vec::new();
+
+        run_bounded_ordered_pipeline(
+            work_items,
+            config,
+            move |start_index| {
+                if start_index == 0 {
+                    thread::sleep(Duration::from_millis(30));
+                }
+                Ok((start_index..start_index + 2)
+                    .map(|index| {
+                        processor.process_single_record(
+                            index,
+                            RecordInput {
+                                id: b"seq",
+                                seq: b"ACG",
+                                qual: None,
+                                format: FastxFormat::Fasta,
+                            },
+                        )
+                    })
+                    .collect())
             },
             |result| {
                 consumed.push(result.record_index);
