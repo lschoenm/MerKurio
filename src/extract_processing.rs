@@ -50,7 +50,7 @@ pub struct SingleResult {
     pub matched: bool,
     pub extracted: bool,
     pub output: Option<OutputRecord>,
-    pub stats: RecordStats,
+    pub stats: Option<RecordStats>,
     pub hits: Vec<RecordHit>,
 }
 
@@ -61,8 +61,8 @@ pub struct PairedResult {
     pub extracted: bool,
     pub output_1: Option<OutputRecord>,
     pub output_2: Option<OutputRecord>,
-    pub stats_1: RecordStats,
-    pub stats_2: RecordStats,
+    pub stats_1: Option<RecordStats>,
+    pub stats_2: Option<RecordStats>,
     pub hits: Vec<RecordHit>,
 }
 
@@ -105,10 +105,12 @@ impl ExtractProcessor {
         record_index: u64,
         record: RecordInput<'_>,
     ) -> SingleResult {
-        let mut stats = RecordStats::new(record.seq.len());
         let mut hits = Vec::new();
+        let mut stats = self
+            .logging_active
+            .then(|| RecordStats::new(record.seq.len()));
         let matched =
-            self.process_record_matches(FileSlot::SingleOrFirst, record, &mut stats, &mut hits);
+            self.process_record_matches(FileSlot::SingleOrFirst, record, stats.as_mut(), &mut hits);
         let extracted = matched != self.invert_match;
         let output = self.output_record_if_needed(extracted, record);
 
@@ -128,16 +130,24 @@ impl ExtractProcessor {
         read_1: RecordInput<'_>,
         read_2: RecordInput<'_>,
     ) -> PairedResult {
-        let mut stats_1 = RecordStats::new(read_1.seq.len());
-        let mut stats_2 = RecordStats::new(read_2.seq.len());
+        let mut stats_1 = self
+            .logging_active
+            .then(|| RecordStats::new(read_1.seq.len()));
+        let mut stats_2 = self
+            .logging_active
+            .then(|| RecordStats::new(read_2.seq.len()));
         let mut hits = Vec::new();
 
-        let matched_1 =
-            self.process_record_matches(FileSlot::SingleOrFirst, read_1, &mut stats_1, &mut hits);
+        let matched_1 = self.process_record_matches(
+            FileSlot::SingleOrFirst,
+            read_1,
+            stats_1.as_mut(),
+            &mut hits,
+        );
         let matched_2 = if !self.logging_active && matched_1 {
             false
         } else {
-            self.process_record_matches(FileSlot::Second, read_2, &mut stats_2, &mut hits)
+            self.process_record_matches(FileSlot::Second, read_2, stats_2.as_mut(), &mut hits)
         };
         let matched = matched_1 || matched_2;
         let extracted = matched != self.invert_match;
@@ -160,10 +170,11 @@ impl ExtractProcessor {
         &self,
         file_slot: FileSlot,
         record: RecordInput<'_>,
-        stats: &mut RecordStats,
+        stats: Option<&mut RecordStats>,
         hits: &mut Vec<RecordHit>,
     ) -> bool {
         if self.logging_active {
+            let stats = stats.expect("logging-active record processing requires stats");
             self.matcher.for_each_match(record.seq, |hit| {
                 stats.hit_count += 1;
                 stats.distinct_record_hit = true;
@@ -550,7 +561,9 @@ impl ExtractSummary {
     }
 
     pub fn merge_single(&mut self, result: &SingleResult) {
-        self.merge_stats(FileSlot::SingleOrFirst, &result.stats);
+        if let Some(stats) = &result.stats {
+            self.merge_stats(FileSlot::SingleOrFirst, stats);
+        }
         self.merge_pattern_hits(&result.hits);
         if result.extracted {
             self.nb_records_extracted += 1;
@@ -558,8 +571,12 @@ impl ExtractSummary {
     }
 
     pub fn merge_paired(&mut self, result: &PairedResult) {
-        self.merge_stats(FileSlot::SingleOrFirst, &result.stats_1);
-        self.merge_stats(FileSlot::Second, &result.stats_2);
+        if let Some(stats) = &result.stats_1 {
+            self.merge_stats(FileSlot::SingleOrFirst, stats);
+        }
+        if let Some(stats) = &result.stats_2 {
+            self.merge_stats(FileSlot::Second, stats);
+        }
         self.merge_pattern_hits(&result.hits);
         if result.extracted {
             self.nb_records_extracted += 2;
@@ -627,9 +644,7 @@ mod tests {
         assert!(result.matched);
         assert!(result.extracted);
         assert!(result.hits.is_empty());
-        assert_eq!(result.stats.hit_count, 0);
-        assert!(!result.stats.distinct_record_hit);
-        assert_eq!(result.stats.num_bases, 7);
+        assert!(result.stats.is_none());
         assert_eq!(result.output.unwrap().seq, b"TTACGTT");
     }
 
@@ -648,8 +663,10 @@ mod tests {
 
         assert!(result.matched);
         assert!(result.extracted);
-        assert_eq!(result.stats.hit_count, 2);
-        assert!(result.stats.distinct_record_hit);
+        let stats = result.stats.as_ref().unwrap();
+        assert_eq!(stats.hit_count, 2);
+        assert!(stats.distinct_record_hit);
+        assert_eq!(stats.num_bases, 6);
         assert_eq!(
             result.hits,
             vec![
@@ -691,8 +708,8 @@ mod tests {
         assert_eq!(result.pair_index, 3);
         assert!(result.matched);
         assert!(result.extracted);
-        assert_eq!(result.stats_1.num_bases, 3);
-        assert_eq!(result.stats_2.num_bases, 3);
+        assert!(result.stats_1.is_none());
+        assert!(result.stats_2.is_none());
         assert!(result.hits.is_empty());
         assert!(result.output_1.is_none());
         assert!(result.output_2.is_none());
