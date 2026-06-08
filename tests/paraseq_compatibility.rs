@@ -1,7 +1,7 @@
-use paraseq::{fastx, Record};
+use paraseq::{Record, fastx};
 use std::sync::{
-    atomic::{AtomicUsize, Ordering},
     Arc,
+    atomic::{AtomicUsize, Ordering},
 };
 
 #[derive(Debug, Eq, PartialEq)]
@@ -123,7 +123,10 @@ fn paraseq_errors_on_mismatched_paired_end_lengths() {
     std::fs::write(&read_2, b"@seq1/2\nGCTATAAT\n+\nIIIIIIII\n").unwrap();
 
     let collection = fastx::Collection::from_paths(
-        &[read_1.to_string_lossy().as_ref(), read_2.to_string_lossy().as_ref()],
+        &[
+            read_1.to_string_lossy().as_ref(),
+            read_2.to_string_lossy().as_ref(),
+        ],
         fastx::CollectionType::Paired,
     )
     .unwrap();

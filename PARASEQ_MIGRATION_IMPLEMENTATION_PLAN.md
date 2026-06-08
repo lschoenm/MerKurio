@@ -164,6 +164,12 @@ Decision point:
 
 Create a parser-independent output writer helper.
 
+Status:
+
+- Implemented in `src/fastx_output.rs`.
+- The helper writes normalized FASTA/FASTQ records and validates FASTQ quality presence/length.
+- Current `extract` still uses `needletail::SequenceRecord::write`; the normalized writer is intentionally not wired in until the `paraseq` path is implemented.
+
 Suggested type:
 
 ```rust

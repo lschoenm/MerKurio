@@ -1,5 +1,6 @@
 pub mod cmd_extract;
 pub mod cmd_tag;
+pub mod fastx_output;
 pub mod helpers;
 pub mod logger;
 pub mod pattern_matching;
