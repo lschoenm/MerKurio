@@ -1081,11 +1081,152 @@ mod tests {
     use std::fs;
     use std::path::Path;
 
+    struct SingleExtractRun {
+        _temp_dir: tempfile::TempDir,
+        out_fastx: PathBuf,
+        out_log: PathBuf,
+        out_json: PathBuf,
+    }
+
+    #[derive(Clone)]
+    struct SingleExtractOptions {
+        input: PathBuf,
+        patterns: Vec<String>,
+        threads: usize,
+        aho_corasick: bool,
+        case_insensitive: bool,
+        invert_match: bool,
+        suppress_output: bool,
+        reverse_complement: bool,
+        log: bool,
+        json: bool,
+    }
+
+    impl SingleExtractOptions {
+        fn simple(patterns: Vec<String>, threads: usize) -> Self {
+            Self {
+                input: PathBuf::from("tests/fixtures/input/simple.fasta"),
+                patterns,
+                threads,
+                aho_corasick: false,
+                case_insensitive: false,
+                invert_match: false,
+                suppress_output: false,
+                reverse_complement: true,
+                log: true,
+                json: true,
+            }
+        }
+    }
+
+    fn run_single_extract(options: SingleExtractOptions) -> Result<SingleExtractRun> {
+        let temp_dir = tempfile::tempdir()?;
+        let out_fastx = temp_dir.path().join("out.fasta");
+        let out_log = temp_dir.path().join("out.log");
+        let out_json = temp_dir.path().join("out.json");
+
+        let args = CmdExtract {
+            in_fastx: options.input,
+            in_fastq_2: None,
+            kmer_seq: Some(options.patterns),
+            kmer_file: None,
+            out_fastx: if options.suppress_output {
+                None
+            } else {
+                Some(out_fastx.clone())
+            },
+            q_size: None,
+            aho_corasick: options.aho_corasick,
+            reverse_complement: options.reverse_complement,
+            canonical: false,
+            out_log: options.log.then_some(out_log.clone()),
+            suppress_output: options.suppress_output,
+            json_log: options.json.then_some(out_json.clone()),
+            invert_match: options.invert_match,
+            case_insensitive: options.case_insensitive,
+            lowercase: false,
+            uppercase: false,
+            threads: options.threads,
+        };
+
+        extract_records(args)?;
+
+        Ok(SingleExtractRun {
+            _temp_dir: temp_dir,
+            out_fastx,
+            out_log,
+            out_json,
+        })
+    }
+
     /// Compare FASTA output with fixture
     fn compare_fasta_output(actual_path: &Path, expected_path: &str) -> Result<()> {
         let expected = fs::read_to_string(expected_path)?;
         let actual = fs::read_to_string(actual_path)?;
         assert_eq!(expected, actual, "FASTA output does not match fixture");
+        Ok(())
+    }
+
+    fn compare_text_files(actual_path: &Path, expected_path: &Path) -> Result<()> {
+        let expected = fs::read_to_string(expected_path)?;
+        let actual = fs::read_to_string(actual_path)?;
+        assert_eq!(expected, actual);
+        Ok(())
+    }
+
+    fn compare_log_outputs(actual_path: &Path, expected_path: &Path) -> Result<()> {
+        let expected_log = fs::read_to_string(expected_path)?;
+        let actual_log = fs::read_to_string(actual_path)?;
+        let expected_lines: Vec<&str> = expected_log.lines().skip(4).collect();
+        let actual_lines: Vec<&str> = actual_log.lines().skip(4).collect();
+        assert_eq!(expected_lines, actual_lines);
+        Ok(())
+    }
+
+    fn compare_json_outputs(actual_path: &Path, expected_path: &Path) -> Result<()> {
+        let expected_json: serde_json::Value =
+            serde_json::from_str(&fs::read_to_string(expected_path)?)?;
+        let actual_json: serde_json::Value =
+            serde_json::from_str(&fs::read_to_string(actual_path)?)?;
+
+        assert_eq!(
+            expected_json["matching_records"],
+            actual_json["matching_records"]
+        );
+        assert_eq!(
+            expected_json["summary_statistics"],
+            actual_json["summary_statistics"]
+        );
+        assert_eq!(
+            expected_json["paired_end_reads_statistics"],
+            actual_json["paired_end_reads_statistics"]
+        );
+        assert_eq!(
+            expected_json["pattern_hit_counts"],
+            actual_json["pattern_hit_counts"]
+        );
+        assert_eq!(
+            expected_json["meta_information"]["search_algorithm"],
+            actual_json["meta_information"]["search_algorithm"]
+        );
+        assert_eq!(
+            expected_json["meta_information"]["inverted_matching"],
+            actual_json["meta_information"]["inverted_matching"]
+        );
+        assert_eq!(
+            expected_json["meta_information"]["case_insensitive"],
+            actual_json["meta_information"]["case_insensitive"]
+        );
+        Ok(())
+    }
+
+    fn assert_single_runs_match(
+        actual: &SingleExtractRun,
+        expected: &SingleExtractRun,
+    ) -> Result<()> {
+        compare_text_files(&actual.out_fastx, &expected.out_fastx)?;
+        compare_log_outputs(&actual.out_log, &expected.out_log)?;
+        compare_json_outputs(&actual.out_json, &expected.out_json)?;
         Ok(())
     }
 
@@ -1496,6 +1637,236 @@ mod tests {
     }
 
     #[test]
+    fn test_extract_parallel_threads_2_and_4_match_serial_single_end() -> Result<()> {
+        let serial = run_single_extract(SingleExtractOptions::simple(vec!["ACG".to_string()], 1))?;
+        let parallel_2 =
+            run_single_extract(SingleExtractOptions::simple(vec!["ACG".to_string()], 2))?;
+        let parallel_4 =
+            run_single_extract(SingleExtractOptions::simple(vec!["ACG".to_string()], 4))?;
+
+        assert_single_runs_match(&parallel_2, &serial)?;
+        assert_single_runs_match(&parallel_4, &serial)?;
+
+        Ok(())
+    }
+
+    #[test]
+    fn test_extract_parallel_threads_4_is_deterministic() -> Result<()> {
+        let first = run_single_extract(SingleExtractOptions::simple(vec!["ACG".to_string()], 4))?;
+        let second = run_single_extract(SingleExtractOptions::simple(vec!["ACG".to_string()], 4))?;
+        let third = run_single_extract(SingleExtractOptions::simple(vec!["ACG".to_string()], 4))?;
+
+        assert_single_runs_match(&second, &first)?;
+        assert_single_runs_match(&third, &first)?;
+
+        Ok(())
+    }
+
+    #[test]
+    fn test_extract_parallel_inverted_matches_serial() -> Result<()> {
+        let mut serial_options = SingleExtractOptions::simple(vec!["ACG".to_string()], 1);
+        serial_options.invert_match = true;
+        let mut parallel_options = serial_options.clone();
+        parallel_options.threads = 4;
+
+        let serial = run_single_extract(serial_options)?;
+        let parallel = run_single_extract(parallel_options)?;
+
+        assert_single_runs_match(&parallel, &serial)?;
+
+        Ok(())
+    }
+
+    #[test]
+    fn test_extract_parallel_aho_corasick_matches_serial() -> Result<()> {
+        let mut serial_options = SingleExtractOptions::simple(vec!["ACG".to_string()], 1);
+        serial_options.aho_corasick = true;
+        let mut parallel_options = serial_options.clone();
+        parallel_options.threads = 4;
+
+        let serial = run_single_extract(serial_options)?;
+        let parallel = run_single_extract(parallel_options)?;
+
+        assert_single_runs_match(&parallel, &serial)?;
+
+        Ok(())
+    }
+
+    #[test]
+    fn test_extract_parallel_bndmq_matches_serial() -> Result<()> {
+        let serial = run_single_extract(SingleExtractOptions::simple(vec!["ACG".to_string()], 1))?;
+        let parallel =
+            run_single_extract(SingleExtractOptions::simple(vec!["ACG".to_string()], 4))?;
+
+        assert_single_runs_match(&parallel, &serial)?;
+
+        Ok(())
+    }
+
+    #[test]
+    fn test_extract_parallel_case_insensitive_matches_serial() -> Result<()> {
+        let mut serial_options = SingleExtractOptions::simple(vec!["acg".to_string()], 1);
+        serial_options.case_insensitive = true;
+        let mut parallel_options = serial_options.clone();
+        parallel_options.threads = 4;
+
+        let serial = run_single_extract(serial_options)?;
+        let parallel = run_single_extract(parallel_options)?;
+
+        assert_single_runs_match(&parallel, &serial)?;
+
+        Ok(())
+    }
+
+    #[test]
+    fn test_extract_parallel_fixed_width_fasta_matches_serial() -> Result<()> {
+        let mut serial_options = SingleExtractOptions::simple(vec!["DKAT".to_string()], 1);
+        serial_options.input = PathBuf::from("tests/fixtures/input/fixed-width.faa");
+        serial_options.reverse_complement = false;
+        let mut parallel_options = serial_options.clone();
+        parallel_options.threads = 4;
+
+        let serial = run_single_extract(serial_options)?;
+        let parallel = run_single_extract(parallel_options)?;
+
+        assert_single_runs_match(&parallel, &serial)?;
+
+        Ok(())
+    }
+
+    #[test]
+    fn test_extract_parallel_no_matches() -> Result<()> {
+        let mut options = SingleExtractOptions::simple(vec!["GGG".to_string()], 4);
+        options.reverse_complement = false;
+        let run = run_single_extract(options)?;
+        let json: serde_json::Value = serde_json::from_str(&fs::read_to_string(&run.out_json)?)?;
+
+        assert_eq!(fs::read_to_string(&run.out_fastx)?, "");
+        assert_eq!(json["summary_statistics"]["number_of_matches"], 0);
+        assert_eq!(
+            json["paired_end_reads_statistics"]["number_of_extracted_records"],
+            0
+        );
+
+        Ok(())
+    }
+
+    #[test]
+    fn test_extract_parallel_all_records_match() -> Result<()> {
+        let mut options = SingleExtractOptions::simple(vec!["T".to_string()], 4);
+        options.reverse_complement = false;
+        let run = run_single_extract(options)?;
+        let json: serde_json::Value = serde_json::from_str(&fs::read_to_string(&run.out_json)?)?;
+
+        assert_eq!(json["summary_statistics"]["number_of_records_searched"], 3);
+        assert_eq!(
+            json["paired_end_reads_statistics"]["number_of_extracted_records"],
+            3
+        );
+
+        Ok(())
+    }
+
+    #[test]
+    fn test_extract_parallel_dense_matches_with_verbose_logging() -> Result<()> {
+        let temp_dir = tempfile::tempdir()?;
+        let input = temp_dir.path().join("dense.fasta");
+        fs::write(&input, b">dense\nAAAAA\n>sparse\nTTTTA\n")?;
+
+        let mut options = SingleExtractOptions::simple(vec!["A".to_string()], 4);
+        options.input = input;
+        options.reverse_complement = false;
+        let run = run_single_extract(options)?;
+        let json: serde_json::Value = serde_json::from_str(&fs::read_to_string(&run.out_json)?)?;
+
+        assert_eq!(json["summary_statistics"]["number_of_records_searched"], 2);
+        assert_eq!(json["summary_statistics"]["number_of_matches"], 6);
+        assert_eq!(
+            json["paired_end_reads_statistics"]["number_of_extracted_records"],
+            2
+        );
+
+        Ok(())
+    }
+
+    #[test]
+    fn test_extract_parallel_sparse_matches_with_verbose_logging() -> Result<()> {
+        let temp_dir = tempfile::tempdir()?;
+        let input = temp_dir.path().join("sparse.fasta");
+        fs::write(&input, b">hit\nACGT\n>miss1\nTTTT\n>miss2\nCCCC\n")?;
+
+        let mut options = SingleExtractOptions::simple(vec!["ACG".to_string()], 4);
+        options.input = input;
+        options.reverse_complement = false;
+        let run = run_single_extract(options)?;
+        let json: serde_json::Value = serde_json::from_str(&fs::read_to_string(&run.out_json)?)?;
+
+        assert_eq!(json["summary_statistics"]["number_of_records_searched"], 3);
+        assert_eq!(json["summary_statistics"]["number_of_matches"], 1);
+        assert_eq!(
+            json["paired_end_reads_statistics"]["number_of_extracted_records"],
+            1
+        );
+
+        Ok(())
+    }
+
+    #[test]
+    fn test_extract_parallel_suppress_output_logs_only() -> Result<()> {
+        let mut options = SingleExtractOptions::simple(vec!["ACG".to_string()], 4);
+        options.suppress_output = true;
+        let run = run_single_extract(options)?;
+        let json: serde_json::Value = serde_json::from_str(&fs::read_to_string(&run.out_json)?)?;
+
+        assert!(!run.out_fastx.exists());
+        assert!(run.out_log.exists());
+        assert_eq!(
+            json["paired_end_reads_statistics"]["number_of_extracted_records"],
+            2
+        );
+
+        Ok(())
+    }
+
+    #[test]
+    fn test_extract_parallel_compressed_fasta_inputs_match_uncompressed() -> Result<()> {
+        let mut uncompressed_options = SingleExtractOptions::simple(vec!["ATGG".to_string()], 4);
+        uncompressed_options.input = PathBuf::from("tests/data/sample.fasta");
+        uncompressed_options.reverse_complement = false;
+        let uncompressed = run_single_extract(uncompressed_options.clone())?;
+
+        for compressed_path in [
+            "tests/data/sample.fasta.gz",
+            "tests/data/sample.fasta.bz2",
+            "tests/data/sample.fasta.xz",
+        ] {
+            let mut compressed_options = uncompressed_options.clone();
+            compressed_options.input = PathBuf::from(compressed_path);
+            let compressed = run_single_extract(compressed_options)?;
+            compare_text_files(&compressed.out_fastx, &uncompressed.out_fastx)?;
+
+            let expected_json: serde_json::Value =
+                serde_json::from_str(&fs::read_to_string(&uncompressed.out_json)?)?;
+            let actual_json: serde_json::Value =
+                serde_json::from_str(&fs::read_to_string(&compressed.out_json)?)?;
+            assert_eq!(
+                expected_json["summary_statistics"],
+                actual_json["summary_statistics"]
+            );
+            assert_eq!(
+                expected_json["paired_end_reads_statistics"],
+                actual_json["paired_end_reads_statistics"]
+            );
+            assert_eq!(
+                expected_json["pattern_hit_counts"],
+                actual_json["pattern_hit_counts"]
+            );
+        }
+
+        Ok(())
+    }
+
+    #[test]
     fn test_extract_thread_resolution_auto_detects_available_threads() {
         assert_eq!(
             resolve_extract_threads_with_available(0, 8),
@@ -1584,6 +1955,47 @@ mod tests {
             lowercase: false,
             uppercase: false,
             threads: 1,
+        };
+
+        let error = extract_records(args).unwrap_err();
+        assert!(
+            error
+                .to_string()
+                .contains("The two input files have a different number of records")
+        );
+
+        Ok(())
+    }
+
+    #[test]
+    fn test_extract_parallel_paired_fastq_length_mismatch_errors() -> Result<()> {
+        let temp_dir = tempfile::tempdir()?;
+        let read_1 = temp_dir.path().join("read_1.fastq");
+        let read_2 = temp_dir.path().join("read_2.fastq");
+        fs::write(
+            &read_1,
+            b"@seq1/1\nACTTACGT\n+\nIIIIIIII\n@seq2/1\nTTTTTTTT\n+\nIIIIIIII\n",
+        )?;
+        fs::write(&read_2, b"@seq1/2\nGCTATAAT\n+\nIIIIIIII\n")?;
+
+        let args = CmdExtract {
+            in_fastx: read_1,
+            in_fastq_2: Some(read_2),
+            kmer_seq: Some(vec!["CTT".to_string()]),
+            kmer_file: None,
+            out_fastx: None,
+            q_size: None,
+            aho_corasick: false,
+            reverse_complement: false,
+            canonical: false,
+            out_log: None,
+            suppress_output: false,
+            json_log: None,
+            invert_match: false,
+            case_insensitive: false,
+            lowercase: false,
+            uppercase: false,
+            threads: 4,
         };
 
         let error = extract_records(args).unwrap_err();

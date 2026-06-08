@@ -492,6 +492,16 @@ Use this for benchmarking and tuning only.
 
 ## Phase 11: Tests
 
+Status:
+
+- Added reusable extract test helpers for temp output generation and metadata-tolerant log/JSON comparisons.
+- Added single-end serial-vs-parallel parity tests for `--threads 2` and `--threads 4`.
+- Added repeated `--threads 4` determinism coverage.
+- Added parallel behavior coverage for no matches, all records match, dense verbose matches, sparse verbose matches, `--suppress-output`, `--invert-match`, fixed-width FASTA, Aho-Corasick, BNDMq, and case-insensitive matching.
+- Added paired-end parallel mismatched-length error coverage.
+- Added gzip, bzip2, and xz extract-path coverage by comparing compressed sample inputs against the uncompressed sample.
+- Existing fixture tests continue to cover serial single-end FASTA, inverted FASTA, fixed-width FASTA, paired-end FASTQ, plain log, and JSON output.
+
 Parity tests:
 
 - Existing single-end FASTA fixture.
