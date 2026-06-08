@@ -38,6 +38,40 @@ use crate::pattern_matching::PatternMatcher;
 
 const EXTRACT_PARALLEL_CHUNK_SIZE: usize = 512;
 
+#[derive(Debug, PartialEq, Eq)]
+struct ThreadResolution {
+    effective_threads: usize,
+    auto_detected: bool,
+    clamped: bool,
+}
+
+fn resolve_extract_threads_with_available(
+    requested_threads: usize,
+    available_threads: usize,
+) -> ThreadResolution {
+    let available_threads = available_threads.max(1);
+    if requested_threads == 0 {
+        return ThreadResolution {
+            effective_threads: available_threads,
+            auto_detected: true,
+            clamped: false,
+        };
+    }
+
+    ThreadResolution {
+        effective_threads: requested_threads.min(available_threads),
+        auto_detected: false,
+        clamped: requested_threads > available_threads,
+    }
+}
+
+fn resolve_extract_threads(requested_threads: usize) -> ThreadResolution {
+    let available_threads = std::thread::available_parallelism()
+        .map(|parallelism| parallelism.get())
+        .unwrap_or(1);
+    resolve_extract_threads_with_available(requested_threads, available_threads)
+}
+
 #[derive(Debug)]
 struct OwnedRecordInput {
     index: u64,
@@ -309,7 +343,7 @@ pub struct CmdExtract {
     )]
     aho_corasick: bool,
 
-    /// Number of worker threads for extract pattern matching. Use 1 for serial processing.
+    /// Number of worker threads for extract pattern matching. Use 0 to auto-detect available cores.
     #[clap(short = 't', long, default_value_t = 1)]
     threads: usize,
 }
@@ -428,9 +462,14 @@ pub fn extract_records(args: CmdExtract) -> Result<()> {
         logger.flush(); // Ensure header is written before records
     }
 
-    if args.threads == 0 {
-        anyhow::bail!("Number of extract worker threads must be greater than zero.");
+    let thread_resolution = resolve_extract_threads(args.threads);
+    if thread_resolution.clamped {
+        eprintln!(
+            "Warning: requested {} extract worker threads, but only {} are available; using {} threads.",
+            args.threads, thread_resolution.effective_threads, thread_resolution.effective_threads
+        );
     }
+    let worker_threads = thread_resolution.effective_threads;
 
     let matcher = Arc::new(PatternMatcher::new(
         &pattern_list,
@@ -483,7 +522,7 @@ pub fn extract_records(args: CmdExtract) -> Result<()> {
             }
         };
 
-        if args.threads > 1 {
+        if worker_threads > 1 {
             let processor = ExtractProcessor::new(
                 Arc::clone(&matcher),
                 pattern_list.len(),
@@ -494,7 +533,7 @@ pub fn extract_records(args: CmdExtract) -> Result<()> {
             let worker_processor = processor.clone();
             let mut summary = ExtractSummary::new(pattern_list.len());
             run_bounded_ordered_pipeline_with_producer(
-                PipelineConfig::new(args.threads),
+                PipelineConfig::new(worker_threads),
                 move |work_tx| {
                     let mut record_set = reader.new_record_set();
                     let mut chunk = SingleWorkChunk {
@@ -680,7 +719,7 @@ pub fn extract_records(args: CmdExtract) -> Result<()> {
             }
         };
 
-        if args.threads > 1 {
+        if worker_threads > 1 {
             let processor = ExtractProcessor::new(
                 Arc::clone(&matcher),
                 pattern_list.len(),
@@ -691,7 +730,7 @@ pub fn extract_records(args: CmdExtract) -> Result<()> {
             let worker_processor = processor.clone();
             let mut summary = ExtractSummary::new(pattern_list.len());
             run_bounded_ordered_pipeline_with_producer(
-                PipelineConfig::new(args.threads),
+                PipelineConfig::new(worker_threads),
                 move |work_tx| {
                     let mut record_set_1 = reader.new_record_set();
                     let mut record_set_2 = reader_2.new_record_set();
@@ -1457,20 +1496,49 @@ mod tests {
     }
 
     #[test]
-    fn test_extract_zero_threads_errors() -> Result<()> {
+    fn test_extract_thread_resolution_auto_detects_available_threads() {
+        assert_eq!(
+            resolve_extract_threads_with_available(0, 8),
+            ThreadResolution {
+                effective_threads: 8,
+                auto_detected: true,
+                clamped: false,
+            }
+        );
+    }
+
+    #[test]
+    fn test_extract_thread_resolution_clamps_to_available_threads() {
+        assert_eq!(
+            resolve_extract_threads_with_available(16, 8),
+            ThreadResolution {
+                effective_threads: 8,
+                auto_detected: false,
+                clamped: true,
+            }
+        );
+    }
+
+    #[test]
+    fn test_extract_auto_threads_matches_serial_fixtures() -> Result<()> {
+        let temp_dir = tempfile::tempdir()?;
+        let out_fasta = temp_dir.path().join("out.fasta");
+        let out_log = temp_dir.path().join("out.log");
+        let out_json = temp_dir.path().join("out.json");
+
         let args = CmdExtract {
             in_fastx: PathBuf::from("tests/fixtures/input/simple.fasta"),
             in_fastq_2: None,
             kmer_seq: Some(vec!["ACG".to_string()]),
             kmer_file: None,
-            out_fastx: None,
+            out_fastx: Some(out_fasta.clone()),
             q_size: None,
             aho_corasick: false,
-            reverse_complement: false,
+            reverse_complement: true,
             canonical: false,
-            out_log: None,
+            out_log: Some(out_log.clone()),
             suppress_output: false,
-            json_log: None,
+            json_log: Some(out_json.clone()),
             invert_match: false,
             case_insensitive: false,
             lowercase: false,
@@ -1478,12 +1546,11 @@ mod tests {
             threads: 0,
         };
 
-        let error = extract_records(args).unwrap_err();
-        assert!(
-            error
-                .to_string()
-                .contains("Number of extract worker threads must be greater than zero")
-        );
+        extract_records(args)?;
+
+        compare_fasta_output(&out_fasta, "tests/fixtures/extract/simple.extracted.fasta")?;
+        compare_log_output(&out_log, "tests/fixtures/extract/simple.log")?;
+        compare_json_output(&out_json, "tests/fixtures/extract/simple.json")?;
 
         Ok(())
     }

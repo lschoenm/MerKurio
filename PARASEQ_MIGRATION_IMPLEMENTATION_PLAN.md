@@ -462,10 +462,11 @@ Status:
 
 - Added `-t, --threads <N>` to `extract`; default remains `1`.
 - `--threads 1` keeps the serial `paraseq` record-set loop.
+- `--threads 0` auto-detects available parallelism and uses all available logical cores.
 - `--threads > 1` uses a bounded producer/worker/ordered-consumer pipeline for both single-end and paired-end inputs.
+- Explicit `--threads <N>` values above available parallelism are clamped to the available logical core count and emit a warning.
 - Worker threads own copied record IDs, sequences, and qualities in fixed-size chunks, so pattern matching runs concurrently while output and logs remain deterministic.
-- `--threads 0` is rejected at runtime.
-- Added fixture parity tests for `threads=4` single-end and paired-end extraction, plus parser coverage for `--threads`.
+- Added fixture parity tests for `threads=0` and `threads=4` single-end extraction, `threads=4` paired-end extraction, plus parser coverage for `--threads`.
 
 Suggested option:
 
@@ -475,8 +476,10 @@ Suggested option:
 
 Semantics:
 
+- `--threads 0` auto-detects available logical cores.
 - `--threads 1` uses serial `paraseq`.
 - `--threads > 1` uses parallel `paraseq`.
+- `--threads N` where `N` exceeds available logical cores is clamped and warned.
 - Default should remain `1` until benchmarks prove parallel mode is consistently beneficial.
 
 Optional hidden option:
