@@ -88,6 +88,31 @@ mod tests {
     }
 
     #[test]
+    fn test_cli_parser_extract_threads() {
+        let args = Cli::try_parse_from(
+            vec![
+                crate_name!(),
+                "extract",
+                "-i",
+                "tests/data/sample_1.fasta",
+                "--kmer-seq",
+                "ACGT",
+                "--threads",
+                "4",
+            ]
+            .iter(),
+        )
+        .unwrap();
+
+        match args.cmd {
+            Commands::Extract(extract_args) => {
+                assert!(format!("{extract_args:?}").contains("threads: 4"))
+            }
+            Commands::Tag(_) => panic!("expected extract command"),
+        }
+    }
+
+    #[test]
     fn test_cli_parser_common_tag() {
         let args = Cli::try_parse_from(
             vec![

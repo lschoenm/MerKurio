@@ -1,6 +1,6 @@
 use crate::fastx_output::FastxFormat;
 use crate::pattern_matching::PatternMatcher;
-use crossbeam_channel::bounded;
+use crossbeam_channel::{Sender, bounded};
 use std::collections::BTreeMap;
 use std::sync::Arc;
 use std::thread;
@@ -325,6 +325,106 @@ where
         }
         Ok(())
     });
+
+    let process_work = Arc::new(process_work);
+    let mut workers = Vec::with_capacity(config.worker_count);
+    for _ in 0..config.worker_count {
+        let work_rx = work_rx.clone();
+        let result_tx = result_tx.clone();
+        let process_work = Arc::clone(&process_work);
+        workers.push(thread::spawn(move || -> anyhow::Result<()> {
+            while let Ok(work) = work_rx.recv() {
+                for result in process_work(work)? {
+                    result_tx.send(result).map_err(|_| {
+                        anyhow::anyhow!(
+                            "Pipeline result queue closed before all results were sent."
+                        )
+                    })?;
+                }
+            }
+            Ok(())
+        }));
+    }
+    drop(result_tx);
+
+    let mut ordered_results = OrderedResultBuffer::new();
+    let mut consume_error = None;
+    while let Ok(result) = result_rx.recv() {
+        ordered_results.push(result);
+        for ready in ordered_results.drain_ready() {
+            if let Err(error) = consume_ready(ready) {
+                consume_error = Some(error);
+                break;
+            }
+        }
+        if consume_error.is_some() {
+            break;
+        }
+    }
+    drop(result_rx);
+
+    let producer_result = producer
+        .join()
+        .map_err(|_| anyhow::anyhow!("Pipeline producer thread panicked."))?;
+
+    let mut worker_error = None;
+    for worker in workers {
+        match worker.join() {
+            Ok(Ok(())) => {}
+            Ok(Err(error)) if worker_error.is_none() => worker_error = Some(error),
+            Ok(Err(_)) => {}
+            Err(_) if worker_error.is_none() => {
+                worker_error = Some(anyhow::anyhow!("Pipeline worker thread panicked."));
+            }
+            Err(_) => {}
+        }
+    }
+
+    producer_result?;
+    if let Some(error) = worker_error {
+        return Err(error);
+    }
+    if let Some(error) = consume_error {
+        return Err(error);
+    }
+    if ordered_results.pending_len() > 0 {
+        anyhow::bail!(
+            "Pipeline completed with {} out-of-order result(s) still pending; missing result index {}.",
+            ordered_results.pending_len(),
+            ordered_results.next_expected_index()
+        );
+    }
+
+    Ok(())
+}
+
+pub fn run_bounded_ordered_pipeline_with_producer<W, R, PR, P, C>(
+    config: PipelineConfig,
+    produce_work: PR,
+    process_work: P,
+    mut consume_ready: C,
+) -> anyhow::Result<()>
+where
+    W: Send + 'static,
+    R: IndexedResult + Send + 'static,
+    PR: FnOnce(Sender<W>) -> anyhow::Result<()> + Send + 'static,
+    P: Fn(W) -> anyhow::Result<Vec<R>> + Send + Sync + 'static,
+    C: FnMut(R) -> anyhow::Result<()>,
+{
+    if config.worker_count == 0 {
+        anyhow::bail!("Pipeline worker count must be greater than zero.");
+    }
+    if config.work_queue_bound == 0 {
+        anyhow::bail!("Pipeline work queue bound must be greater than zero.");
+    }
+    if config.result_queue_bound == 0 {
+        anyhow::bail!("Pipeline result queue bound must be greater than zero.");
+    }
+
+    let (work_tx, work_rx) = bounded::<W>(config.work_queue_bound);
+    let (result_tx, result_rx) = bounded::<R>(config.result_queue_bound);
+
+    let producer = thread::spawn(move || produce_work(work_tx));
 
     let process_work = Arc::new(process_work);
     let mut workers = Vec::with_capacity(config.worker_count);

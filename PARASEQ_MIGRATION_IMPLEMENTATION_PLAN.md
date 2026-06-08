@@ -425,7 +425,7 @@ Status:
 - Added `PipelineConfig` and `run_bounded_ordered_pipeline` in `src/extract_processing.rs`.
 - The pipeline uses bounded work/result queues, producer and worker threads, and `OrderedResultBuffer` for deterministic draining.
 - Added tests proving out-of-order worker completion is consumed in input order.
-- Current `extract` command is not wired to this pipeline yet; Phase 10 will add thread control and the parallel path.
+- Phase 10 wires `extract` to the bounded pipeline through `run_bounded_ordered_pipeline_with_producer`.
 
 Pipeline:
 
@@ -457,6 +457,15 @@ Recommendation:
 ## Phase 10: CLI
 
 Add thread control to `extract`.
+
+Status:
+
+- Added `-t, --threads <N>` to `extract`; default remains `1`.
+- `--threads 1` keeps the serial `paraseq` record-set loop.
+- `--threads > 1` uses a bounded producer/worker/ordered-consumer pipeline for both single-end and paired-end inputs.
+- Worker threads own copied record IDs, sequences, and qualities in fixed-size chunks, so pattern matching runs concurrently while output and logs remain deterministic.
+- `--threads 0` is rejected at runtime.
+- Added fixture parity tests for `threads=4` single-end and paired-end extraction, plus parser coverage for `--threads`.
 
 Suggested option:
 
