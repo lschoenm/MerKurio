@@ -280,13 +280,13 @@ struct ResultChunk<R> {
     results: Vec<R>,
 }
 
-impl<R> IndexedResult for ResultChunk<R> {
+impl<R: IndexedResult> IndexedResult for ResultChunk<R> {
     fn index(&self) -> u64 {
         self.start_index
     }
 
     fn index_span(&self) -> u64 {
-        self.results.len() as u64
+        self.results.iter().map(IndexedResult::index_span).sum()
     }
 }
 
