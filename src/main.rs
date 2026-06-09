@@ -99,6 +99,8 @@ mod tests {
                 "ACGT",
                 "--threads",
                 "4",
+                "--chunk-size",
+                "16384",
             ]
             .iter(),
         )
@@ -106,7 +108,9 @@ mod tests {
 
         match args.cmd {
             Commands::Extract(extract_args) => {
-                assert!(format!("{extract_args:?}").contains("threads: 4"))
+                let debug = format!("{extract_args:?}");
+                assert!(debug.contains("threads: 4"));
+                assert!(debug.contains("chunk_size: 16384"));
             }
             Commands::Tag(_) => panic!("expected extract command"),
         }

@@ -48,6 +48,7 @@ Useful overrides:
 
 ```bash
 RECORDS=100000 PATTERNS=500 THREADS="1 4" RUNS=3 ./06-realistic-extract-parallel-benchmarks.sh
+RECORDS=1000000 THREADS="2 4" CHUNK_SIZES="8192 16384 32768" RUNS=3 ./06-realistic-extract-parallel-benchmarks.sh
 MERKURIO=/path/to/current/merkurio MERKURIO_SINGLE=/path/to/old/merkurio ./06-realistic-extract-parallel-benchmarks.sh
 ```
 

@@ -36,7 +36,7 @@ use crate::helpers::{
 use crate::logger::{BufferedLogger, JsonLogger};
 use crate::pattern_matching::PatternMatcher;
 
-const EXTRACT_PARALLEL_CHUNK_SIZE: usize = 8192;
+const DEFAULT_EXTRACT_PARALLEL_CHUNK_SIZE: usize = 8192;
 
 #[derive(Debug, PartialEq, Eq)]
 struct ThreadResolution {
@@ -463,6 +463,10 @@ pub struct CmdExtract {
     /// Number of worker threads for extract pattern matching. Use 0 to auto-detect available cores.
     #[clap(short = 't', long, default_value_t = 1)]
     threads: usize,
+
+    /// Number of FASTA/Q records per parallel extract work chunk.
+    #[clap(long, default_value_t = DEFAULT_EXTRACT_PARALLEL_CHUNK_SIZE, hide = true)]
+    chunk_size: usize,
 }
 
 pub fn extract_records(args: CmdExtract) -> Result<()> {
@@ -587,6 +591,10 @@ pub fn extract_records(args: CmdExtract) -> Result<()> {
         );
     }
     let worker_threads = thread_resolution.effective_threads;
+    if args.chunk_size == 0 {
+        anyhow::bail!("Extract chunk size must be greater than zero.");
+    }
+    let parallel_chunk_size = args.chunk_size;
 
     let matcher = Arc::new(PatternMatcher::new(
         &pattern_list,
@@ -653,8 +661,7 @@ pub fn extract_records(args: CmdExtract) -> Result<()> {
                 PipelineConfig::new(worker_threads),
                 move |work_tx| {
                     let mut start_index = 0_u64;
-                    let mut record_set =
-                        reader.new_record_set_with_size(EXTRACT_PARALLEL_CHUNK_SIZE);
+                    let mut record_set = reader.new_record_set_with_size(parallel_chunk_size);
                     while record_set
                         .fill(&mut reader)
                         .with_context(|| "Error during FASTQ/A record parsing.")?
@@ -671,7 +678,7 @@ pub fn extract_records(args: CmdExtract) -> Result<()> {
                             )
                         })?;
                         start_index += len as u64;
-                        record_set = reader.new_record_set_with_size(EXTRACT_PARALLEL_CHUNK_SIZE);
+                        record_set = reader.new_record_set_with_size(parallel_chunk_size);
                     }
                     Ok(())
                 },
@@ -831,10 +838,8 @@ pub fn extract_records(args: CmdExtract) -> Result<()> {
                 PipelineConfig::new(worker_threads),
                 move |work_tx| {
                     let mut start_index = 0_u64;
-                    let mut record_set_1 =
-                        reader.new_record_set_with_size(EXTRACT_PARALLEL_CHUNK_SIZE);
-                    let mut record_set_2 =
-                        reader_2.new_record_set_with_size(EXTRACT_PARALLEL_CHUNK_SIZE);
+                    let mut record_set_1 = reader.new_record_set_with_size(parallel_chunk_size);
+                    let mut record_set_2 = reader_2.new_record_set_with_size(parallel_chunk_size);
 
                     loop {
                         let filled_1 = record_set_1
@@ -875,9 +880,8 @@ pub fn extract_records(args: CmdExtract) -> Result<()> {
                             )
                         })?;
                         start_index += len_1 as u64;
-                        record_set_1 = reader.new_record_set_with_size(EXTRACT_PARALLEL_CHUNK_SIZE);
-                        record_set_2 =
-                            reader_2.new_record_set_with_size(EXTRACT_PARALLEL_CHUNK_SIZE);
+                        record_set_1 = reader.new_record_set_with_size(parallel_chunk_size);
+                        record_set_2 = reader_2.new_record_set_with_size(parallel_chunk_size);
                     }
                     Ok(())
                 },
@@ -1212,6 +1216,7 @@ mod tests {
             lowercase: false,
             uppercase: false,
             threads: options.threads,
+            chunk_size: DEFAULT_EXTRACT_PARALLEL_CHUNK_SIZE,
         };
 
         extract_records(args)?;
@@ -1470,6 +1475,7 @@ mod tests {
             lowercase: false,
             uppercase: false,
             threads: 1,
+            chunk_size: DEFAULT_EXTRACT_PARALLEL_CHUNK_SIZE,
         };
 
         extract_records(args)?;
@@ -1511,6 +1517,7 @@ mod tests {
             lowercase: false,
             uppercase: false,
             threads: 1,
+            chunk_size: DEFAULT_EXTRACT_PARALLEL_CHUNK_SIZE,
         };
 
         extract_records(args)?;
@@ -1555,6 +1562,7 @@ mod tests {
             lowercase: false,
             uppercase: false,
             threads: 1,
+            chunk_size: DEFAULT_EXTRACT_PARALLEL_CHUNK_SIZE,
         };
 
         extract_records(args)?;
@@ -1601,6 +1609,7 @@ mod tests {
             lowercase: false,
             uppercase: false,
             threads: 1,
+            chunk_size: DEFAULT_EXTRACT_PARALLEL_CHUNK_SIZE,
         };
 
         extract_records(args)?;
@@ -1645,6 +1654,7 @@ mod tests {
             lowercase: false,
             uppercase: false,
             threads: 4,
+            chunk_size: DEFAULT_EXTRACT_PARALLEL_CHUNK_SIZE,
         };
 
         extract_records(args)?;
@@ -1683,6 +1693,7 @@ mod tests {
             lowercase: false,
             uppercase: false,
             threads: 4,
+            chunk_size: DEFAULT_EXTRACT_PARALLEL_CHUNK_SIZE,
         };
 
         extract_records(args)?;
@@ -1956,6 +1967,37 @@ mod tests {
     }
 
     #[test]
+    fn test_extract_rejects_zero_chunk_size() {
+        let args = CmdExtract {
+            in_fastx: PathBuf::from("tests/fixtures/input/simple.fasta"),
+            in_fastq_2: None,
+            kmer_seq: Some(vec!["ACG".to_string()]),
+            kmer_file: None,
+            out_fastx: None,
+            q_size: None,
+            aho_corasick: false,
+            reverse_complement: true,
+            canonical: false,
+            out_log: None,
+            suppress_output: false,
+            json_log: None,
+            invert_match: false,
+            case_insensitive: false,
+            lowercase: false,
+            uppercase: false,
+            threads: 4,
+            chunk_size: 0,
+        };
+
+        let error = extract_records(args).unwrap_err();
+        assert!(
+            error
+                .to_string()
+                .contains("Extract chunk size must be greater than zero")
+        );
+    }
+
+    #[test]
     fn test_extract_auto_threads_matches_serial_fixtures() -> Result<()> {
         let temp_dir = tempfile::tempdir()?;
         let out_fasta = temp_dir.path().join("out.fasta");
@@ -1980,6 +2022,7 @@ mod tests {
             lowercase: false,
             uppercase: false,
             threads: 0,
+            chunk_size: DEFAULT_EXTRACT_PARALLEL_CHUNK_SIZE,
         };
 
         extract_records(args)?;
@@ -2020,6 +2063,7 @@ mod tests {
             lowercase: false,
             uppercase: false,
             threads: 1,
+            chunk_size: DEFAULT_EXTRACT_PARALLEL_CHUNK_SIZE,
         };
 
         let error = extract_records(args).unwrap_err();
@@ -2061,6 +2105,7 @@ mod tests {
             lowercase: false,
             uppercase: false,
             threads: 4,
+            chunk_size: DEFAULT_EXTRACT_PARALLEL_CHUNK_SIZE,
         };
 
         let error = extract_records(args).unwrap_err();

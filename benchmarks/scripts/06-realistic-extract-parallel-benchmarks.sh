@@ -16,6 +16,7 @@ READ_LEN="${READ_LEN:-150}"
 PATTERNS="${PATTERNS:-250}"
 HIT_EVERY="${HIT_EVERY:-50}"
 THREADS="${THREADS:-1 2 4}"
+CHUNK_SIZES="${CHUNK_SIZES:-}"
 
 mkdir -p "$RESULT_DIR" "$DATA_DIR"
 
@@ -164,6 +165,11 @@ main() {
     echo "Patterns: $PATTERNS x 31 bp"
     echo "Hit every: $HIT_EVERY records in R1, every $((HIT_EVERY * 3)) records in R2"
     echo "Threads: $THREADS"
+    if [[ -n "$CHUNK_SIZES" ]]; then
+        echo "Chunk sizes: $CHUNK_SIZES"
+    else
+        echo "Chunk sizes: default"
+    fi
     echo "Runs: $RUNS, warmup: $WARMUP"
     echo "Results: $RESULT_DIR"
 
@@ -171,25 +177,49 @@ main() {
     if [[ -x "$MERKURIO_SINGLE" ]]; then
         fast_output_commands+=("$MERKURIO_SINGLE extract -i $FASTQ_1 -2 $FASTQ_2 -f $PATTERN_FILE -o $RESULT_DIR/fast-output-${DATA_TAG}-single")
     fi
-    for thread_count in $THREADS; do
-        fast_output_commands+=("$MERKURIO extract -i $FASTQ_1 -2 $FASTQ_2 -f $PATTERN_FILE --threads $thread_count -o $RESULT_DIR/fast-output-${DATA_TAG}-t${thread_count}")
-    done
+    if [[ -n "$CHUNK_SIZES" ]]; then
+        for chunk_size in $CHUNK_SIZES; do
+            for thread_count in $THREADS; do
+                fast_output_commands+=("$MERKURIO extract -i $FASTQ_1 -2 $FASTQ_2 -f $PATTERN_FILE --threads $thread_count --chunk-size $chunk_size -o $RESULT_DIR/fast-output-${DATA_TAG}-t${thread_count}-c${chunk_size}")
+            done
+        done
+    else
+        for thread_count in $THREADS; do
+            fast_output_commands+=("$MERKURIO extract -i $FASTQ_1 -2 $FASTQ_2 -f $PATTERN_FILE --threads $thread_count -o $RESULT_DIR/fast-output-${DATA_TAG}-t${thread_count}")
+        done
+    fi
 
     local json_output_commands=()
     if [[ -x "$MERKURIO_SINGLE" ]]; then
         json_output_commands+=("$MERKURIO_SINGLE extract -i $FASTQ_1 -2 $FASTQ_2 -f $PATTERN_FILE -o $RESULT_DIR/json-output-${DATA_TAG}-single -j $RESULT_DIR/json-output-${DATA_TAG}-single.json")
     fi
-    for thread_count in $THREADS; do
-        json_output_commands+=("$MERKURIO extract -i $FASTQ_1 -2 $FASTQ_2 -f $PATTERN_FILE --threads $thread_count -o $RESULT_DIR/json-output-${DATA_TAG}-t${thread_count} -j $RESULT_DIR/json-output-${DATA_TAG}-t${thread_count}.json")
-    done
+    if [[ -n "$CHUNK_SIZES" ]]; then
+        for chunk_size in $CHUNK_SIZES; do
+            for thread_count in $THREADS; do
+                json_output_commands+=("$MERKURIO extract -i $FASTQ_1 -2 $FASTQ_2 -f $PATTERN_FILE --threads $thread_count --chunk-size $chunk_size -o $RESULT_DIR/json-output-${DATA_TAG}-t${thread_count}-c${chunk_size} -j $RESULT_DIR/json-output-${DATA_TAG}-t${thread_count}-c${chunk_size}.json")
+            done
+        done
+    else
+        for thread_count in $THREADS; do
+            json_output_commands+=("$MERKURIO extract -i $FASTQ_1 -2 $FASTQ_2 -f $PATTERN_FILE --threads $thread_count -o $RESULT_DIR/json-output-${DATA_TAG}-t${thread_count} -j $RESULT_DIR/json-output-${DATA_TAG}-t${thread_count}.json")
+        done
+    fi
 
     local json_suppress_commands=()
     if [[ -x "$MERKURIO_SINGLE" ]]; then
         json_suppress_commands+=("$MERKURIO_SINGLE extract -i $FASTQ_1 -2 $FASTQ_2 -f $PATTERN_FILE --suppress-output -j $RESULT_DIR/json-suppress-${DATA_TAG}-single.json")
     fi
-    for thread_count in $THREADS; do
-        json_suppress_commands+=("$MERKURIO extract -i $FASTQ_1 -2 $FASTQ_2 -f $PATTERN_FILE --threads $thread_count --suppress-output -j $RESULT_DIR/json-suppress-${DATA_TAG}-t${thread_count}.json")
-    done
+    if [[ -n "$CHUNK_SIZES" ]]; then
+        for chunk_size in $CHUNK_SIZES; do
+            for thread_count in $THREADS; do
+                json_suppress_commands+=("$MERKURIO extract -i $FASTQ_1 -2 $FASTQ_2 -f $PATTERN_FILE --threads $thread_count --chunk-size $chunk_size --suppress-output -j $RESULT_DIR/json-suppress-${DATA_TAG}-t${thread_count}-c${chunk_size}.json")
+            done
+        done
+    else
+        for thread_count in $THREADS; do
+            json_suppress_commands+=("$MERKURIO extract -i $FASTQ_1 -2 $FASTQ_2 -f $PATTERN_FILE --threads $thread_count --suppress-output -j $RESULT_DIR/json-suppress-${DATA_TAG}-t${thread_count}.json")
+        done
+    fi
 
     run_benchmark_group "fast-output" "${fast_output_commands[@]}"
     run_benchmark_group "json-output" "${json_output_commands[@]}"
