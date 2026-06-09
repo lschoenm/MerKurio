@@ -21,6 +21,7 @@ use std::path::{Path, PathBuf};
 use std::string::String;
 use std::{env, fs};
 
+use crossbeam_channel::{Receiver, Sender, bounded};
 use paraseq::{Record, fastx};
 use std::sync::Arc;
 
@@ -93,6 +94,10 @@ fn record_set_len(record_set: &fastx::RecordSet) -> usize {
     }
 }
 
+fn record_set_pool_size(config: PipelineConfig) -> usize {
+    config.worker_count + config.work_queue_bound
+}
+
 fn process_borrowed_single_record<R: Record>(
     processor: &ExtractProcessor,
     record_index: u64,
@@ -138,20 +143,22 @@ fn process_borrowed_paired_record<R1: Record, R2: Record>(
     )
 }
 
-fn process_single_record_set_chunk(
+fn process_single_record_set(
     processor: &ExtractProcessor,
-    chunk: SingleRecordSetWorkChunk,
+    start_index: u64,
+    record_set: &fastx::RecordSet,
+    format: FastxFormat,
 ) -> Result<Vec<SingleResult>> {
-    let mut results = Vec::with_capacity(record_set_len(&chunk.record_set));
-    match &chunk.record_set {
+    let mut results = Vec::with_capacity(record_set_len(record_set));
+    match record_set {
         fastx::RecordSet::Fasta(records) => {
             for (offset, record) in records.iter().enumerate() {
                 let record = record.with_context(|| "Error during FASTQ/A record parsing.")?;
                 results.push(process_borrowed_single_record(
                     processor,
-                    chunk.start_index + offset as u64,
+                    start_index + offset as u64,
                     record,
-                    chunk.format,
+                    format,
                 ));
             }
         }
@@ -160,14 +167,31 @@ fn process_single_record_set_chunk(
                 let record = record.with_context(|| "Error during FASTQ/A record parsing.")?;
                 results.push(process_borrowed_single_record(
                     processor,
-                    chunk.start_index + offset as u64,
+                    start_index + offset as u64,
                     record,
-                    chunk.format,
+                    format,
                 ));
             }
         }
     }
     Ok(results)
+}
+
+fn process_pooled_single_record_set_chunk(
+    processor: &ExtractProcessor,
+    chunk: SingleRecordSetWorkChunk,
+    pool_tx: &Sender<fastx::RecordSet>,
+) -> Result<Vec<SingleResult>> {
+    let SingleRecordSetWorkChunk {
+        start_index,
+        record_set,
+        format,
+    } = chunk;
+    let results = process_single_record_set(processor, start_index, &record_set, format);
+    pool_tx
+        .send(record_set)
+        .map_err(|_| anyhow::anyhow!("Single-end record-set pool closed during processing."))?;
+    results
 }
 
 fn process_paired_record_iters<R1, R2, I1, I2>(
@@ -203,64 +227,94 @@ where
     Ok(results)
 }
 
-fn process_paired_record_set_chunk(
+fn process_paired_record_sets(
     processor: &ExtractProcessor,
-    chunk: PairedRecordSetWorkChunk,
+    start_index: u64,
+    record_set_1: &fastx::RecordSet,
+    record_set_2: &fastx::RecordSet,
+    format_1: FastxFormat,
+    format_2: FastxFormat,
 ) -> Result<Vec<PairedResult>> {
-    let len_1 = record_set_len(&chunk.record_set_1);
-    let len_2 = record_set_len(&chunk.record_set_2);
+    let len_1 = record_set_len(record_set_1);
+    let len_2 = record_set_len(record_set_2);
     if len_1 != len_2 {
         anyhow::bail!(
             "The two input files have a different number of records. Please provide valid paired-end read files."
         );
     }
 
-    Ok(match (&chunk.record_set_1, &chunk.record_set_2) {
+    Ok(match (record_set_1, record_set_2) {
         (fastx::RecordSet::Fasta(records_1), fastx::RecordSet::Fasta(records_2)) => {
             process_paired_record_iters(
                 processor,
-                chunk.start_index,
+                start_index,
                 len_1,
                 records_1.iter(),
-                chunk.format_1,
+                format_1,
                 records_2.iter(),
-                chunk.format_2,
+                format_2,
             )?
         }
         (fastx::RecordSet::Fasta(records_1), fastx::RecordSet::Fastq(records_2)) => {
             process_paired_record_iters(
                 processor,
-                chunk.start_index,
+                start_index,
                 len_1,
                 records_1.iter(),
-                chunk.format_1,
+                format_1,
                 records_2.iter(),
-                chunk.format_2,
+                format_2,
             )?
         }
         (fastx::RecordSet::Fastq(records_1), fastx::RecordSet::Fasta(records_2)) => {
             process_paired_record_iters(
                 processor,
-                chunk.start_index,
+                start_index,
                 len_1,
                 records_1.iter(),
-                chunk.format_1,
+                format_1,
                 records_2.iter(),
-                chunk.format_2,
+                format_2,
             )?
         }
         (fastx::RecordSet::Fastq(records_1), fastx::RecordSet::Fastq(records_2)) => {
             process_paired_record_iters(
                 processor,
-                chunk.start_index,
+                start_index,
                 len_1,
                 records_1.iter(),
-                chunk.format_1,
+                format_1,
                 records_2.iter(),
-                chunk.format_2,
+                format_2,
             )?
         }
     })
+}
+
+fn process_pooled_paired_record_set_chunk(
+    processor: &ExtractProcessor,
+    chunk: PairedRecordSetWorkChunk,
+    pool_tx: &Sender<(fastx::RecordSet, fastx::RecordSet)>,
+) -> Result<Vec<PairedResult>> {
+    let PairedRecordSetWorkChunk {
+        start_index,
+        record_set_1,
+        record_set_2,
+        format_1,
+        format_2,
+    } = chunk;
+    let results = process_paired_record_sets(
+        processor,
+        start_index,
+        &record_set_1,
+        &record_set_2,
+        format_1,
+        format_2,
+    );
+    pool_tx
+        .send((record_set_1, record_set_2))
+        .map_err(|_| anyhow::anyhow!("Paired-end record-set pool closed during processing."))?;
+    results
 }
 
 fn output_record_view(record: &OutputRecord) -> FastxRecordView<'_> {
@@ -657,15 +711,34 @@ pub fn extract_records(args: CmdExtract) -> Result<()> {
             );
             let worker_processor = processor.clone();
             let mut summary = ExtractSummary::new(pattern_list.len());
+            let pipeline_config = PipelineConfig::new(worker_threads);
+            let pool_size = record_set_pool_size(pipeline_config);
+            let (record_pool_tx, record_pool_rx) = bounded::<fastx::RecordSet>(pool_size);
+            for _ in 0..pool_size {
+                record_pool_tx
+                    .send(reader.new_record_set_with_size(parallel_chunk_size))
+                    .map_err(|_| {
+                        anyhow::anyhow!("Failed to initialize single-end record-set pool.")
+                    })?;
+            }
+            let producer_record_pool_rx: Receiver<fastx::RecordSet> = record_pool_rx.clone();
+            let worker_record_pool_tx = record_pool_tx.clone();
             run_bounded_ordered_pipeline_with_producer(
-                PipelineConfig::new(worker_threads),
+                pipeline_config,
                 move |work_tx| {
                     let mut start_index = 0_u64;
-                    let mut record_set = reader.new_record_set_with_size(parallel_chunk_size);
-                    while record_set
-                        .fill(&mut reader)
-                        .with_context(|| "Error during FASTQ/A record parsing.")?
-                    {
+                    loop {
+                        let mut record_set = producer_record_pool_rx.recv().map_err(|_| {
+                            anyhow::anyhow!(
+                                "Single-end record-set pool closed before parsing completed."
+                            )
+                        })?;
+                        if !record_set
+                            .fill(&mut reader)
+                            .with_context(|| "Error during FASTQ/A record parsing.")?
+                        {
+                            break;
+                        }
                         let len = record_set_len(&record_set);
                         let chunk = SingleRecordSetWorkChunk {
                             start_index,
@@ -678,11 +751,16 @@ pub fn extract_records(args: CmdExtract) -> Result<()> {
                             )
                         })?;
                         start_index += len as u64;
-                        record_set = reader.new_record_set_with_size(parallel_chunk_size);
                     }
                     Ok(())
                 },
-                move |chunk| process_single_record_set_chunk(&worker_processor, chunk),
+                move |chunk| {
+                    process_pooled_single_record_set_chunk(
+                        &worker_processor,
+                        chunk,
+                        &worker_record_pool_tx,
+                    )
+                },
                 |result| {
                     consume_single_result(
                         result,
@@ -834,14 +912,35 @@ pub fn extract_records(args: CmdExtract) -> Result<()> {
             );
             let worker_processor = processor.clone();
             let mut summary = ExtractSummary::new(pattern_list.len());
+            let pipeline_config = PipelineConfig::new(worker_threads);
+            let pool_size = record_set_pool_size(pipeline_config);
+            let (record_pool_tx, record_pool_rx) =
+                bounded::<(fastx::RecordSet, fastx::RecordSet)>(pool_size);
+            for _ in 0..pool_size {
+                record_pool_tx
+                    .send((
+                        reader.new_record_set_with_size(parallel_chunk_size),
+                        reader_2.new_record_set_with_size(parallel_chunk_size),
+                    ))
+                    .map_err(|_| {
+                        anyhow::anyhow!("Failed to initialize paired-end record-set pool.")
+                    })?;
+            }
+            let producer_record_pool_rx: Receiver<(fastx::RecordSet, fastx::RecordSet)> =
+                record_pool_rx.clone();
+            let worker_record_pool_tx = record_pool_tx.clone();
             run_bounded_ordered_pipeline_with_producer(
-                PipelineConfig::new(worker_threads),
+                pipeline_config,
                 move |work_tx| {
                     let mut start_index = 0_u64;
-                    let mut record_set_1 = reader.new_record_set_with_size(parallel_chunk_size);
-                    let mut record_set_2 = reader_2.new_record_set_with_size(parallel_chunk_size);
 
                     loop {
+                        let (mut record_set_1, mut record_set_2) =
+                            producer_record_pool_rx.recv().map_err(|_| {
+                                anyhow::anyhow!(
+                                    "Paired-end record-set pool closed before parsing completed."
+                                )
+                            })?;
                         let filled_1 = record_set_1
                             .fill(&mut reader)
                             .with_context(|| "Error during FASTQ record parsing of first file.")?;
@@ -880,12 +979,16 @@ pub fn extract_records(args: CmdExtract) -> Result<()> {
                             )
                         })?;
                         start_index += len_1 as u64;
-                        record_set_1 = reader.new_record_set_with_size(parallel_chunk_size);
-                        record_set_2 = reader_2.new_record_set_with_size(parallel_chunk_size);
                     }
                     Ok(())
                 },
-                move |chunk| process_paired_record_set_chunk(&worker_processor, chunk),
+                move |chunk| {
+                    process_pooled_paired_record_set_chunk(
+                        &worker_processor,
+                        chunk,
+                        &worker_record_pool_tx,
+                    )
+                },
                 |result| {
                     consume_paired_result(
                         result,
