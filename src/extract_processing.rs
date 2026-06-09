@@ -261,13 +261,10 @@ impl<T: IndexedResult> OrderedResultBuffer<T> {
         self.pending.insert(result.index(), result)
     }
 
-    pub fn drain_ready(&mut self) -> Vec<T> {
-        let mut ready = Vec::new();
-        while let Some(result) = self.pending.remove(&self.next_expected_index) {
-            self.next_expected_index += result.index_span();
-            ready.push(result);
-        }
-        ready
+    pub fn pop_ready(&mut self) -> Option<T> {
+        let result = self.pending.remove(&self.next_expected_index)?;
+        self.next_expected_index += result.index_span();
+        Some(result)
     }
 }
 
@@ -385,7 +382,7 @@ where
     let mut consume_error = None;
     while let Ok(result_chunk) = result_rx.recv() {
         ordered_results.push(result_chunk);
-        for ready_chunk in ordered_results.drain_ready() {
+        while let Some(ready_chunk) = ordered_results.pop_ready() {
             for ready in ready_chunk.results {
                 if let Err(error) = consume_ready(ready) {
                     consume_error = Some(error);
@@ -496,7 +493,7 @@ where
     let mut consume_error = None;
     while let Ok(result_chunk) = result_rx.recv() {
         ordered_results.push(result_chunk);
-        for ready_chunk in ordered_results.drain_ready() {
+        while let Some(ready_chunk) = ordered_results.pop_ready() {
             for ready in ready_chunk.results {
                 if let Err(error) = consume_ready(ready) {
                     consume_error = Some(error);
@@ -716,7 +713,7 @@ mod tests {
     }
 
     #[test]
-    fn ordered_result_buffer_drains_contiguous_results_only() {
+    fn ordered_result_buffer_pops_contiguous_results_only() {
         let processor = bndmq_processor(false, true);
         let mut buffer = OrderedResultBuffer::new();
 
@@ -732,14 +729,11 @@ mod tests {
             ));
         }
 
-        let ready = buffer.drain_ready();
         assert_eq!(
-            ready
-                .iter()
-                .map(|result| result.record_index)
-                .collect::<Vec<_>>(),
-            vec![0]
+            buffer.pop_ready().map(|result| result.record_index),
+            Some(0)
         );
+        assert!(buffer.pop_ready().is_none());
         assert_eq!(buffer.next_expected_index(), 1);
         assert_eq!(buffer.pending_len(), 1);
 
@@ -753,14 +747,15 @@ mod tests {
             },
         ));
 
-        let ready = buffer.drain_ready();
         assert_eq!(
-            ready
-                .iter()
-                .map(|result| result.record_index)
-                .collect::<Vec<_>>(),
-            vec![1, 2]
+            buffer.pop_ready().map(|result| result.record_index),
+            Some(1)
         );
+        assert_eq!(
+            buffer.pop_ready().map(|result| result.record_index),
+            Some(2)
+        );
+        assert!(buffer.pop_ready().is_none());
         assert_eq!(buffer.next_expected_index(), 3);
         assert_eq!(buffer.pending_len(), 0);
     }
