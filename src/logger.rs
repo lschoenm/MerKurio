@@ -7,11 +7,12 @@ use std::{
     str,
 };
 
-/// A buffered logger that accumulates log records and writes them in batches.
+/// A buffered logger that streams log records in batches.
 pub struct BufferedLogger {
     buffer: String,
     writer: Option<Box<dyn io::Write>>,
     buffer_size: usize,
+    /// Retained only for records-only/test mode when no writer is configured.
     records: Vec<String>,
 }
 
@@ -28,7 +29,11 @@ impl BufferedLogger {
 
     /// Logs a record to the buffer and writes to output if buffer is full.
     pub fn log_record(&mut self, record: &str) {
-        self.records.push(record.to_string());
+        if self.writer.is_none() {
+            self.records.push(record.to_string());
+            return;
+        }
+
         self.buffer.push_str(record);
 
         if self.buffer.len() >= self.buffer_size {
@@ -41,9 +46,11 @@ impl BufferedLogger {
     pub fn log_fields(&mut self, prefix: &str, record: &[u8], pattern: &str, index: usize) {
         let id_str = str::from_utf8(record).expect("Error during id parsing.");
 
-        // Store the record string for later retrieval
-        self.records
-            .push(format!("{prefix}\t{id_str}\t{pattern}\t{index}\n"));
+        if self.writer.is_none() {
+            self.records
+                .push(format!("{prefix}\t{id_str}\t{pattern}\t{index}\n"));
+            return;
+        }
 
         self.buffer.push_str(prefix);
         self.buffer.push('\t');
@@ -76,7 +83,7 @@ impl BufferedLogger {
         }
     }
 
-    /// Returns a reference to the collected records.
+    /// Returns records collected in records-only mode.
     pub fn records(&self) -> &[String] {
         &self.records
     }
@@ -254,5 +261,16 @@ mod tests {
         assert_eq!(records[0], "Record 1\n");
         assert_eq!(records[1], "Record 2\n");
         assert_eq!(records[2], "Record 3\n");
+    }
+
+    #[test]
+    fn test_buffered_logger_with_writer_does_not_retain_records() {
+        let mut logger = BufferedLogger::new(Some(Box::new(std::io::sink())), 1024);
+
+        logger.log_record("Record 1\n");
+        logger.log_fields("file.fastq", b"read-1", "ACGT", 7);
+        logger.flush();
+
+        assert!(logger.records().is_empty());
     }
 }
