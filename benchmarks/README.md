@@ -34,7 +34,7 @@ cd benchmarks/scripts
 ./06-realistic-extract-parallel-benchmarks.sh
 ```
 
-By default this generates `1,000,000` paired-end reads at `150 bp`, searches `250` deterministic `31 bp` patterns, and compares `--threads 1`, `--threads 2`, `--threads 4`, and `--threads 0`. The generated FASTQ input is about `319 MB` per mate file, or about `638 MB` for both files together.
+By default this generates `1,000,000` paired-end reads at `150 bp`, searches `250` deterministic `31 bp` patterns, and compares the current MerKurio binary with `--threads 1`, `--threads 2`, and `--threads 4`. If `benchmarks/merkurio-single` exists and is executable, the script also includes it as an old single-threaded baseline. The generated FASTQ input is about `319 MB` per mate file, or about `638 MB` for both files together.
 
 The realistic benchmark separates three modes:
 
@@ -42,12 +42,13 @@ The realistic benchmark separates three modes:
 - JSON output: writes extracted records and JSON logs, so it reports all matches.
 - JSON suppress: suppresses extracted records and writes JSON logs, so it also reports all matches.
 
-Current CLI semantics require logging when `--suppress-output` is used, so there is no pure no-output/no-log benchmark mode. Results are written under `benchmarks/results/realistic-extract`.
+Current CLI semantics require logging when `--suppress-output` is used, so there is no pure no-output/no-log benchmark mode. Each mode is benchmarked separately so hyperfine only compares commands with equivalent output/logging work. Results are written under `benchmarks/results/realistic-extract`.
 
 Useful overrides:
 
 ```bash
-RECORDS=100000 PATTERNS=500 THREADS="1 4 0" RUNS=3 ./06-realistic-extract-parallel-benchmarks.sh
+RECORDS=100000 PATTERNS=500 THREADS="1 4" RUNS=3 ./06-realistic-extract-parallel-benchmarks.sh
+MERKURIO=/path/to/current/merkurio MERKURIO_SINGLE=/path/to/old/merkurio ./06-realistic-extract-parallel-benchmarks.sh
 ```
 
 ## Full External Tool Benchmarks

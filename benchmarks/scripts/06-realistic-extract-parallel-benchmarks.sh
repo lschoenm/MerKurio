@@ -8,13 +8,14 @@ REPO_DIR="$(cd "$BENCH_DIR/.." && pwd)"
 RESULT_DIR="$BENCH_DIR/results/realistic-extract"
 DATA_DIR="$BENCH_DIR/data/realistic-extract"
 MERKURIO="${MERKURIO:-$REPO_DIR/target/release/merkurio}"
+MERKURIO_SINGLE="${MERKURIO_SINGLE:-$BENCH_DIR/merkurio-single}"
 RUNS="${RUNS:-5}"
 WARMUP="${WARMUP:-1}"
 RECORDS="${RECORDS:-1000000}"
 READ_LEN="${READ_LEN:-150}"
 PATTERNS="${PATTERNS:-250}"
 HIT_EVERY="${HIT_EVERY:-50}"
-THREADS="${THREADS:-1 2 4 0}"
+THREADS="${THREADS:-1 2 4}"
 
 mkdir -p "$RESULT_DIR" "$DATA_DIR"
 
@@ -107,9 +108,10 @@ with open(metadata_file, "w", encoding="ascii") as handle:
 PY
 }
 
-run_hyperfine() {
-    local output_csv="$RESULT_DIR/realistic-extract-${DATA_TAG}.csv"
+run_hyperfine_group() {
+    local mode="$1"
     shift
+    local output_csv="$RESULT_DIR/realistic-extract-${DATA_TAG}-${mode}.csv"
 
     hyperfine \
         --warmup "$WARMUP" \
@@ -119,8 +121,10 @@ run_hyperfine() {
     echo "Wrote $output_csv"
 }
 
-run_shell_timer() {
-    local output="$RESULT_DIR/summary-${DATA_TAG}.txt"
+run_shell_timer_group() {
+    local mode="$1"
+    shift
+    local output="$RESULT_DIR/summary-${DATA_TAG}-${mode}.txt"
     : > "$output"
 
     for command in "$@"; do
@@ -133,11 +137,28 @@ run_shell_timer() {
     echo "Wrote $output"
 }
 
+run_benchmark_group() {
+    local mode="$1"
+    shift
+
+    if command -v hyperfine >/dev/null 2>&1; then
+        run_hyperfine_group "$mode" "$@"
+    else
+        echo "hyperfine not found; using /usr/bin/time fallback for $mode."
+        run_shell_timer_group "$mode" "$@"
+    fi
+}
+
 main() {
     generate_inputs
 
     echo "Realistic extract parallel benchmarks"
     echo "Binary: $MERKURIO"
+    if [[ -x "$MERKURIO_SINGLE" ]]; then
+        echo "Single-threaded baseline: $MERKURIO_SINGLE"
+    else
+        echo "Single-threaded baseline: not found at $MERKURIO_SINGLE; skipping baseline"
+    fi
     echo "Records: $RECORDS read pairs"
     echo "Read length: $READ_LEN"
     echo "Patterns: $PATTERNS x 31 bp"
@@ -146,23 +167,33 @@ main() {
     echo "Runs: $RUNS, warmup: $WARMUP"
     echo "Results: $RESULT_DIR"
 
-    local commands=()
+    local fast_output_commands=()
+    if [[ -x "$MERKURIO_SINGLE" ]]; then
+        fast_output_commands+=("$MERKURIO_SINGLE extract -i $FASTQ_1 -2 $FASTQ_2 -f $PATTERN_FILE -o $RESULT_DIR/fast-output-${DATA_TAG}-single")
+    fi
     for thread_count in $THREADS; do
-        commands+=("$MERKURIO extract -i $FASTQ_1 -2 $FASTQ_2 -f $PATTERN_FILE --threads $thread_count -o $RESULT_DIR/fast-output-${DATA_TAG}-t${thread_count}")
-    done
-    for thread_count in $THREADS; do
-        commands+=("$MERKURIO extract -i $FASTQ_1 -2 $FASTQ_2 -f $PATTERN_FILE --threads $thread_count -o $RESULT_DIR/json-output-${DATA_TAG}-t${thread_count} -j $RESULT_DIR/json-output-${DATA_TAG}-t${thread_count}.json")
-    done
-    for thread_count in $THREADS; do
-        commands+=("$MERKURIO extract -i $FASTQ_1 -2 $FASTQ_2 -f $PATTERN_FILE --threads $thread_count --suppress-output -j $RESULT_DIR/json-suppress-${DATA_TAG}-t${thread_count}.json")
+        fast_output_commands+=("$MERKURIO extract -i $FASTQ_1 -2 $FASTQ_2 -f $PATTERN_FILE --threads $thread_count -o $RESULT_DIR/fast-output-${DATA_TAG}-t${thread_count}")
     done
 
-    if command -v hyperfine >/dev/null 2>&1; then
-        run_hyperfine "$DATA_TAG" "${commands[@]}"
-    else
-        echo "hyperfine not found; using /usr/bin/time fallback."
-        run_shell_timer "${commands[@]}"
+    local json_output_commands=()
+    if [[ -x "$MERKURIO_SINGLE" ]]; then
+        json_output_commands+=("$MERKURIO_SINGLE extract -i $FASTQ_1 -2 $FASTQ_2 -f $PATTERN_FILE -o $RESULT_DIR/json-output-${DATA_TAG}-single -j $RESULT_DIR/json-output-${DATA_TAG}-single.json")
     fi
+    for thread_count in $THREADS; do
+        json_output_commands+=("$MERKURIO extract -i $FASTQ_1 -2 $FASTQ_2 -f $PATTERN_FILE --threads $thread_count -o $RESULT_DIR/json-output-${DATA_TAG}-t${thread_count} -j $RESULT_DIR/json-output-${DATA_TAG}-t${thread_count}.json")
+    done
+
+    local json_suppress_commands=()
+    if [[ -x "$MERKURIO_SINGLE" ]]; then
+        json_suppress_commands+=("$MERKURIO_SINGLE extract -i $FASTQ_1 -2 $FASTQ_2 -f $PATTERN_FILE --suppress-output -j $RESULT_DIR/json-suppress-${DATA_TAG}-single.json")
+    fi
+    for thread_count in $THREADS; do
+        json_suppress_commands+=("$MERKURIO extract -i $FASTQ_1 -2 $FASTQ_2 -f $PATTERN_FILE --threads $thread_count --suppress-output -j $RESULT_DIR/json-suppress-${DATA_TAG}-t${thread_count}.json")
+    done
+
+    run_benchmark_group "fast-output" "${fast_output_commands[@]}"
+    run_benchmark_group "json-output" "${json_output_commands[@]}"
+    run_benchmark_group "json-suppress" "${json_suppress_commands[@]}"
 }
 
 main "$@"
