@@ -62,22 +62,6 @@ impl<T> Default for OrderedResultBuffer<T> {
     }
 }
 
-#[derive(Debug)]
-struct ResultChunk<R> {
-    start_index: u64,
-    results: Vec<R>,
-}
-
-impl<R: IndexedResult> IndexedResult for ResultChunk<R> {
-    fn index(&self) -> u64 {
-        self.start_index
-    }
-
-    fn index_span(&self) -> u64 {
-        self.results.iter().map(IndexedResult::index_span).sum()
-    }
-}
-
 #[derive(Debug, Clone, Eq, PartialEq)]
 pub struct ExtractSummary {
     pub nb_records_tot: usize,
@@ -105,124 +89,7 @@ impl PipelineConfig {
     }
 }
 
-pub fn run_bounded_ordered_pipeline<W, R, P, C>(
-    work_items: Vec<W>,
-    config: PipelineConfig,
-    process_work: P,
-    mut consume_ready: C,
-) -> anyhow::Result<()>
-where
-    W: Send + 'static,
-    R: IndexedResult + Send + 'static,
-    P: Fn(W) -> anyhow::Result<Vec<R>> + Send + Sync + 'static,
-    C: FnMut(R) -> anyhow::Result<()>,
-{
-    if config.worker_count == 0 {
-        anyhow::bail!("Pipeline worker count must be greater than zero.");
-    }
-    if config.work_queue_bound == 0 {
-        anyhow::bail!("Pipeline work queue bound must be greater than zero.");
-    }
-    if config.result_queue_bound == 0 {
-        anyhow::bail!("Pipeline result queue bound must be greater than zero.");
-    }
-
-    let (work_tx, work_rx) = bounded::<W>(config.work_queue_bound);
-    let (result_tx, result_rx) = bounded::<ResultChunk<R>>(config.result_queue_bound);
-
-    let producer = thread::spawn(move || -> anyhow::Result<()> {
-        for work in work_items {
-            work_tx.send(work).map_err(|_| {
-                anyhow::anyhow!("Pipeline work queue closed before all work was sent.")
-            })?;
-        }
-        Ok(())
-    });
-
-    let process_work = Arc::new(process_work);
-    let mut workers = Vec::with_capacity(config.worker_count);
-    for _ in 0..config.worker_count {
-        let work_rx = work_rx.clone();
-        let result_tx = result_tx.clone();
-        let process_work = Arc::clone(&process_work);
-        workers.push(thread::spawn(move || -> anyhow::Result<()> {
-            while let Ok(work) = work_rx.recv() {
-                let results = process_work(work)?;
-                if let Some(first_result) = results.first() {
-                    result_tx
-                        .send(ResultChunk {
-                            start_index: first_result.index(),
-                            results,
-                        })
-                        .map_err(|_| {
-                            anyhow::anyhow!(
-                                "Pipeline result queue closed before all result chunks were sent."
-                            )
-                        })?;
-                }
-            }
-            Ok(())
-        }));
-    }
-    drop(result_tx);
-
-    let mut ordered_results = OrderedResultBuffer::new();
-    let mut consume_error = None;
-    while let Ok(result_chunk) = result_rx.recv() {
-        ordered_results.push(result_chunk);
-        while let Some(ready_chunk) = ordered_results.pop_ready() {
-            for ready in ready_chunk.results {
-                if let Err(error) = consume_ready(ready) {
-                    consume_error = Some(error);
-                    break;
-                }
-            }
-            if consume_error.is_some() {
-                break;
-            }
-        }
-        if consume_error.is_some() {
-            break;
-        }
-    }
-    drop(result_rx);
-
-    let producer_result = producer
-        .join()
-        .map_err(|_| anyhow::anyhow!("Pipeline producer thread panicked."))?;
-
-    let mut worker_error = None;
-    for worker in workers {
-        match worker.join() {
-            Ok(Ok(())) => {}
-            Ok(Err(error)) if worker_error.is_none() => worker_error = Some(error),
-            Ok(Err(_)) => {}
-            Err(_) if worker_error.is_none() => {
-                worker_error = Some(anyhow::anyhow!("Pipeline worker thread panicked."));
-            }
-            Err(_) => {}
-        }
-    }
-
-    producer_result?;
-    if let Some(error) = worker_error {
-        return Err(error);
-    }
-    if let Some(error) = consume_error {
-        return Err(error);
-    }
-    if ordered_results.pending_len() > 0 {
-        anyhow::bail!(
-            "Pipeline completed with {} out-of-order result chunk(s) still pending; missing result index {}.",
-            ordered_results.pending_len(),
-            ordered_results.next_expected_index()
-        );
-    }
-
-    Ok(())
-}
-
-pub fn run_bounded_ordered_pipeline_with_producer<W, R, PR, P, C>(
+pub fn run_bounded_ordered_pipeline<W, R, PR, P, C>(
     config: PipelineConfig,
     produce_work: PR,
     process_work: P,
@@ -456,13 +323,18 @@ mod tests {
         let mut consumed = Vec::new();
 
         run_bounded_ordered_pipeline(
-            work_items,
             config,
+            move |work_tx| {
+                for work in work_items {
+                    work_tx.send(work).unwrap();
+                }
+                Ok(())
+            },
             move |index| {
                 if index == 0 {
                     thread::sleep(Duration::from_millis(30));
                 }
-                Ok(vec![TestResult { index, span: 1 }])
+                Ok(TestResult { index, span: 1 })
             },
             |result| {
                 consumed.push(result.index);
@@ -485,18 +357,24 @@ mod tests {
         let mut consumed = Vec::new();
 
         run_bounded_ordered_pipeline(
-            work_items,
             config,
+            move |work_tx| {
+                for work in work_items {
+                    work_tx.send(work).unwrap();
+                }
+                Ok(())
+            },
             move |start_index| {
                 if start_index == 0 {
                     thread::sleep(Duration::from_millis(30));
                 }
-                Ok((start_index..start_index + 2)
-                    .map(|index| TestResult { index, span: 1 })
-                    .collect())
+                Ok(TestResult {
+                    index: start_index,
+                    span: 2,
+                })
             },
             |result| {
-                consumed.push(result.index);
+                consumed.extend(result.index..result.index + result.span);
                 Ok(())
             },
         )
@@ -507,13 +385,13 @@ mod tests {
 
     #[test]
     fn bounded_pipeline_rejects_zero_workers() {
-        let error = run_bounded_ordered_pipeline::<u64, TestResult, _, _>(
-            Vec::new(),
+        let error = run_bounded_ordered_pipeline::<u64, TestResult, _, _, _>(
             PipelineConfig {
                 worker_count: 0,
                 work_queue_bound: 1,
                 result_queue_bound: 1,
             },
+            |_| unreachable!(),
             |_| unreachable!(),
             |_| Ok(()),
         )
