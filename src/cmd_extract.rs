@@ -34,8 +34,8 @@ use crate::helpers::{
     add_suffix_to_file_prefix, check_log_flag_conflict, error_if_directory,
     identify_uncompressed_type, parse_pattern_list, recommend_aho_corasick,
 };
-use crate::logger::{BufferedLogger, JsonLogger};
-use crate::pattern_matching::{MatchHit, PatternMatcher};
+use crate::logger::{BufferedLogger, JsonLogger, append_json_log_fields, append_log_fields};
+use crate::pattern_matching::PatternMatcher;
 
 const DEFAULT_EXTRACT_PARALLEL_CHUNK_SIZE: usize = 1024;
 
@@ -94,7 +94,7 @@ struct PairedRecordSetWorkChunk {
 struct SingleChunkResult {
     start_index: u64,
     record_count: usize,
-    log_records: Vec<LogRecord>,
+    logs: ChunkLogs,
     summary: ExtractSummary,
     output: Vec<u8>,
 }
@@ -112,7 +112,7 @@ impl IndexedResult for SingleChunkResult {
 struct PairedChunkResult {
     start_index: u64,
     record_count: usize,
-    log_records: Vec<LogRecord>,
+    logs: ChunkLogs,
     summary: ExtractSummary,
     output_1: Vec<u8>,
     output_2: Vec<u8>,
@@ -139,16 +139,21 @@ fn record_set_pool_size(config: PipelineConfig) -> usize {
     config.worker_count + config.work_queue_bound
 }
 
-struct LogRecord {
-    file_slot: FileSlot,
-    record_id: Vec<u8>,
-    hits: Vec<MatchHit>,
+#[derive(Default)]
+struct ChunkLogs {
+    plain: String,
+    json: String,
+    json_first: bool,
 }
 
 struct ChunkProcessor {
     matcher: Arc<PatternMatcher>,
+    patterns: Arc<Vec<String>>,
+    file_names: [String; 2],
     pattern_count: usize,
     logging_active: bool,
+    plain_logging_active: bool,
+    json_logging_active: bool,
     invert_match: bool,
     write_output: bool,
 }
@@ -159,29 +164,40 @@ fn process_record_matches(
     record_id: &[u8],
     seq: &[u8],
     summary: &mut ExtractSummary,
-    log_records: &mut Vec<LogRecord>,
+    logs: &mut ChunkLogs,
 ) -> bool {
     if !processor.logging_active {
         return processor.matcher.find_any(seq);
     }
 
     summary.record_searched(seq.len());
-    let mut hits = Vec::new();
+    let mut matched = false;
+    let file_name = match file_slot {
+        FileSlot::SingleOrFirst => &processor.file_names[0],
+        FileSlot::Second => &processor.file_names[1],
+    };
     processor.matcher.for_each_match(seq, |hit| {
+        matched = true;
         summary.pattern_hit(file_slot, hit.pattern_index);
-        hits.push(hit);
+        let pattern = &processor.patterns[hit.pattern_index];
+        if processor.plain_logging_active {
+            append_log_fields(&mut logs.plain, file_name, record_id, pattern, hit.position);
+        }
+        if processor.json_logging_active {
+            append_json_log_fields(
+                &mut logs.json,
+                &mut logs.json_first,
+                file_name,
+                record_id,
+                pattern,
+                hit.position,
+            );
+        }
     });
-    if hits.is_empty() {
-        false
-    } else {
+    if matched {
         summary.record_hit(file_slot);
-        log_records.push(LogRecord {
-            file_slot,
-            record_id: record_id.to_vec(),
-            hits,
-        });
-        true
     }
+    matched
 }
 
 fn process_borrowed_single_record_with_chunk_output<R: Record>(
@@ -197,7 +213,7 @@ fn process_borrowed_single_record_with_chunk_output<R: Record>(
         record.id(),
         &seq,
         &mut chunk.summary,
-        &mut chunk.log_records,
+        &mut chunk.logs,
     ) != processor.invert_match;
     if extracted {
         chunk.summary.extracted_records(1);
@@ -232,7 +248,7 @@ fn process_borrowed_paired_record_with_chunk_output<R1: Record, R2: Record>(
         record_1.id(),
         &seq_1,
         &mut chunk.summary,
-        &mut chunk.log_records,
+        &mut chunk.logs,
     );
     let matched_2 = if !processor.logging_active && matched_1 {
         false
@@ -243,7 +259,7 @@ fn process_borrowed_paired_record_with_chunk_output<R1: Record, R2: Record>(
             record_2.id(),
             &seq_2,
             &mut chunk.summary,
-            &mut chunk.log_records,
+            &mut chunk.logs,
         )
     };
     let extracted = (matched_1 || matched_2) != processor.invert_match;
@@ -283,7 +299,10 @@ fn process_single_record_set(
     let mut chunk = SingleChunkResult {
         start_index,
         record_count,
-        log_records: Vec::new(),
+        logs: ChunkLogs {
+            json_first: true,
+            ..ChunkLogs::default()
+        },
         summary: ExtractSummary::new(processor.pattern_count),
         output: Vec::new(),
     };
@@ -341,7 +360,10 @@ where
     let mut chunk = PairedChunkResult {
         start_index,
         record_count: capacity,
-        log_records: Vec::new(),
+        logs: ChunkLogs {
+            json_first: true,
+            ..ChunkLogs::default()
+        },
         summary: ExtractSummary::new(processor.pattern_count),
         output_1: Vec::new(),
         output_2: Vec::new(),
@@ -438,56 +460,16 @@ fn process_pooled_paired_record_set_chunk(
     result
 }
 
-fn log_record_hit(
-    record: &LogRecord,
-    hit: MatchHit,
-    file_1_name: &str,
-    file_2_name: &str,
-    pattern_list: &[String],
-    logger: &mut BufferedLogger,
-    json_logger: &mut Option<JsonLogger>,
-) {
-    let file_name = match record.file_slot {
-        FileSlot::SingleOrFirst => file_1_name,
-        FileSlot::Second => file_2_name,
-    };
-    logger.log_fields(
-        file_name,
-        &record.record_id,
-        &pattern_list[hit.pattern_index],
-        hit.position,
-    );
-    if let Some(jl) = json_logger {
-        jl.log_fields(
-            file_name,
-            &record.record_id,
-            &pattern_list[hit.pattern_index],
-            hit.position,
-        );
-    }
-}
-
 fn consume_single_chunk_result(
     chunk: SingleChunkResult,
-    file_name: &str,
-    pattern_list: &[String],
     writer: &mut Box<dyn io::Write>,
     logger: &mut BufferedLogger,
     json_logger: &mut Option<JsonLogger>,
     summary: &mut ExtractSummary,
 ) -> Result<()> {
-    for record in &chunk.log_records {
-        for &hit in &record.hits {
-            log_record_hit(
-                record,
-                hit,
-                file_name,
-                "",
-                pattern_list,
-                logger,
-                json_logger,
-            );
-        }
+    logger.log_fragment(&chunk.logs.plain);
+    if let Some(json_logger) = json_logger {
+        json_logger.log_fragment(&chunk.logs.json);
     }
     summary.merge(&chunk.summary);
     if !chunk.output.is_empty() {
@@ -498,25 +480,14 @@ fn consume_single_chunk_result(
 
 fn consume_paired_chunk_result(
     chunk: PairedChunkResult,
-    file_names: (&str, &str),
-    pattern_list: &[String],
     writers: (&mut Box<dyn io::Write>, &mut Box<dyn io::Write>),
     logger: &mut BufferedLogger,
     json_logger: &mut Option<JsonLogger>,
     summary: &mut ExtractSummary,
 ) -> Result<()> {
-    for record in &chunk.log_records {
-        for &hit in &record.hits {
-            log_record_hit(
-                record,
-                hit,
-                file_names.0,
-                file_names.1,
-                pattern_list,
-                logger,
-                json_logger,
-            );
-        }
+    logger.log_fragment(&chunk.logs.plain);
+    if let Some(json_logger) = json_logger {
+        json_logger.log_fragment(&chunk.logs.json);
     }
     summary.merge(&chunk.summary);
     if !chunk.output_1.is_empty() {
@@ -714,7 +685,9 @@ pub fn extract_records(args: CmdExtract) -> Result<()> {
     };
 
     // Activate logging if a log or JSON log file is provided
-    let logging_active = log_file.is_some() || args.json_log.is_some();
+    let plain_logging_active = log_file.is_some();
+    let json_logging_active = args.json_log.is_some();
+    let logging_active = plain_logging_active || json_logging_active;
 
     // Initialize buffered logger with 8KB buffer
     let mut logger = BufferedLogger::new(log_file, 8192);
@@ -832,8 +805,12 @@ pub fn extract_records(args: CmdExtract) -> Result<()> {
             let write_output = !args.suppress_output;
             let chunk_processor = ChunkProcessor {
                 matcher: Arc::clone(&matcher),
+                patterns: Arc::new(pattern_list.clone()),
+                file_names: [in_fastx_filename.to_string(), String::new()],
                 pattern_count: pattern_list.len(),
                 logging_active,
+                plain_logging_active,
+                json_logging_active,
                 invert_match: args.invert_match,
                 write_output,
             };
@@ -891,8 +868,6 @@ pub fn extract_records(args: CmdExtract) -> Result<()> {
                 |result| {
                     consume_single_chunk_result(
                         result,
-                        in_fastx_filename,
-                        &pattern_list,
                         &mut writer,
                         &mut logger,
                         &mut json_logger,
@@ -1033,8 +1008,15 @@ pub fn extract_records(args: CmdExtract) -> Result<()> {
             let write_output = !args.suppress_output;
             let chunk_processor = ChunkProcessor {
                 matcher: Arc::clone(&matcher),
+                patterns: Arc::new(pattern_list.clone()),
+                file_names: [
+                    in_fastx_filename.to_string(),
+                    in_fastq_2_filename.to_string(),
+                ],
                 pattern_count: pattern_list.len(),
                 logging_active,
+                plain_logging_active,
+                json_logging_active,
                 invert_match: args.invert_match,
                 write_output,
             };
@@ -1119,8 +1101,6 @@ pub fn extract_records(args: CmdExtract) -> Result<()> {
                 |result| {
                     consume_paired_chunk_result(
                         result,
-                        (in_fastx_filename, in_fastq_2_filename),
-                        &pattern_list,
                         (&mut writer, &mut writer2),
                         &mut logger,
                         &mut json_logger,

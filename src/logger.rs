@@ -7,6 +7,54 @@ use std::{
     str,
 };
 
+pub fn append_log_fields(
+    buffer: &mut String,
+    prefix: &str,
+    record: &[u8],
+    pattern: &str,
+    index: usize,
+) {
+    let id_str = str::from_utf8(record).expect("Error during id parsing.");
+    buffer.push_str(prefix);
+    buffer.push('\t');
+    buffer.push_str(id_str);
+    buffer.push('\t');
+    buffer.push_str(pattern);
+    buffer.push('\t');
+    write!(buffer, "{index}").unwrap();
+    buffer.push('\n');
+}
+
+pub fn append_json_log_fields(
+    buffer: &mut String,
+    first: &mut bool,
+    file: &str,
+    record: &[u8],
+    pattern: &str,
+    index: usize,
+) {
+    let id_str = str::from_utf8(record).expect("Error during id parsing.");
+
+    if !*first {
+        buffer.push_str(",\n");
+    }
+    *first = false;
+
+    let value = json!({
+        "file": file,
+        "record_id": id_str,
+        "pattern": pattern,
+        "position": index.to_string(),
+    });
+
+    let pretty = serde_json::to_string_pretty(&value).unwrap();
+    for line in pretty.lines() {
+        buffer.push_str("    ");
+        buffer.push_str(line);
+        buffer.push('\n');
+    }
+}
+
 /// A buffered logger that streams log records in batches.
 pub struct BufferedLogger {
     buffer: String,
@@ -44,23 +92,29 @@ impl BufferedLogger {
     /// Logs the given fields directly to the buffer without constructing an
     /// intermediate `String` for output.
     pub fn log_fields(&mut self, prefix: &str, record: &[u8], pattern: &str, index: usize) {
-        let id_str = str::from_utf8(record).expect("Error during id parsing.");
-
         if self.writer.is_none() {
+            let id_str = str::from_utf8(record).expect("Error during id parsing.");
             self.records
                 .push(format!("{prefix}\t{id_str}\t{pattern}\t{index}\n"));
             return;
         }
 
-        self.buffer.push_str(prefix);
-        self.buffer.push('\t');
-        self.buffer.push_str(id_str);
-        self.buffer.push('\t');
-        self.buffer.push_str(pattern);
-        self.buffer.push('\t');
-        write!(self.buffer, "{index}").unwrap();
-        self.buffer.push('\n');
+        append_log_fields(&mut self.buffer, prefix, record, pattern, index);
 
+        if self.buffer.len() >= self.buffer_size {
+            self.flush();
+        }
+    }
+
+    pub fn log_fragment(&mut self, fragment: &str) {
+        if fragment.is_empty() {
+            return;
+        }
+        if self.writer.is_none() {
+            self.records.push(fragment.to_string());
+            return;
+        }
+        self.buffer.push_str(fragment);
         if self.buffer.len() >= self.buffer_size {
             self.flush();
         }
@@ -113,27 +167,29 @@ impl JsonLogger {
 
     /// Log record fields as a JSON object.
     pub fn log_fields(&mut self, file: &str, record: &[u8], pattern: &str, index: usize) {
-        let id_str = str::from_utf8(record).expect("Error during id parsing.");
+        append_json_log_fields(
+            &mut self.buffer,
+            &mut self.first,
+            file,
+            record,
+            pattern,
+            index,
+        );
 
+        if self.buffer.len() >= self.buffer_size {
+            self.flush();
+        }
+    }
+
+    pub fn log_fragment(&mut self, fragment: &str) {
+        if fragment.is_empty() {
+            return;
+        }
         if !self.first {
             self.buffer.push_str(",\n");
         }
         self.first = false;
-
-        let value = json!({
-            "file": file,
-            "record_id": id_str,
-            "pattern": pattern,
-            "position": index.to_string(),
-        });
-
-        let pretty = serde_json::to_string_pretty(&value).unwrap();
-        for line in pretty.lines() {
-            self.buffer.push_str("    ");
-            self.buffer.push_str(line);
-            self.buffer.push('\n');
-        }
-
+        self.buffer.push_str(fragment);
         if self.buffer.len() >= self.buffer_size {
             self.flush();
         }
