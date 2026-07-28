@@ -1,7 +1,6 @@
 //! Logger utilities
 
 use core::fmt::Write as FmtWrite;
-use serde_json::json;
 use std::{
     io::{self, Write},
     str,
@@ -26,7 +25,7 @@ pub fn append_log_fields(
 }
 
 pub fn append_json_log_fields(
-    buffer: &mut String,
+    buffer: &mut Vec<u8>,
     first: &mut bool,
     file: &str,
     record: &[u8],
@@ -36,23 +35,19 @@ pub fn append_json_log_fields(
     let id_str = str::from_utf8(record).expect("Error during id parsing.");
 
     if !*first {
-        buffer.push_str(",\n");
+        buffer.extend_from_slice(b",\n");
     }
     *first = false;
 
-    let value = json!({
-        "file": file,
-        "record_id": id_str,
-        "pattern": pattern,
-        "position": index.to_string(),
-    });
-
-    let pretty = serde_json::to_string_pretty(&value).unwrap();
-    for line in pretty.lines() {
-        buffer.push_str("    ");
-        buffer.push_str(line);
-        buffer.push('\n');
-    }
+    buffer.extend_from_slice(b"    {\n      \"file\": ");
+    serde_json::to_writer(&mut *buffer, file).unwrap();
+    buffer.extend_from_slice(b",\n      \"pattern\": ");
+    serde_json::to_writer(&mut *buffer, pattern).unwrap();
+    buffer.extend_from_slice(b",\n      \"position\": \"");
+    write!(buffer, "{index}").unwrap();
+    buffer.extend_from_slice(b"\",\n      \"record_id\": ");
+    serde_json::to_writer(&mut *buffer, id_str).unwrap();
+    buffer.extend_from_slice(b"\n    }\n");
 }
 
 /// A buffered logger that streams log records in batches.
@@ -106,18 +101,26 @@ impl BufferedLogger {
         }
     }
 
-    pub fn log_fragment(&mut self, fragment: &str) {
+    pub fn log_fragment(&mut self, fragment: &str) -> io::Result<()> {
         if fragment.is_empty() {
-            return;
+            return Ok(());
         }
         if self.writer.is_none() {
             self.records.push(fragment.to_string());
-            return;
+            return Ok(());
+        }
+        if fragment.len() >= self.buffer_size {
+            self.try_flush()?;
+            if let Some(writer) = &mut self.writer {
+                writer.write_all(fragment.as_bytes())?;
+            }
+            return Ok(());
         }
         self.buffer.push_str(fragment);
         if self.buffer.len() >= self.buffer_size {
-            self.flush();
+            self.try_flush()?;
         }
+        Ok(())
     }
 
     /// Writes a header directly to the output without buffering.
@@ -129,12 +132,17 @@ impl BufferedLogger {
 
     /// Flushes the buffer to the output.
     pub fn flush(&mut self) {
+        let _ = self.try_flush();
+    }
+
+    fn try_flush(&mut self) -> io::Result<()> {
         if let Some(writer) = &mut self.writer
             && !self.buffer.is_empty()
         {
-            let _ = writer.write_all(self.buffer.as_bytes());
+            writer.write_all(self.buffer.as_bytes())?;
             self.buffer.clear();
         }
+        Ok(())
     }
 
     /// Returns records collected in records-only mode.
@@ -145,7 +153,7 @@ impl BufferedLogger {
 
 /// A logger that streams matching records directly to a JSON file.
 pub struct JsonLogger {
-    buffer: String,
+    buffer: Vec<u8>,
     writer: Option<Box<dyn io::Write>>,
     buffer_size: usize,
     first: bool,
@@ -158,7 +166,7 @@ impl JsonLogger {
             let _ = w.write_all(b"{\n  \"matching_records\": [\n");
         }
         Self {
-            buffer: String::with_capacity(buffer_size),
+            buffer: Vec::with_capacity(buffer_size),
             writer,
             buffer_size,
             first: true,
@@ -181,28 +189,41 @@ impl JsonLogger {
         }
     }
 
-    pub fn log_fragment(&mut self, fragment: &str) {
+    pub fn log_fragment(&mut self, fragment: &[u8]) -> io::Result<()> {
         if fragment.is_empty() {
-            return;
+            return Ok(());
         }
         if !self.first {
-            self.buffer.push_str(",\n");
+            self.buffer.extend_from_slice(b",\n");
         }
         self.first = false;
-        self.buffer.push_str(fragment);
-        if self.buffer.len() >= self.buffer_size {
-            self.flush();
+        if fragment.len() >= self.buffer_size {
+            self.try_flush()?;
+            if let Some(writer) = &mut self.writer {
+                writer.write_all(fragment)?;
+            }
+            return Ok(());
         }
+        self.buffer.extend_from_slice(fragment);
+        if self.buffer.len() >= self.buffer_size {
+            self.try_flush()?;
+        }
+        Ok(())
     }
 
     /// Flush the internal buffer.
     pub fn flush(&mut self) {
+        let _ = self.try_flush();
+    }
+
+    fn try_flush(&mut self) -> io::Result<()> {
         if let Some(writer) = &mut self.writer
             && !self.buffer.is_empty()
         {
-            let _ = writer.write_all(self.buffer.as_bytes());
+            writer.write_all(&self.buffer)?;
             self.buffer.clear();
         }
+        Ok(())
     }
 
     fn write_indented_value(&mut self, value: &serde_json::Value, indent: usize) {
@@ -210,10 +231,10 @@ impl JsonLogger {
         let pretty = serde_json::to_string_pretty(value).unwrap();
         for (i, line) in pretty.lines().enumerate() {
             if i > 0 {
-                self.buffer.push_str(&indent_str);
+                self.buffer.extend_from_slice(indent_str.as_bytes());
             }
-            self.buffer.push_str(line);
-            self.buffer.push('\n');
+            self.buffer.extend_from_slice(line.as_bytes());
+            self.buffer.push(b'\n');
         }
     }
 
@@ -225,30 +246,33 @@ impl JsonLogger {
         summary_statistics: &serde_json::Value,
         paired_end_stats: Option<&serde_json::Value>,
     ) {
-        self.buffer.push_str("  ],\n  \"meta_information\": ");
+        self.buffer
+            .extend_from_slice(b"  ],\n  \"meta_information\": ");
         self.write_indented_value(meta_information, 2);
-        if self.buffer.ends_with('\n') {
+        if self.buffer.ends_with(b"\n") {
             self.buffer.pop();
         }
         if let Some(stats) = paired_end_stats {
             self.buffer
-                .push_str(",\n  \"paired_end_reads_statistics\": ");
+                .extend_from_slice(b",\n  \"paired_end_reads_statistics\": ");
             self.write_indented_value(stats, 2);
-            if self.buffer.ends_with('\n') {
+            if self.buffer.ends_with(b"\n") {
                 self.buffer.pop();
             }
         }
-        self.buffer.push_str(",\n  \"pattern_hit_counts\": ");
+        self.buffer
+            .extend_from_slice(b",\n  \"pattern_hit_counts\": ");
         self.write_indented_value(pattern_hit_counts, 2);
-        if self.buffer.ends_with('\n') {
+        if self.buffer.ends_with(b"\n") {
             self.buffer.pop();
         }
-        self.buffer.push_str(",\n  \"summary_statistics\": ");
+        self.buffer
+            .extend_from_slice(b",\n  \"summary_statistics\": ");
         self.write_indented_value(summary_statistics, 2);
-        if self.buffer.ends_with('\n') {
+        if self.buffer.ends_with(b"\n") {
             self.buffer.pop();
         }
-        self.buffer.push_str("\n}\n");
+        self.buffer.extend_from_slice(b"\n}\n");
         self.flush();
     }
 }

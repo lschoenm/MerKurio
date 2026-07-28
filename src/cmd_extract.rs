@@ -142,7 +142,7 @@ fn record_set_pool_size(config: PipelineConfig) -> usize {
 #[derive(Default)]
 struct ChunkLogs {
     plain: String,
-    json: String,
+    json: Vec<u8>,
     json_first: bool,
 }
 
@@ -467,9 +467,9 @@ fn consume_single_chunk_result(
     json_logger: &mut Option<JsonLogger>,
     summary: &mut ExtractSummary,
 ) -> Result<()> {
-    logger.log_fragment(&chunk.logs.plain);
+    logger.log_fragment(&chunk.logs.plain)?;
     if let Some(json_logger) = json_logger {
-        json_logger.log_fragment(&chunk.logs.json);
+        json_logger.log_fragment(&chunk.logs.json)?;
     }
     summary.merge(&chunk.summary);
     if !chunk.output.is_empty() {
@@ -485,9 +485,9 @@ fn consume_paired_chunk_result(
     json_logger: &mut Option<JsonLogger>,
     summary: &mut ExtractSummary,
 ) -> Result<()> {
-    logger.log_fragment(&chunk.logs.plain);
+    logger.log_fragment(&chunk.logs.plain)?;
     if let Some(json_logger) = json_logger {
-        json_logger.log_fragment(&chunk.logs.json);
+        json_logger.log_fragment(&chunk.logs.json)?;
     }
     summary.merge(&chunk.summary);
     if !chunk.output_1.is_empty() {
