@@ -41,7 +41,7 @@ const DEFAULT_EXTRACT_PARALLEL_CHUNK_SIZE: usize = 1024;
 
 #[derive(Debug, PartialEq, Eq)]
 struct ThreadResolution {
-    effective_threads: usize,
+    effective_total_threads: usize,
     auto_detected: bool,
     clamped: bool,
 }
@@ -53,14 +53,14 @@ fn resolve_extract_threads_with_available(
     let available_threads = available_threads.max(1);
     if requested_threads == 0 {
         return ThreadResolution {
-            effective_threads: available_threads,
+            effective_total_threads: available_threads,
             auto_detected: true,
             clamped: false,
         };
     }
 
     ThreadResolution {
-        effective_threads: requested_threads.min(available_threads),
+        effective_total_threads: requested_threads.min(available_threads),
         auto_detected: false,
         clamped: requested_threads > available_threads,
     }
@@ -71,6 +71,10 @@ fn resolve_extract_threads(requested_threads: usize) -> ThreadResolution {
         .map(|parallelism| parallelism.get())
         .unwrap_or(1);
     resolve_extract_threads_with_available(requested_threads, available_threads)
+}
+
+fn matching_thread_count(total_threads: usize) -> usize {
+    total_threads.saturating_sub(1)
 }
 
 struct SingleRecordSetWorkChunk {
@@ -617,7 +621,7 @@ pub struct CmdExtract {
     )]
     aho_corasick: bool,
 
-    /// Number of worker threads for extract pattern matching. Use 0 to auto-detect available cores.
+    /// Total number of processing threads. One thread reads input and the remaining threads match records. Use 0 to auto-detect available cores.
     #[clap(short = 't', long, default_value_t = 1)]
     threads: usize,
 
@@ -743,11 +747,14 @@ pub fn extract_records(args: CmdExtract) -> Result<()> {
     let thread_resolution = resolve_extract_threads(args.threads);
     if thread_resolution.clamped {
         eprintln!(
-            "Warning: requested {} extract worker threads, but only {} are available; using {} threads.",
-            args.threads, thread_resolution.effective_threads, thread_resolution.effective_threads
+            "Warning: requested {} extract threads, but only {} are available; using {} threads.",
+            args.threads,
+            thread_resolution.effective_total_threads,
+            thread_resolution.effective_total_threads
         );
     }
-    let worker_threads = thread_resolution.effective_threads;
+    let total_threads = thread_resolution.effective_total_threads;
+    let matching_threads = matching_thread_count(total_threads);
     if args.chunk_size == 0 {
         anyhow::bail!("Extract chunk size must be greater than zero.");
     }
@@ -804,7 +811,7 @@ pub fn extract_records(args: CmdExtract) -> Result<()> {
             }
         };
 
-        if worker_threads > 1 {
+        if total_threads > 1 {
             let write_output = !args.suppress_output;
             let worker_processor = ExtractProcessor::new(
                 Arc::clone(&matcher),
@@ -814,7 +821,7 @@ pub fn extract_records(args: CmdExtract) -> Result<()> {
                 args.invert_match,
             );
             let mut summary = ExtractSummary::new(pattern_list.len());
-            let pipeline_config = PipelineConfig::new(worker_threads);
+            let pipeline_config = PipelineConfig::new(matching_threads);
             let pool_size = record_set_pool_size(pipeline_config);
             let (record_pool_tx, record_pool_rx) = bounded::<fastx::RecordSet>(pool_size);
             for _ in 0..pool_size {
@@ -1006,7 +1013,7 @@ pub fn extract_records(args: CmdExtract) -> Result<()> {
             }
         };
 
-        if worker_threads > 1 {
+        if total_threads > 1 {
             let write_output = !args.suppress_output;
             let worker_processor = ExtractProcessor::new(
                 Arc::clone(&matcher),
@@ -1016,7 +1023,7 @@ pub fn extract_records(args: CmdExtract) -> Result<()> {
                 args.invert_match,
             );
             let mut summary = ExtractSummary::new(pattern_list.len());
-            let pipeline_config = PipelineConfig::new(worker_threads);
+            let pipeline_config = PipelineConfig::new(matching_threads);
             let pool_size = record_set_pool_size(pipeline_config);
             let (record_pool_tx, record_pool_rx) =
                 bounded::<(fastx::RecordSet, fastx::RecordSet)>(pool_size);
@@ -2155,7 +2162,7 @@ mod tests {
         assert_eq!(
             resolve_extract_threads_with_available(0, 8),
             ThreadResolution {
-                effective_threads: 8,
+                effective_total_threads: 8,
                 auto_detected: true,
                 clamped: false,
             }
@@ -2167,11 +2174,18 @@ mod tests {
         assert_eq!(
             resolve_extract_threads_with_available(16, 8),
             ThreadResolution {
-                effective_threads: 8,
+                effective_total_threads: 8,
                 auto_detected: false,
                 clamped: true,
             }
         );
+    }
+
+    #[test]
+    fn test_extract_total_thread_budget_reserves_one_reader_thread() {
+        assert_eq!(matching_thread_count(1), 0);
+        assert_eq!(matching_thread_count(2), 1);
+        assert_eq!(matching_thread_count(4), 3);
     }
 
     #[test]

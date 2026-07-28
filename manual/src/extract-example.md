@@ -17,3 +17,10 @@ The following example only writes the matching statistics to a JSON file `log.js
 ```bash
 merkurio extract -i input.fasta -f query_kmers.txt -S -j log.json
 ```
+
+The following example uses four processing threads in total: one input reader
+and three pattern-matching threads:
+
+```bash
+merkurio extract -i input.fastq -f query_kmers.txt --threads 4 -o output.fastq
+```

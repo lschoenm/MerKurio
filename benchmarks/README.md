@@ -17,7 +17,7 @@ cd benchmarks/scripts
 ./05-quick-extract-parallel-benchmarks.sh
 ```
 
-This generates small FASTA and paired-end FASTQ inputs under `benchmarks/data/quick-extract` and benchmarks `--threads 1`, `--threads 2`, `--threads 4`, and `--threads 0` on a few logging-disabled and output-writing scenarios. If `hyperfine` is installed, results are written to `benchmarks/results/quick-extract/quick-extract.csv`; otherwise the script falls back to `/usr/bin/time` and writes `benchmarks/results/quick-extract/summary.txt`.
+This generates small FASTA and paired-end FASTQ inputs under `benchmarks/data/quick-extract` and benchmarks total processing-thread budgets of `--threads 1`, `--threads 2`, `--threads 4`, and `--threads 0` on a few logging-disabled and output-writing scenarios. One thread reads input and the remaining threads perform pattern matching; `0` uses the available CPU count automatically. If `hyperfine` is installed, results are written to `benchmarks/results/quick-extract/quick-extract.csv`; otherwise the script falls back to `/usr/bin/time` and writes `benchmarks/results/quick-extract/summary.txt`.
 
 Optional environment variables:
 
@@ -34,7 +34,7 @@ cd benchmarks/scripts
 ./06-realistic-extract-parallel-benchmarks.sh
 ```
 
-By default this generates `1,000,000` paired-end reads at `150 bp`, searches `250` deterministic `31 bp` patterns, and compares the current MerKurio binary with `--threads 1`, `--threads 2`, and `--threads 4`. If `benchmarks/merkurio-single` exists and is executable, the script also includes it as an old single-threaded baseline. The generated FASTQ input is about `319 MB` per mate file, or about `638 MB` for both files together.
+By default this generates `1,000,000` paired-end reads at `150 bp`, searches `250` deterministic `31 bp` patterns, and compares the current MerKurio binary with total processing-thread budgets of `--threads 1`, `--threads 2`, and `--threads 4`. If `benchmarks/merkurio-single` exists and is executable, the script also includes it as an old single-threaded baseline. The generated FASTQ input is about `319 MB` per mate file, or about `638 MB` for both files together.
 
 The realistic benchmark separates three modes:
 

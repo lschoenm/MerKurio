@@ -8,6 +8,11 @@ MerKurio supports input files compressed with gzip, bzip2 or xz. Note that searc
 
 MerKurio supports processing of **paired-end reads**, where a hit in one read also extracts the other read of that pair. The extracted records are written to separate files, with their names being set accordingly. In this mode, additional statistics are provided.
 
+Extraction can run in parallel. The `--threads` option sets the total number of
+processing threads: one thread reads the input and the remaining threads perform
+pattern matching. The default is 1. Set it to 0 to use the available CPU count
+automatically.
+
 Further options include the ability to also search for the **reverse complements** of nucleotide query sequences (i.e., a sequence is reversed, and C/G and A/T are swapped), or searching for canonical _k_-mers only. Output of matching records can be suppressed if only the statistics are needed. MerKurio tries to select the most efficient algorithm for the given query sequences, but the user can override this choice by selecting a specific algorithm (not recommended).
 
 For a detailed explanation of the matching statistics, see the [**Log Output**](log.md) section.
@@ -38,6 +43,7 @@ You can display a help message with `-h` or `--help`.
 | `-l`       | `--out-log`    | Set this flag without any arguments to write matching statistics to stdout, or write to file if a path to the output file is passed as an argument to this option. For an explanation of the matching statistics, see the [section below](extract-log.md). |
 | `-j`       | `--json-log`   | Set this flag without any arguments to write matching statistics in JSON format to stdout, or provide a file path to write JSON log to a file. If both `-l` and `-j` are set without arguments, it will return an error.                                   |
 | `-S`       | `--suppress-output`    | Set this flag to suppress the output of matching records. Only the matching statistics are printed (either use `-l` or `-j` for plain text or JSON logging, respectively).  |
+| `-t`       | `--threads`            | `<Total number of processing threads>` One thread reads input and the remaining threads perform pattern matching. Default is 1. Use 0 to detect the available CPU count automatically. |
 
 ### Search parameters: 
 

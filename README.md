@@ -37,6 +37,7 @@ MerKurio provides two complementary subcommands:
 
 - 🔍 **Extract**: Search FASTA/FASTQ data for _k_-mers and write records with matching _k_-mers to the terminal or a new file.
   - Supports paired-end reads (a hit in one read extracts the whole pair).
+  - Supports parallel processing with a configurable total thread count.
 - 📑 **Tag**: Annotate BAM/SAM alignments with _k_-mer tags and filter them based on matching _k_-mers.
   - Adds a two‑letter tag (default `km`) with comma-separated matching k‑mers (follows the [SAM format specification](https://samtools.github.io/hts-specs/SAMtags.pdf)).
   - Optionally keeps only reads containing at least one _k_‑mer.
@@ -101,6 +102,14 @@ Another example where paired-end reads are extracted if they contain the sequenc
 
 ```bash
 merkurio extract -1 input_R1.fastq -2 input_R2.fastq -o output -s ACGT TGCA -l log.txt
+```
+
+Use `--threads` to set the total number of processing threads. One thread reads
+the input and the remaining threads perform pattern matching. A value of `0`
+uses the available CPU count automatically:
+
+```bash
+merkurio extract -i input.fastq -f query_kmers.txt --threads 4 -o output.fastq
 ```
 
 ### The `tag` Subcommand
