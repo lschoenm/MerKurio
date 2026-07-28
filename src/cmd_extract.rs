@@ -26,8 +26,8 @@ use paraseq::{Record, fastx};
 use std::sync::Arc;
 
 use crate::extract_processing::{
-    ExtractProcessor, ExtractSummary, FileSlot, IndexedResult, PairedResult, PipelineConfig,
-    RecordHit, RecordInput, SingleResult, run_bounded_ordered_pipeline_with_producer,
+    ExtractSummary, FileSlot, IndexedResult, PipelineConfig,
+    run_bounded_ordered_pipeline_with_producer,
 };
 use crate::fastx_output::{FastxFormat, FastxRecordView, write_fastx_record};
 use crate::helpers::{
@@ -35,7 +35,7 @@ use crate::helpers::{
     identify_uncompressed_type, parse_pattern_list, recommend_aho_corasick,
 };
 use crate::logger::{BufferedLogger, JsonLogger};
-use crate::pattern_matching::PatternMatcher;
+use crate::pattern_matching::{MatchHit, PatternMatcher};
 
 const DEFAULT_EXTRACT_PARALLEL_CHUNK_SIZE: usize = 1024;
 
@@ -94,7 +94,8 @@ struct PairedRecordSetWorkChunk {
 struct SingleChunkResult {
     start_index: u64,
     record_count: usize,
-    results: Vec<SingleResult>,
+    log_records: Vec<LogRecord>,
+    summary: ExtractSummary,
     output: Vec<u8>,
 }
 
@@ -111,7 +112,8 @@ impl IndexedResult for SingleChunkResult {
 struct PairedChunkResult {
     start_index: u64,
     record_count: usize,
-    results: Vec<PairedResult>,
+    log_records: Vec<LogRecord>,
+    summary: ExtractSummary,
     output_1: Vec<u8>,
     output_2: Vec<u8>,
 }
@@ -137,27 +139,72 @@ fn record_set_pool_size(config: PipelineConfig) -> usize {
     config.worker_count + config.work_queue_bound
 }
 
+struct LogRecord {
+    file_slot: FileSlot,
+    record_id: Vec<u8>,
+    hits: Vec<MatchHit>,
+}
+
+struct ChunkProcessor {
+    matcher: Arc<PatternMatcher>,
+    pattern_count: usize,
+    logging_active: bool,
+    invert_match: bool,
+    write_output: bool,
+}
+
+fn process_record_matches(
+    processor: &ChunkProcessor,
+    file_slot: FileSlot,
+    record_id: &[u8],
+    seq: &[u8],
+    summary: &mut ExtractSummary,
+    log_records: &mut Vec<LogRecord>,
+) -> bool {
+    if !processor.logging_active {
+        return processor.matcher.find_any(seq);
+    }
+
+    summary.record_searched(seq.len());
+    let mut hits = Vec::new();
+    processor.matcher.for_each_match(seq, |hit| {
+        summary.pattern_hit(file_slot, hit.pattern_index);
+        hits.push(hit);
+    });
+    if hits.is_empty() {
+        false
+    } else {
+        summary.record_hit(file_slot);
+        log_records.push(LogRecord {
+            file_slot,
+            record_id: record_id.to_vec(),
+            hits,
+        });
+        true
+    }
+}
+
 fn process_borrowed_single_record_with_chunk_output<R: Record>(
-    processor: &ExtractProcessor,
-    record_index: u64,
+    processor: &ChunkProcessor,
     record: R,
     format: FastxFormat,
-    write_output: bool,
-    output: &mut Vec<u8>,
-) -> Result<SingleResult> {
+    chunk: &mut SingleChunkResult,
+) -> Result<()> {
     let seq = record.seq();
-    let result = processor.process_single_record(
-        record_index,
-        RecordInput {
-            id: record.id(),
-            seq: &seq,
-            qual: record.qual(),
-            format,
-        },
-    );
-    if write_output && result.extracted {
+    let extracted = process_record_matches(
+        processor,
+        FileSlot::SingleOrFirst,
+        record.id(),
+        &seq,
+        &mut chunk.summary,
+        &mut chunk.log_records,
+    ) != processor.invert_match;
+    if extracted {
+        chunk.summary.extracted_records(1);
+    }
+    if processor.write_output && extracted {
         write_fastx_record(
-            output,
+            &mut chunk.output,
             FastxRecordView {
                 id: record.id(),
                 seq: &seq,
@@ -166,40 +213,46 @@ fn process_borrowed_single_record_with_chunk_output<R: Record>(
             },
         )?;
     }
-    Ok(result)
+    Ok(())
 }
 
 fn process_borrowed_paired_record_with_chunk_output<R1: Record, R2: Record>(
-    processor: &ExtractProcessor,
-    pair_index: u64,
+    processor: &ChunkProcessor,
     record_1: R1,
     format_1: FastxFormat,
     record_2: R2,
     format_2: FastxFormat,
-    write_output: bool,
-    output_1: &mut Vec<u8>,
-    output_2: &mut Vec<u8>,
-) -> Result<PairedResult> {
+    chunk: &mut PairedChunkResult,
+) -> Result<()> {
     let seq_1 = record_1.seq();
     let seq_2 = record_2.seq();
-    let result = processor.process_paired_record(
-        pair_index,
-        RecordInput {
-            id: record_1.id(),
-            seq: &seq_1,
-            qual: record_1.qual(),
-            format: format_1,
-        },
-        RecordInput {
-            id: record_2.id(),
-            seq: &seq_2,
-            qual: record_2.qual(),
-            format: format_2,
-        },
+    let matched_1 = process_record_matches(
+        processor,
+        FileSlot::SingleOrFirst,
+        record_1.id(),
+        &seq_1,
+        &mut chunk.summary,
+        &mut chunk.log_records,
     );
-    if write_output && result.extracted {
+    let matched_2 = if !processor.logging_active && matched_1 {
+        false
+    } else {
+        process_record_matches(
+            processor,
+            FileSlot::Second,
+            record_2.id(),
+            &seq_2,
+            &mut chunk.summary,
+            &mut chunk.log_records,
+        )
+    };
+    let extracted = (matched_1 || matched_2) != processor.invert_match;
+    if extracted {
+        chunk.summary.extracted_records(2);
+    }
+    if processor.write_output && extracted {
         write_fastx_record(
-            output_1,
+            &mut chunk.output_1,
             FastxRecordView {
                 id: record_1.id(),
                 seq: &seq_1,
@@ -208,7 +261,7 @@ fn process_borrowed_paired_record_with_chunk_output<R1: Record, R2: Record>(
             },
         )?;
         write_fastx_record(
-            output_2,
+            &mut chunk.output_2,
             FastxRecordView {
                 id: record_2.id(),
                 seq: &seq_2,
@@ -217,84 +270,67 @@ fn process_borrowed_paired_record_with_chunk_output<R1: Record, R2: Record>(
             },
         )?;
     }
-    Ok(result)
+    Ok(())
 }
 
 fn process_single_record_set(
-    processor: &ExtractProcessor,
+    processor: &ChunkProcessor,
     start_index: u64,
     record_set: &fastx::RecordSet,
     format: FastxFormat,
-    write_output: bool,
 ) -> Result<SingleChunkResult> {
     let record_count = record_set_len(record_set);
-    let mut results = Vec::with_capacity(record_count);
-    let mut output = Vec::new();
+    let mut chunk = SingleChunkResult {
+        start_index,
+        record_count,
+        log_records: Vec::new(),
+        summary: ExtractSummary::new(processor.pattern_count),
+        output: Vec::new(),
+    };
     match record_set {
         fastx::RecordSet::Fasta(records) => {
-            for (offset, record) in records.iter().enumerate() {
+            for record in records.iter() {
                 let record = record.with_context(|| "Error during FASTQ/A record parsing.")?;
-                results.push(process_borrowed_single_record_with_chunk_output(
-                    processor,
-                    start_index + offset as u64,
-                    record,
-                    format,
-                    write_output,
-                    &mut output,
-                )?);
+                process_borrowed_single_record_with_chunk_output(
+                    processor, record, format, &mut chunk,
+                )?;
             }
         }
         fastx::RecordSet::Fastq(records) => {
-            for (offset, record) in records.iter().enumerate() {
+            for record in records.iter() {
                 let record = record.with_context(|| "Error during FASTQ/A record parsing.")?;
-                results.push(process_borrowed_single_record_with_chunk_output(
-                    processor,
-                    start_index + offset as u64,
-                    record,
-                    format,
-                    write_output,
-                    &mut output,
-                )?);
+                process_borrowed_single_record_with_chunk_output(
+                    processor, record, format, &mut chunk,
+                )?;
             }
         }
     }
-    Ok(SingleChunkResult {
-        start_index,
-        record_count,
-        results,
-        output,
-    })
+    Ok(chunk)
 }
 
 fn process_pooled_single_record_set_chunk(
-    processor: &ExtractProcessor,
+    processor: &ChunkProcessor,
     chunk: SingleRecordSetWorkChunk,
     pool_tx: &Sender<fastx::RecordSet>,
-    write_output: bool,
-) -> Result<Vec<SingleChunkResult>> {
+) -> Result<SingleChunkResult> {
     let SingleRecordSetWorkChunk {
         start_index,
         record_set,
         format,
     } = chunk;
-    let results =
-        process_single_record_set(processor, start_index, &record_set, format, write_output)
-            .map(|result| vec![result]);
+    let result = process_single_record_set(processor, start_index, &record_set, format);
     pool_tx
         .send(record_set)
         .map_err(|_| anyhow::anyhow!("Single-end record-set pool closed during processing."))?;
-    results
+    result
 }
 
 fn process_paired_record_iters<R1, R2, I1, I2>(
-    processor: &ExtractProcessor,
+    processor: &ChunkProcessor,
     start_index: u64,
     capacity: usize,
-    records_1: I1,
-    format_1: FastxFormat,
-    records_2: I2,
-    format_2: FastxFormat,
-    write_output: bool,
+    records: (I1, I2),
+    formats: (FastxFormat, FastxFormat),
 ) -> Result<PairedChunkResult>
 where
     R1: Record,
@@ -302,43 +338,32 @@ where
     I1: Iterator<Item = std::result::Result<R1, paraseq::Error>>,
     I2: Iterator<Item = std::result::Result<R2, paraseq::Error>>,
 {
-    let mut results = Vec::with_capacity(capacity);
-    let mut output_1 = Vec::new();
-    let mut output_2 = Vec::new();
-    for (offset, (record_1, record_2)) in records_1.zip(records_2).enumerate() {
+    let mut chunk = PairedChunkResult {
+        start_index,
+        record_count: capacity,
+        log_records: Vec::new(),
+        summary: ExtractSummary::new(processor.pattern_count),
+        output_1: Vec::new(),
+        output_2: Vec::new(),
+    };
+    for (record_1, record_2) in records.0.zip(records.1) {
         let record_1 =
             record_1.with_context(|| "Error during FASTQ record parsing of first file.")?;
         let record_2 =
             record_2.with_context(|| "Error during FASTQ record parsing of second file.")?;
-        results.push(process_borrowed_paired_record_with_chunk_output(
-            processor,
-            start_index + offset as u64,
-            record_1,
-            format_1,
-            record_2,
-            format_2,
-            write_output,
-            &mut output_1,
-            &mut output_2,
-        )?);
+        process_borrowed_paired_record_with_chunk_output(
+            processor, record_1, formats.0, record_2, formats.1, &mut chunk,
+        )?;
     }
-    Ok(PairedChunkResult {
-        start_index,
-        record_count: capacity,
-        results,
-        output_1,
-        output_2,
-    })
+    Ok(chunk)
 }
 
 fn process_paired_record_sets(
-    processor: &ExtractProcessor,
+    processor: &ChunkProcessor,
     start_index: u64,
     record_set_1: &fastx::RecordSet,
     record_set_2: &fastx::RecordSet,
-    format_1: FastxFormat,
-    format_2: FastxFormat,
-    write_output: bool,
+    formats: (FastxFormat, FastxFormat),
 ) -> Result<PairedChunkResult> {
     let len_1 = record_set_len(record_set_1);
     let len_2 = record_set_len(record_set_2);
@@ -354,11 +379,8 @@ fn process_paired_record_sets(
                 processor,
                 start_index,
                 len_1,
-                records_1.iter(),
-                format_1,
-                records_2.iter(),
-                format_2,
-                write_output,
+                (records_1.iter(), records_2.iter()),
+                formats,
             )?
         }
         (fastx::RecordSet::Fasta(records_1), fastx::RecordSet::Fastq(records_2)) => {
@@ -366,11 +388,8 @@ fn process_paired_record_sets(
                 processor,
                 start_index,
                 len_1,
-                records_1.iter(),
-                format_1,
-                records_2.iter(),
-                format_2,
-                write_output,
+                (records_1.iter(), records_2.iter()),
+                formats,
             )?
         }
         (fastx::RecordSet::Fastq(records_1), fastx::RecordSet::Fasta(records_2)) => {
@@ -378,11 +397,8 @@ fn process_paired_record_sets(
                 processor,
                 start_index,
                 len_1,
-                records_1.iter(),
-                format_1,
-                records_2.iter(),
-                format_2,
-                write_output,
+                (records_1.iter(), records_2.iter()),
+                formats,
             )?
         }
         (fastx::RecordSet::Fastq(records_1), fastx::RecordSet::Fastq(records_2)) => {
@@ -390,22 +406,18 @@ fn process_paired_record_sets(
                 processor,
                 start_index,
                 len_1,
-                records_1.iter(),
-                format_1,
-                records_2.iter(),
-                format_2,
-                write_output,
+                (records_1.iter(), records_2.iter()),
+                formats,
             )?
         }
     })
 }
 
 fn process_pooled_paired_record_set_chunk(
-    processor: &ExtractProcessor,
+    processor: &ChunkProcessor,
     chunk: PairedRecordSetWorkChunk,
     pool_tx: &Sender<(fastx::RecordSet, fastx::RecordSet)>,
-    write_output: bool,
-) -> Result<Vec<PairedChunkResult>> {
+) -> Result<PairedChunkResult> {
     let PairedRecordSetWorkChunk {
         start_index,
         record_set_1,
@@ -413,44 +425,42 @@ fn process_pooled_paired_record_set_chunk(
         format_1,
         format_2,
     } = chunk;
-    let results = process_paired_record_sets(
+    let result = process_paired_record_sets(
         processor,
         start_index,
         &record_set_1,
         &record_set_2,
-        format_1,
-        format_2,
-        write_output,
-    )
-    .map(|result| vec![result]);
+        (format_1, format_2),
+    );
     pool_tx
         .send((record_set_1, record_set_2))
         .map_err(|_| anyhow::anyhow!("Paired-end record-set pool closed during processing."))?;
-    results
+    result
 }
 
 fn log_record_hit(
-    hit: &RecordHit,
+    record: &LogRecord,
+    hit: MatchHit,
     file_1_name: &str,
     file_2_name: &str,
     pattern_list: &[String],
     logger: &mut BufferedLogger,
     json_logger: &mut Option<JsonLogger>,
 ) {
-    let file_name = match hit.file_slot {
+    let file_name = match record.file_slot {
         FileSlot::SingleOrFirst => file_1_name,
         FileSlot::Second => file_2_name,
     };
     logger.log_fields(
         file_name,
-        &hit.record_id,
+        &record.record_id,
         &pattern_list[hit.pattern_index],
         hit.position,
     );
     if let Some(jl) = json_logger {
         jl.log_fields(
             file_name,
-            &hit.record_id,
+            &record.record_id,
             &pattern_list[hit.pattern_index],
             hit.position,
         );
@@ -466,12 +476,20 @@ fn consume_single_chunk_result(
     json_logger: &mut Option<JsonLogger>,
     summary: &mut ExtractSummary,
 ) -> Result<()> {
-    for result in &chunk.results {
-        for hit in &result.hits {
-            log_record_hit(hit, file_name, "", pattern_list, logger, json_logger);
+    for record in &chunk.log_records {
+        for &hit in &record.hits {
+            log_record_hit(
+                record,
+                hit,
+                file_name,
+                "",
+                pattern_list,
+                logger,
+                json_logger,
+            );
         }
-        summary.merge_single(result);
     }
+    summary.merge(&chunk.summary);
     if !chunk.output.is_empty() {
         io::Write::write_all(writer, &chunk.output)?;
     }
@@ -480,33 +498,32 @@ fn consume_single_chunk_result(
 
 fn consume_paired_chunk_result(
     chunk: PairedChunkResult,
-    file_1_name: &str,
-    file_2_name: &str,
+    file_names: (&str, &str),
     pattern_list: &[String],
-    writer_1: &mut Box<dyn io::Write>,
-    writer_2: &mut Box<dyn io::Write>,
+    writers: (&mut Box<dyn io::Write>, &mut Box<dyn io::Write>),
     logger: &mut BufferedLogger,
     json_logger: &mut Option<JsonLogger>,
     summary: &mut ExtractSummary,
 ) -> Result<()> {
-    for result in &chunk.results {
-        for hit in &result.hits {
+    for record in &chunk.log_records {
+        for &hit in &record.hits {
             log_record_hit(
+                record,
                 hit,
-                file_1_name,
-                file_2_name,
+                file_names.0,
+                file_names.1,
                 pattern_list,
                 logger,
                 json_logger,
             );
         }
-        summary.merge_paired(result);
     }
+    summary.merge(&chunk.summary);
     if !chunk.output_1.is_empty() {
-        io::Write::write_all(writer_1, &chunk.output_1)?;
+        io::Write::write_all(writers.0, &chunk.output_1)?;
     }
     if !chunk.output_2.is_empty() {
-        io::Write::write_all(writer_2, &chunk.output_2)?;
+        io::Write::write_all(writers.1, &chunk.output_2)?;
     }
     Ok(())
 }
@@ -813,13 +830,13 @@ pub fn extract_records(args: CmdExtract) -> Result<()> {
 
         if total_threads > 1 {
             let write_output = !args.suppress_output;
-            let worker_processor = ExtractProcessor::new(
-                Arc::clone(&matcher),
-                pattern_list.len(),
+            let chunk_processor = ChunkProcessor {
+                matcher: Arc::clone(&matcher),
+                pattern_count: pattern_list.len(),
                 logging_active,
-                true,
-                args.invert_match,
-            );
+                invert_match: args.invert_match,
+                write_output,
+            };
             let mut summary = ExtractSummary::new(pattern_list.len());
             let pipeline_config = PipelineConfig::new(matching_threads);
             let pool_size = record_set_pool_size(pipeline_config);
@@ -866,10 +883,9 @@ pub fn extract_records(args: CmdExtract) -> Result<()> {
                 },
                 move |chunk| {
                     process_pooled_single_record_set_chunk(
-                        &worker_processor,
+                        &chunk_processor,
                         chunk,
                         &worker_record_pool_tx,
-                        write_output,
                     )
                 },
                 |result| {
@@ -1015,13 +1031,13 @@ pub fn extract_records(args: CmdExtract) -> Result<()> {
 
         if total_threads > 1 {
             let write_output = !args.suppress_output;
-            let worker_processor = ExtractProcessor::new(
-                Arc::clone(&matcher),
-                pattern_list.len(),
+            let chunk_processor = ChunkProcessor {
+                matcher: Arc::clone(&matcher),
+                pattern_count: pattern_list.len(),
                 logging_active,
-                true,
-                args.invert_match,
-            );
+                invert_match: args.invert_match,
+                write_output,
+            };
             let mut summary = ExtractSummary::new(pattern_list.len());
             let pipeline_config = PipelineConfig::new(matching_threads);
             let pool_size = record_set_pool_size(pipeline_config);
@@ -1095,20 +1111,17 @@ pub fn extract_records(args: CmdExtract) -> Result<()> {
                 },
                 move |chunk| {
                     process_pooled_paired_record_set_chunk(
-                        &worker_processor,
+                        &chunk_processor,
                         chunk,
                         &worker_record_pool_tx,
-                        write_output,
                     )
                 },
                 |result| {
                     consume_paired_chunk_result(
                         result,
-                        in_fastx_filename,
-                        in_fastq_2_filename,
+                        (in_fastx_filename, in_fastq_2_filename),
                         &pattern_list,
-                        &mut writer,
-                        &mut writer2,
+                        (&mut writer, &mut writer2),
                         &mut logger,
                         &mut json_logger,
                         &mut summary,

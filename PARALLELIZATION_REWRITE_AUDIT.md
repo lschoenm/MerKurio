@@ -78,24 +78,7 @@ separators and writes.
 Also, the logger silently ignores write errors in flush() and header writing. That is a correctness problem for large bioinformatics runs: disk-full or broken-pipe errors can produce incomplete logs
 while the command reports success.
 
-### 4. The thread setting does not represent total process concurrency
-
---threads 4 means four matcher workers, but the pipeline also runs:
-
-- A producer/parser thread
-- The main ordered consumer/writer thread
-
-See src/extract_processing.rs:437.
-
-This partly explains why two workers can achieve more than a simple 2× improvement: it is effectively a three- or four-stage concurrent process. The documentation says “worker threads,” so this is not
-strictly incorrect, but users scheduling HPC jobs commonly expect --threads N to approximate the total CPU allocation.
-
-Either document the extra threads prominently or define the option as a total concurrency budget.
-
-There is also a product-level mismatch: the default remains one thread in src/cmd_extract.rs:620. Therefore, ordinary users receive none of the rewrite’s headline parallel speedup unless they discover
-and enable it.
-
-### 5. Reading and decompression can still dominate
+### 4. Reading and decompression can still dominate
 
 There is one producer thread. For paired input it fills mate 1 and then mate 2 sequentially in src/cmd_extract.rs:1041.
 
@@ -104,7 +87,7 @@ opportunity for two reader/decompressor threads, joined by chunk index before ma
 
 The benchmark suite should explicitly include compressed inputs before claiming broadly “drastic” performance improvements.
 
-### 6. Matcher selection remains a crude heuristic
+### 5. Matcher selection remains a crude heuristic
 
 The implementation chooses Aho–Corasick at 14 patterns or when a pattern exceeds 64 bytes in src/helpers.rs:203. That cutoff ignores:
 
@@ -124,7 +107,7 @@ The fast Aho–Corasick path also uses find_overlapping_iter(seq).next() instead
 For the tool’s primary case—equal-length DNA k-mers—a specialized rolling two-bit encoding plus hash lookup could outperform both general-purpose algorithms, especially for thousands of k-mers. The
 general matcher should remain as a fallback for proteins, arbitrary text, mixed lengths, and ambiguous symbols.
 
-### 7. Result and output buffers are not pooled
+### 6. Result and output buffers are not pooled
 
 Input RecordSets are pooled, which is good. The result vectors and output byte buffers are newly allocated for every chunk:
 

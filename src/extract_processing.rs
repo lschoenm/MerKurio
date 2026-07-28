@@ -1,5 +1,3 @@
-use crate::fastx_output::FastxFormat;
-use crate::pattern_matching::PatternMatcher;
 use crossbeam_channel::{Sender, bounded};
 use std::collections::BTreeMap;
 use std::sync::Arc;
@@ -11,221 +9,11 @@ pub enum FileSlot {
     Second,
 }
 
-#[derive(Debug, Clone, Eq, PartialEq)]
-pub struct OutputRecord {
-    pub id: Vec<u8>,
-    pub seq: Vec<u8>,
-    pub qual: Option<Vec<u8>>,
-    pub format: FastxFormat,
-}
-
-#[derive(Debug, Clone, Eq, PartialEq)]
-pub struct RecordHit {
-    pub file_slot: FileSlot,
-    pub record_id: Vec<u8>,
-    pub pattern_index: usize,
-    pub position: usize,
-}
-
-#[derive(Debug, Clone, Eq, PartialEq)]
-pub struct RecordStats {
-    pub num_bases: usize,
-    pub hit_count: usize,
-    pub distinct_record_hit: bool,
-}
-
-impl RecordStats {
-    fn new(num_bases: usize) -> Self {
-        Self {
-            num_bases,
-            hit_count: 0,
-            distinct_record_hit: false,
-        }
-    }
-}
-
-#[derive(Debug, Clone, Eq, PartialEq)]
-pub struct SingleResult {
-    pub record_index: u64,
-    pub matched: bool,
-    pub extracted: bool,
-    pub output: Option<OutputRecord>,
-    pub stats: Option<RecordStats>,
-    pub hits: Vec<RecordHit>,
-}
-
-#[derive(Debug, Clone, Eq, PartialEq)]
-pub struct PairedResult {
-    pub pair_index: u64,
-    pub matched: bool,
-    pub extracted: bool,
-    pub output_1: Option<OutputRecord>,
-    pub output_2: Option<OutputRecord>,
-    pub stats_1: Option<RecordStats>,
-    pub stats_2: Option<RecordStats>,
-    pub hits: Vec<RecordHit>,
-}
-
-#[derive(Debug, Clone, Copy)]
-pub struct RecordInput<'a> {
-    pub id: &'a [u8],
-    pub seq: &'a [u8],
-    pub qual: Option<&'a [u8]>,
-    pub format: FastxFormat,
-}
-
-#[derive(Debug, Clone)]
-pub struct ExtractProcessor {
-    pub matcher: Arc<PatternMatcher>,
-    pub pattern_count: usize,
-    pub logging_active: bool,
-    pub suppress_output: bool,
-    pub invert_match: bool,
-}
-
-impl ExtractProcessor {
-    pub fn new(
-        matcher: Arc<PatternMatcher>,
-        pattern_count: usize,
-        logging_active: bool,
-        suppress_output: bool,
-        invert_match: bool,
-    ) -> Self {
-        Self {
-            matcher,
-            pattern_count,
-            logging_active,
-            suppress_output,
-            invert_match,
-        }
-    }
-
-    pub fn process_single_record(
-        &self,
-        record_index: u64,
-        record: RecordInput<'_>,
-    ) -> SingleResult {
-        let mut hits = Vec::new();
-        let mut stats = self
-            .logging_active
-            .then(|| RecordStats::new(record.seq.len()));
-        let matched =
-            self.process_record_matches(FileSlot::SingleOrFirst, record, stats.as_mut(), &mut hits);
-        let extracted = matched != self.invert_match;
-        let output = self.output_record_if_needed(extracted, record);
-
-        SingleResult {
-            record_index,
-            matched,
-            extracted,
-            output,
-            stats,
-            hits,
-        }
-    }
-
-    pub fn process_paired_record(
-        &self,
-        pair_index: u64,
-        read_1: RecordInput<'_>,
-        read_2: RecordInput<'_>,
-    ) -> PairedResult {
-        let mut stats_1 = self
-            .logging_active
-            .then(|| RecordStats::new(read_1.seq.len()));
-        let mut stats_2 = self
-            .logging_active
-            .then(|| RecordStats::new(read_2.seq.len()));
-        let mut hits = Vec::new();
-
-        let matched_1 = self.process_record_matches(
-            FileSlot::SingleOrFirst,
-            read_1,
-            stats_1.as_mut(),
-            &mut hits,
-        );
-        let matched_2 = if !self.logging_active && matched_1 {
-            false
-        } else {
-            self.process_record_matches(FileSlot::Second, read_2, stats_2.as_mut(), &mut hits)
-        };
-        let matched = matched_1 || matched_2;
-        let extracted = matched != self.invert_match;
-        let output_1 = self.output_record_if_needed(extracted, read_1);
-        let output_2 = self.output_record_if_needed(extracted, read_2);
-
-        PairedResult {
-            pair_index,
-            matched,
-            extracted,
-            output_1,
-            output_2,
-            stats_1,
-            stats_2,
-            hits,
-        }
-    }
-
-    fn process_record_matches(
-        &self,
-        file_slot: FileSlot,
-        record: RecordInput<'_>,
-        stats: Option<&mut RecordStats>,
-        hits: &mut Vec<RecordHit>,
-    ) -> bool {
-        if self.logging_active {
-            let stats = stats.expect("logging-active record processing requires stats");
-            self.matcher.for_each_match(record.seq, |hit| {
-                stats.hit_count += 1;
-                stats.distinct_record_hit = true;
-                hits.push(RecordHit {
-                    file_slot,
-                    record_id: record.id.to_vec(),
-                    pattern_index: hit.pattern_index,
-                    position: hit.position,
-                });
-            });
-            stats.distinct_record_hit
-        } else {
-            self.matcher.find_any(record.seq)
-        }
-    }
-
-    fn output_record_if_needed(
-        &self,
-        extracted: bool,
-        record: RecordInput<'_>,
-    ) -> Option<OutputRecord> {
-        if self.suppress_output || !extracted {
-            return None;
-        }
-
-        Some(OutputRecord {
-            id: record.id.to_vec(),
-            seq: record.seq.to_vec(),
-            qual: record.qual.map(|qual| qual.to_vec()),
-            format: record.format,
-        })
-    }
-}
-
 pub trait IndexedResult {
     fn index(&self) -> u64;
 
     fn index_span(&self) -> u64 {
         1
-    }
-}
-
-impl IndexedResult for SingleResult {
-    fn index(&self) -> u64 {
-        self.record_index
-    }
-}
-
-impl IndexedResult for PairedResult {
-    fn index(&self) -> u64 {
-        self.pair_index
     }
 }
 
@@ -444,7 +232,7 @@ where
     W: Send + 'static,
     R: IndexedResult + Send + 'static,
     PR: FnOnce(Sender<W>) -> anyhow::Result<()> + Send + 'static,
-    P: Fn(W) -> anyhow::Result<Vec<R>> + Send + Sync + 'static,
+    P: Fn(W) -> anyhow::Result<R> + Send + Sync + 'static,
     C: FnMut(R) -> anyhow::Result<()>,
 {
     if config.worker_count == 0 {
@@ -458,7 +246,7 @@ where
     }
 
     let (work_tx, work_rx) = bounded::<W>(config.work_queue_bound);
-    let (result_tx, result_rx) = bounded::<ResultChunk<R>>(config.result_queue_bound);
+    let (result_tx, result_rx) = bounded::<R>(config.result_queue_bound);
 
     let producer = thread::spawn(move || produce_work(work_tx));
 
@@ -470,19 +258,12 @@ where
         let process_work = Arc::clone(&process_work);
         workers.push(thread::spawn(move || -> anyhow::Result<()> {
             while let Ok(work) = work_rx.recv() {
-                let results = process_work(work)?;
-                if let Some(first_result) = results.first() {
-                    result_tx
-                        .send(ResultChunk {
-                            start_index: first_result.index(),
-                            results,
-                        })
-                        .map_err(|_| {
-                            anyhow::anyhow!(
-                                "Pipeline result queue closed before all result chunks were sent."
-                            )
-                        })?;
-                }
+                let result = process_work(work)?;
+                result_tx.send(result).map_err(|_| {
+                    anyhow::anyhow!(
+                        "Pipeline result queue closed before all result chunks were sent."
+                    )
+                })?;
             }
             Ok(())
         }));
@@ -491,16 +272,11 @@ where
 
     let mut ordered_results = OrderedResultBuffer::new();
     let mut consume_error = None;
-    while let Ok(result_chunk) = result_rx.recv() {
-        ordered_results.push(result_chunk);
-        while let Some(ready_chunk) = ordered_results.pop_ready() {
-            for ready in ready_chunk.results {
-                if let Err(error) = consume_ready(ready) {
-                    consume_error = Some(error);
-                    break;
-                }
-            }
-            if consume_error.is_some() {
+    while let Ok(result) = result_rx.recv() {
+        ordered_results.push(result);
+        while let Some(ready) = ordered_results.pop_ready() {
+            if let Err(error) = consume_ready(ready) {
+                consume_error = Some(error);
                 break;
             }
         }
@@ -557,51 +333,48 @@ impl ExtractSummary {
         }
     }
 
-    pub fn merge_single(&mut self, result: &SingleResult) {
-        if let Some(stats) = &result.stats {
-            self.merge_stats(FileSlot::SingleOrFirst, stats);
-        }
-        self.merge_pattern_hits(&result.hits);
-        if result.extracted {
-            self.nb_records_extracted += 1;
-        }
-    }
-
-    pub fn merge_paired(&mut self, result: &PairedResult) {
-        if let Some(stats) = &result.stats_1 {
-            self.merge_stats(FileSlot::SingleOrFirst, stats);
-        }
-        if let Some(stats) = &result.stats_2 {
-            self.merge_stats(FileSlot::Second, stats);
-        }
-        self.merge_pattern_hits(&result.hits);
-        if result.extracted {
-            self.nb_records_extracted += 2;
-        }
-    }
-
-    fn merge_stats(&mut self, file_slot: FileSlot, stats: &RecordStats) {
+    pub fn record_searched(&mut self, num_bases: usize) {
         self.nb_records_tot += 1;
-        self.nb_bases += stats.num_bases;
+        self.nb_bases += num_bases;
+    }
+
+    pub fn record_hit(&mut self, file_slot: FileSlot) {
         match file_slot {
-            FileSlot::SingleOrFirst => {
-                self.nb_hits_tot.0 += stats.hit_count;
-                if stats.distinct_record_hit {
-                    self.nb_records_hit.0 += 1;
-                }
-            }
-            FileSlot::Second => {
-                self.nb_hits_tot.1 += stats.hit_count;
-                if stats.distinct_record_hit {
-                    self.nb_records_hit.1 += 1;
-                }
-            }
+            FileSlot::SingleOrFirst => self.nb_records_hit.0 += 1,
+            FileSlot::Second => self.nb_records_hit.1 += 1,
         }
     }
 
-    fn merge_pattern_hits(&mut self, hits: &[RecordHit]) {
-        for hit in hits {
-            self.pattern_hit_counts[hit.pattern_index] += 1;
+    pub fn pattern_hit(&mut self, file_slot: FileSlot, pattern_index: usize) {
+        match file_slot {
+            FileSlot::SingleOrFirst => self.nb_hits_tot.0 += 1,
+            FileSlot::Second => self.nb_hits_tot.1 += 1,
+        }
+        self.pattern_hit_counts[pattern_index] += 1;
+    }
+
+    pub fn extracted_records(&mut self, count: usize) {
+        self.nb_records_extracted += count;
+    }
+
+    pub fn merge(&mut self, other: &Self) {
+        self.nb_records_tot += other.nb_records_tot;
+        self.nb_bases += other.nb_bases;
+        self.nb_hits_tot.0 += other.nb_hits_tot.0;
+        self.nb_hits_tot.1 += other.nb_hits_tot.1;
+        self.nb_records_hit.0 += other.nb_records_hit.0;
+        self.nb_records_hit.1 += other.nb_records_hit.1;
+        self.nb_records_extracted += other.nb_records_extracted;
+        debug_assert_eq!(
+            self.pattern_hit_counts.len(),
+            other.pattern_hit_counts.len()
+        );
+        for (total, chunk_count) in self
+            .pattern_hit_counts
+            .iter_mut()
+            .zip(&other.pattern_hit_counts)
+        {
+            *total += chunk_count;
         }
     }
 }
@@ -609,214 +382,71 @@ impl ExtractSummary {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::pattern_matching::PatternMatcher;
     use std::time::Duration;
 
-    fn bndmq_processor(logging_active: bool, suppress_output: bool) -> ExtractProcessor {
-        let patterns = vec!["ACG".to_string()];
-        let matcher = PatternMatcher::new(&patterns, false, false, None).unwrap();
-        ExtractProcessor::new(
-            Arc::new(matcher),
-            patterns.len(),
-            logging_active,
-            suppress_output,
-            false,
-        )
+    #[derive(Debug)]
+    struct TestResult {
+        index: u64,
+        span: u64,
     }
 
-    #[test]
-    fn single_non_logging_result_uses_first_hit_path_without_hits() {
-        let processor = bndmq_processor(false, false);
-        let result = processor.process_single_record(
-            7,
-            RecordInput {
-                id: b"seq1",
-                seq: b"TTACGTT",
-                qual: None,
-                format: FastxFormat::Fasta,
-            },
-        );
+    impl IndexedResult for TestResult {
+        fn index(&self) -> u64 {
+            self.index
+        }
 
-        assert_eq!(result.record_index, 7);
-        assert!(result.matched);
-        assert!(result.extracted);
-        assert!(result.hits.is_empty());
-        assert!(result.stats.is_none());
-        assert_eq!(result.output.unwrap().seq, b"TTACGTT");
-    }
-
-    #[test]
-    fn single_logging_result_reports_all_hits_and_counts() {
-        let processor = bndmq_processor(true, false);
-        let result = processor.process_single_record(
-            0,
-            RecordInput {
-                id: b"seq1",
-                seq: b"ACGACG",
-                qual: None,
-                format: FastxFormat::Fasta,
-            },
-        );
-
-        assert!(result.matched);
-        assert!(result.extracted);
-        let stats = result.stats.as_ref().unwrap();
-        assert_eq!(stats.hit_count, 2);
-        assert!(stats.distinct_record_hit);
-        assert_eq!(stats.num_bases, 6);
-        assert_eq!(
-            result.hits,
-            vec![
-                RecordHit {
-                    file_slot: FileSlot::SingleOrFirst,
-                    record_id: b"seq1".to_vec(),
-                    pattern_index: 0,
-                    position: 0,
-                },
-                RecordHit {
-                    file_slot: FileSlot::SingleOrFirst,
-                    record_id: b"seq1".to_vec(),
-                    pattern_index: 0,
-                    position: 3,
-                },
-            ]
-        );
-    }
-
-    #[test]
-    fn paired_non_logging_short_circuits_second_read_matching() {
-        let processor = bndmq_processor(false, true);
-        let result = processor.process_paired_record(
-            3,
-            RecordInput {
-                id: b"seq1/1",
-                seq: b"ACG",
-                qual: Some(b"III"),
-                format: FastxFormat::Fastq,
-            },
-            RecordInput {
-                id: b"seq1/2",
-                seq: b"ACG",
-                qual: Some(b"III"),
-                format: FastxFormat::Fastq,
-            },
-        );
-
-        assert_eq!(result.pair_index, 3);
-        assert!(result.matched);
-        assert!(result.extracted);
-        assert!(result.stats_1.is_none());
-        assert!(result.stats_2.is_none());
-        assert!(result.hits.is_empty());
-        assert!(result.output_1.is_none());
-        assert!(result.output_2.is_none());
+        fn index_span(&self) -> u64 {
+            self.span
+        }
     }
 
     #[test]
     fn ordered_result_buffer_pops_contiguous_results_only() {
-        let processor = bndmq_processor(false, true);
         let mut buffer = OrderedResultBuffer::new();
 
         for index in [2, 0] {
-            buffer.push(processor.process_single_record(
-                index,
-                RecordInput {
-                    id: b"seq",
-                    seq: b"ACG",
-                    qual: None,
-                    format: FastxFormat::Fasta,
-                },
-            ));
+            buffer.push(TestResult { index, span: 1 });
         }
 
-        assert_eq!(
-            buffer.pop_ready().map(|result| result.record_index),
-            Some(0)
-        );
+        assert_eq!(buffer.pop_ready().map(|result| result.index), Some(0));
         assert!(buffer.pop_ready().is_none());
         assert_eq!(buffer.next_expected_index(), 1);
         assert_eq!(buffer.pending_len(), 1);
 
-        buffer.push(processor.process_single_record(
-            1,
-            RecordInput {
-                id: b"seq",
-                seq: b"ACG",
-                qual: None,
-                format: FastxFormat::Fasta,
-            },
-        ));
+        buffer.push(TestResult { index: 1, span: 1 });
 
-        assert_eq!(
-            buffer.pop_ready().map(|result| result.record_index),
-            Some(1)
-        );
-        assert_eq!(
-            buffer.pop_ready().map(|result| result.record_index),
-            Some(2)
-        );
+        assert_eq!(buffer.pop_ready().map(|result| result.index), Some(1));
+        assert_eq!(buffer.pop_ready().map(|result| result.index), Some(2));
         assert!(buffer.pop_ready().is_none());
         assert_eq!(buffer.next_expected_index(), 3);
         assert_eq!(buffer.pending_len(), 0);
     }
 
     #[test]
-    fn extract_summary_merges_ordered_single_results() {
-        let processor = bndmq_processor(true, false);
-        let mut summary = ExtractSummary::new(1);
-        let result = processor.process_single_record(
-            0,
-            RecordInput {
-                id: b"seq1",
-                seq: b"ACGACG",
-                qual: None,
-                format: FastxFormat::Fasta,
-            },
-        );
+    fn extract_summary_merges_chunk_totals() {
+        let mut total = ExtractSummary::new(2);
+        let mut chunk = ExtractSummary::new(2);
+        chunk.record_searched(6);
+        chunk.record_searched(4);
+        chunk.pattern_hit(FileSlot::SingleOrFirst, 0);
+        chunk.pattern_hit(FileSlot::SingleOrFirst, 0);
+        chunk.pattern_hit(FileSlot::Second, 1);
+        chunk.record_hit(FileSlot::SingleOrFirst);
+        chunk.record_hit(FileSlot::Second);
+        chunk.extracted_records(2);
 
-        summary.merge_single(&result);
+        total.merge(&chunk);
 
-        assert_eq!(summary.nb_records_tot, 1);
-        assert_eq!(summary.nb_bases, 6);
-        assert_eq!(summary.nb_hits_tot, (2, 0));
-        assert_eq!(summary.nb_records_hit, (1, 0));
-        assert_eq!(summary.nb_records_extracted, 1);
-        assert_eq!(summary.pattern_hit_counts, vec![2]);
-    }
-
-    #[test]
-    fn extract_summary_merges_paired_results_by_file_slot() {
-        let processor = bndmq_processor(true, false);
-        let mut summary = ExtractSummary::new(1);
-        let result = processor.process_paired_record(
-            0,
-            RecordInput {
-                id: b"seq1/1",
-                seq: b"ACG",
-                qual: Some(b"III"),
-                format: FastxFormat::Fastq,
-            },
-            RecordInput {
-                id: b"seq1/2",
-                seq: b"TTT",
-                qual: Some(b"III"),
-                format: FastxFormat::Fastq,
-            },
-        );
-
-        summary.merge_paired(&result);
-
-        assert_eq!(summary.nb_records_tot, 2);
-        assert_eq!(summary.nb_bases, 6);
-        assert_eq!(summary.nb_hits_tot, (1, 0));
-        assert_eq!(summary.nb_records_hit, (1, 0));
-        assert_eq!(summary.nb_records_extracted, 2);
-        assert_eq!(summary.pattern_hit_counts, vec![1]);
+        assert_eq!(total.nb_records_tot, 2);
+        assert_eq!(total.nb_bases, 10);
+        assert_eq!(total.nb_hits_tot, (2, 1));
+        assert_eq!(total.nb_records_hit, (1, 1));
+        assert_eq!(total.nb_records_extracted, 2);
+        assert_eq!(total.pattern_hit_counts, vec![2, 1]);
     }
 
     #[test]
     fn bounded_pipeline_consumes_out_of_order_results_in_order() {
-        let processor = bndmq_processor(false, true);
         let work_items = vec![0_u64, 1, 2, 3];
         let config = PipelineConfig {
             worker_count: 3,
@@ -832,18 +462,10 @@ mod tests {
                 if index == 0 {
                     thread::sleep(Duration::from_millis(30));
                 }
-                Ok(vec![processor.process_single_record(
-                    index,
-                    RecordInput {
-                        id: b"seq",
-                        seq: b"ACG",
-                        qual: None,
-                        format: FastxFormat::Fasta,
-                    },
-                )])
+                Ok(vec![TestResult { index, span: 1 }])
             },
             |result| {
-                consumed.push(result.record_index);
+                consumed.push(result.index);
                 Ok(())
             },
         )
@@ -854,7 +476,6 @@ mod tests {
 
     #[test]
     fn bounded_pipeline_consumes_chunked_results_in_order() {
-        let processor = bndmq_processor(false, true);
         let work_items = vec![2_u64, 0];
         let config = PipelineConfig {
             worker_count: 2,
@@ -871,21 +492,11 @@ mod tests {
                     thread::sleep(Duration::from_millis(30));
                 }
                 Ok((start_index..start_index + 2)
-                    .map(|index| {
-                        processor.process_single_record(
-                            index,
-                            RecordInput {
-                                id: b"seq",
-                                seq: b"ACG",
-                                qual: None,
-                                format: FastxFormat::Fasta,
-                            },
-                        )
-                    })
+                    .map(|index| TestResult { index, span: 1 })
                     .collect())
             },
             |result| {
-                consumed.push(result.record_index);
+                consumed.push(result.index);
                 Ok(())
             },
         )
@@ -896,7 +507,7 @@ mod tests {
 
     #[test]
     fn bounded_pipeline_rejects_zero_workers() {
-        let error = run_bounded_ordered_pipeline::<u64, SingleResult, _, _>(
+        let error = run_bounded_ordered_pipeline::<u64, TestResult, _, _>(
             Vec::new(),
             PipelineConfig {
                 worker_count: 0,
