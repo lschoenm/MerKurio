@@ -78,7 +78,7 @@ impl PatternMatcher {
     /// Search for any match and return as soon as one is found.
     pub fn find_any(&self, seq: &[u8]) -> bool {
         match self {
-            Self::AhoCorasick { ac } => ac.find_overlapping_iter(seq).next().is_some(),
+            Self::AhoCorasick { ac } => ac.find(seq).is_some(),
             Self::Bndmq { matchers } => matchers.iter().any(|bndmq| bndmq.find_match(seq)),
         }
     }
