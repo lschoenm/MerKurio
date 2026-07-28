@@ -25,7 +25,7 @@ Optional environment variables:
 RUNS=10 WARMUP=2 MERKURIO=/path/to/merkurio ./05-quick-extract-parallel-benchmarks.sh
 ```
 
-## Realistic Extract Parallel Benchmarks
+## Realistic Extract Version Comparison
 
 For a larger paired-end workload closer to sequencing data, run:
 
@@ -34,7 +34,32 @@ cd benchmarks/scripts
 ./06-realistic-extract-parallel-benchmarks.sh
 ```
 
-By default this generates `1,000,000` paired-end reads at `150 bp`, searches `250` deterministic `31 bp` patterns, and compares the current MerKurio binary with total processing-thread budgets of `--threads 1`, `--threads 2`, and `--threads 4`. If `benchmarks/merkurio-single` exists and is executable, the script also includes it as an old single-threaded baseline. The generated FASTQ input is about `319 MB` per mate file, or about `638 MB` for both files together.
+By default this generates `1,000,000` paired-end reads at `150 bp`, searches `250` deterministic `31 bp` patterns, and compares an old MerKurio binary with the current binary using total processing-thread budgets of `--threads 1`, `--threads 2`, `--threads 4`, and `--threads 8`. The generated FASTQ input is about `319 MB` per mate file, or about `638 MB` for both files together.
+
+The default old binary is `target/release/merkurio-old`. Before the first
+comparison, create it from a release build:
+
+```bash
+cargo build --release
+cp target/release/merkurio target/release/merkurio-old
+```
+
+After making and building substantial changes, run the benchmark:
+
+```bash
+./06-realistic-extract-parallel-benchmarks.sh
+```
+
+If the current version is correct and should become the next baseline, promote
+it only after the benchmark succeeds:
+
+```bash
+cp target/release/merkurio target/release/merkurio-old
+```
+
+Each Hyperfine invocation compares exactly two commands: old and current with
+the same mode, thread count, and optional chunk size. Both versions must support
+the same `--threads` semantics.
 
 The realistic benchmark separates three modes:
 
@@ -47,9 +72,9 @@ Current CLI semantics require logging when `--suppress-output` is used, so there
 Useful overrides:
 
 ```bash
-RECORDS=100000 PATTERNS=500 THREADS="1 4" RUNS=3 ./06-realistic-extract-parallel-benchmarks.sh
-RECORDS=1000000 THREADS="2 4" CHUNK_SIZES="8192 16384 32768" RUNS=3 ./06-realistic-extract-parallel-benchmarks.sh
-MERKURIO=/path/to/current/merkurio MERKURIO_SINGLE=/path/to/old/merkurio ./06-realistic-extract-parallel-benchmarks.sh
+RECORDS=100000 PATTERNS=500 THREADS="1 2 4 8" RUNS=3 OLD_MERKURIO=/path/to/old/merkurio ./06-realistic-extract-parallel-benchmarks.sh
+RECORDS=1000000 THREADS="2 4" CHUNK_SIZES="8192 16384 32768" RUNS=3 OLD_MERKURIO=/path/to/old/merkurio ./06-realistic-extract-parallel-benchmarks.sh
+CURRENT_MERKURIO=/path/to/current/merkurio OLD_MERKURIO=/path/to/old/merkurio ./06-realistic-extract-parallel-benchmarks.sh
 ```
 
 ## Full External Tool Benchmarks

@@ -7,22 +7,30 @@ BENCH_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 REPO_DIR="$(cd "$BENCH_DIR/.." && pwd)"
 RESULT_DIR="$BENCH_DIR/results/realistic-extract"
 DATA_DIR="$BENCH_DIR/data/realistic-extract"
-MERKURIO="${MERKURIO:-$REPO_DIR/target/release/merkurio}"
-MERKURIO_SINGLE="${MERKURIO_SINGLE:-$BENCH_DIR/merkurio-single}"
-RUNS="${RUNS:-5}"
-WARMUP="${WARMUP:-1}"
+CURRENT_MERKURIO="${CURRENT_MERKURIO:-$REPO_DIR/target/release/merkurio}"
+OLD_MERKURIO="${OLD_MERKURIO:-$REPO_DIR/target/release/merkurio-old}"
+RUNS="${RUNS:-15}"
+WARMUP="${WARMUP:-3}"
 RECORDS="${RECORDS:-1000000}"
 READ_LEN="${READ_LEN:-150}"
 PATTERNS="${PATTERNS:-250}"
 HIT_EVERY="${HIT_EVERY:-50}"
-THREADS="${THREADS:-1 2 4}"
+THREADS="${THREADS:-1 2 4 8}"
 CHUNK_SIZES="${CHUNK_SIZES:-}"
 
 mkdir -p "$RESULT_DIR" "$DATA_DIR"
 
-if [[ ! -x "$MERKURIO" ]]; then
-    echo "Missing MerKurio release binary at $MERKURIO" >&2
+if [[ ! -x "$CURRENT_MERKURIO" ]]; then
+    echo "Missing current MerKurio release binary at $CURRENT_MERKURIO" >&2
     echo "Build it first with: cargo build --release" >&2
+    exit 1
+fi
+
+if [[ ! -x "$OLD_MERKURIO" ]]; then
+    echo "Missing old MerKurio release binary at $OLD_MERKURIO" >&2
+    echo "Create the initial baseline with:" >&2
+    echo "  cp $CURRENT_MERKURIO $REPO_DIR/target/release/merkurio-old" >&2
+    echo "Both binaries must support the same --threads and --chunk-size semantics." >&2
     exit 1
 fi
 
@@ -109,10 +117,10 @@ with open(metadata_file, "w", encoding="ascii") as handle:
 PY
 }
 
-run_hyperfine_group() {
-    local mode="$1"
+run_hyperfine_pair() {
+    local case_name="$1"
     shift
-    local output_csv="$RESULT_DIR/realistic-extract-${DATA_TAG}-${mode}.csv"
+    local output_csv="$RESULT_DIR/realistic-extract-${DATA_TAG}-${case_name}.csv"
 
     hyperfine \
         --warmup "$WARMUP" \
@@ -122,10 +130,10 @@ run_hyperfine_group() {
     echo "Wrote $output_csv"
 }
 
-run_shell_timer_group() {
-    local mode="$1"
+run_shell_timer_pair() {
+    local case_name="$1"
     shift
-    local output="$RESULT_DIR/summary-${DATA_TAG}-${mode}.txt"
+    local output="$RESULT_DIR/summary-${DATA_TAG}-${case_name}.txt"
     : > "$output"
 
     for command in "$@"; do
@@ -138,28 +146,24 @@ run_shell_timer_group() {
     echo "Wrote $output"
 }
 
-run_benchmark_group() {
-    local mode="$1"
+run_benchmark_pair() {
+    local case_name="$1"
     shift
 
     if command -v hyperfine >/dev/null 2>&1; then
-        run_hyperfine_group "$mode" "$@"
+        run_hyperfine_pair "$case_name" "$@"
     else
-        echo "hyperfine not found; using /usr/bin/time fallback for $mode."
-        run_shell_timer_group "$mode" "$@"
+        echo "hyperfine not found; using /usr/bin/time fallback for $case_name."
+        run_shell_timer_pair "$case_name" "$@"
     fi
 }
 
 main() {
     generate_inputs
 
-    echo "Realistic extract parallel benchmarks"
-    echo "Binary: $MERKURIO"
-    if [[ -x "$MERKURIO_SINGLE" ]]; then
-        echo "Single-threaded baseline: $MERKURIO_SINGLE"
-    else
-        echo "Single-threaded baseline: not found at $MERKURIO_SINGLE; skipping baseline"
-    fi
+    echo "Realistic extract old-vs-current benchmarks"
+    echo "Old binary: $OLD_MERKURIO"
+    echo "Current binary: $CURRENT_MERKURIO"
     echo "Records: $RECORDS read pairs"
     echo "Read length: $READ_LEN"
     echo "Patterns: $PATTERNS x 31 bp"
@@ -173,57 +177,59 @@ main() {
     echo "Runs: $RUNS, warmup: $WARMUP"
     echo "Results: $RESULT_DIR"
 
-    local fast_output_commands=()
-    if [[ -x "$MERKURIO_SINGLE" ]]; then
-        fast_output_commands+=("$MERKURIO_SINGLE extract -i $FASTQ_1 -2 $FASTQ_2 -f $PATTERN_FILE -o $RESULT_DIR/fast-output-${DATA_TAG}-single")
-    fi
     if [[ -n "$CHUNK_SIZES" ]]; then
         for chunk_size in $CHUNK_SIZES; do
             for thread_count in $THREADS; do
-                fast_output_commands+=("$MERKURIO extract -i $FASTQ_1 -2 $FASTQ_2 -f $PATTERN_FILE --threads $thread_count --chunk-size $chunk_size -o $RESULT_DIR/fast-output-${DATA_TAG}-t${thread_count}-c${chunk_size}")
+                run_benchmark_pair \
+                    "fast-output-t${thread_count}-c${chunk_size}" \
+                    "$OLD_MERKURIO extract -i $FASTQ_1 -2 $FASTQ_2 -f $PATTERN_FILE --threads $thread_count --chunk-size $chunk_size -o $RESULT_DIR/fast-output-${DATA_TAG}-old-t${thread_count}-c${chunk_size}" \
+                    "$CURRENT_MERKURIO extract -i $FASTQ_1 -2 $FASTQ_2 -f $PATTERN_FILE --threads $thread_count --chunk-size $chunk_size -o $RESULT_DIR/fast-output-${DATA_TAG}-current-t${thread_count}-c${chunk_size}"
             done
         done
     else
         for thread_count in $THREADS; do
-            fast_output_commands+=("$MERKURIO extract -i $FASTQ_1 -2 $FASTQ_2 -f $PATTERN_FILE --threads $thread_count -o $RESULT_DIR/fast-output-${DATA_TAG}-t${thread_count}")
+            run_benchmark_pair \
+                "fast-output-t${thread_count}" \
+                "$OLD_MERKURIO extract -i $FASTQ_1 -2 $FASTQ_2 -f $PATTERN_FILE --threads $thread_count -o $RESULT_DIR/fast-output-${DATA_TAG}-old-t${thread_count}" \
+                "$CURRENT_MERKURIO extract -i $FASTQ_1 -2 $FASTQ_2 -f $PATTERN_FILE --threads $thread_count -o $RESULT_DIR/fast-output-${DATA_TAG}-current-t${thread_count}"
         done
     fi
 
-    local json_output_commands=()
-    if [[ -x "$MERKURIO_SINGLE" ]]; then
-        json_output_commands+=("$MERKURIO_SINGLE extract -i $FASTQ_1 -2 $FASTQ_2 -f $PATTERN_FILE -o $RESULT_DIR/json-output-${DATA_TAG}-single -j $RESULT_DIR/json-output-${DATA_TAG}-single.json")
-    fi
     if [[ -n "$CHUNK_SIZES" ]]; then
         for chunk_size in $CHUNK_SIZES; do
             for thread_count in $THREADS; do
-                json_output_commands+=("$MERKURIO extract -i $FASTQ_1 -2 $FASTQ_2 -f $PATTERN_FILE --threads $thread_count --chunk-size $chunk_size -o $RESULT_DIR/json-output-${DATA_TAG}-t${thread_count}-c${chunk_size} -j $RESULT_DIR/json-output-${DATA_TAG}-t${thread_count}-c${chunk_size}.json")
+                run_benchmark_pair \
+                    "json-output-t${thread_count}-c${chunk_size}" \
+                    "$OLD_MERKURIO extract -i $FASTQ_1 -2 $FASTQ_2 -f $PATTERN_FILE --threads $thread_count --chunk-size $chunk_size -o $RESULT_DIR/json-output-${DATA_TAG}-old-t${thread_count}-c${chunk_size} -j $RESULT_DIR/json-output-${DATA_TAG}-old-t${thread_count}-c${chunk_size}.json" \
+                    "$CURRENT_MERKURIO extract -i $FASTQ_1 -2 $FASTQ_2 -f $PATTERN_FILE --threads $thread_count --chunk-size $chunk_size -o $RESULT_DIR/json-output-${DATA_TAG}-current-t${thread_count}-c${chunk_size} -j $RESULT_DIR/json-output-${DATA_TAG}-current-t${thread_count}-c${chunk_size}.json"
             done
         done
     else
         for thread_count in $THREADS; do
-            json_output_commands+=("$MERKURIO extract -i $FASTQ_1 -2 $FASTQ_2 -f $PATTERN_FILE --threads $thread_count -o $RESULT_DIR/json-output-${DATA_TAG}-t${thread_count} -j $RESULT_DIR/json-output-${DATA_TAG}-t${thread_count}.json")
+            run_benchmark_pair \
+                "json-output-t${thread_count}" \
+                "$OLD_MERKURIO extract -i $FASTQ_1 -2 $FASTQ_2 -f $PATTERN_FILE --threads $thread_count -o $RESULT_DIR/json-output-${DATA_TAG}-old-t${thread_count} -j $RESULT_DIR/json-output-${DATA_TAG}-old-t${thread_count}.json" \
+                "$CURRENT_MERKURIO extract -i $FASTQ_1 -2 $FASTQ_2 -f $PATTERN_FILE --threads $thread_count -o $RESULT_DIR/json-output-${DATA_TAG}-current-t${thread_count} -j $RESULT_DIR/json-output-${DATA_TAG}-current-t${thread_count}.json"
         done
     fi
 
-    local json_suppress_commands=()
-    if [[ -x "$MERKURIO_SINGLE" ]]; then
-        json_suppress_commands+=("$MERKURIO_SINGLE extract -i $FASTQ_1 -2 $FASTQ_2 -f $PATTERN_FILE --suppress-output -j $RESULT_DIR/json-suppress-${DATA_TAG}-single.json")
-    fi
     if [[ -n "$CHUNK_SIZES" ]]; then
         for chunk_size in $CHUNK_SIZES; do
             for thread_count in $THREADS; do
-                json_suppress_commands+=("$MERKURIO extract -i $FASTQ_1 -2 $FASTQ_2 -f $PATTERN_FILE --threads $thread_count --chunk-size $chunk_size --suppress-output -j $RESULT_DIR/json-suppress-${DATA_TAG}-t${thread_count}-c${chunk_size}.json")
+                run_benchmark_pair \
+                    "json-suppress-t${thread_count}-c${chunk_size}" \
+                    "$OLD_MERKURIO extract -i $FASTQ_1 -2 $FASTQ_2 -f $PATTERN_FILE --threads $thread_count --chunk-size $chunk_size --suppress-output -j $RESULT_DIR/json-suppress-${DATA_TAG}-old-t${thread_count}-c${chunk_size}.json" \
+                    "$CURRENT_MERKURIO extract -i $FASTQ_1 -2 $FASTQ_2 -f $PATTERN_FILE --threads $thread_count --chunk-size $chunk_size --suppress-output -j $RESULT_DIR/json-suppress-${DATA_TAG}-current-t${thread_count}-c${chunk_size}.json"
             done
         done
     else
         for thread_count in $THREADS; do
-            json_suppress_commands+=("$MERKURIO extract -i $FASTQ_1 -2 $FASTQ_2 -f $PATTERN_FILE --threads $thread_count --suppress-output -j $RESULT_DIR/json-suppress-${DATA_TAG}-t${thread_count}.json")
+            run_benchmark_pair \
+                "json-suppress-t${thread_count}" \
+                "$OLD_MERKURIO extract -i $FASTQ_1 -2 $FASTQ_2 -f $PATTERN_FILE --threads $thread_count --suppress-output -j $RESULT_DIR/json-suppress-${DATA_TAG}-old-t${thread_count}.json" \
+                "$CURRENT_MERKURIO extract -i $FASTQ_1 -2 $FASTQ_2 -f $PATTERN_FILE --threads $thread_count --suppress-output -j $RESULT_DIR/json-suppress-${DATA_TAG}-current-t${thread_count}.json"
         done
     fi
-
-    run_benchmark_group "fast-output" "${fast_output_commands[@]}"
-    run_benchmark_group "json-output" "${json_output_commands[@]}"
-    run_benchmark_group "json-suppress" "${json_suppress_commands[@]}"
 }
 
 main "$@"
