@@ -6,7 +6,6 @@
 //! automatically based on the input file extension. Additionally, adds a tag to the BAM/SAM
 //! header with the program information.
 
-use aho_corasick::AhoCorasick;
 use anyhow::{Context, Result};
 use bam::record::tags;
 use bam::{RecordReader, RecordWriter};
@@ -23,7 +22,7 @@ use crate::helpers::{
     check_log_flag_conflict, error_if_directory, parse_pattern_list, recommend_aho_corasick,
 };
 use crate::logger::{BufferedLogger, JsonLogger};
-use crate::pattern_matching::{BNDMq, tune_q_value};
+use crate::pattern_matching::PatternMatcher;
 
 #[derive(Args)]
 #[clap(group(
@@ -48,7 +47,7 @@ group(
     ArgGroup::new("algorithm")
         .required(false)
         .multiple(false)
-        .args(&["q_size", "aho_corasick"]),
+        .args(&["q_size", "aho_corasick", "hash"]),
 ),
 group(
     ArgGroup::new("case-sensitivity")
@@ -123,7 +122,13 @@ pub struct CmdTag {
     invert_match: bool,
 
     /// Use case-insensitive matching.
-    #[clap(short = 'I', long, action(ArgAction::SetTrue), default_value("false"))]
+    #[clap(
+        short = 'I',
+        long,
+        action(ArgAction::SetTrue),
+        default_value("false"),
+        conflicts_with("hash")
+    )]
     case_insensitive: bool,
 
     /// Convert all input sequences to lowercase.
@@ -147,6 +152,15 @@ pub struct CmdTag {
         hide_short_help = true
     )]
     aho_corasick: bool,
+
+    /// Use rolling-hash matching. All query sequences must have the same length.
+    #[clap(
+        long,
+        action(ArgAction::SetTrue),
+        default_value("false"),
+        hide_short_help = true
+    )]
+    hash: bool,
 }
 
 /// Core function of the `tag` subcommand that reads a SAM/BAM file, searches
@@ -229,27 +243,13 @@ pub fn tag_records(args: CmdTag) -> Result<()> {
             .map_err(|_| anyhow::anyhow!("Invalid tag format."))?
     };
 
-    // Initialize algorithm instances for each pattern. Only construct the Aho-
-    // Corasick automaton when requested.
-    let (ac, bndmq_collection): (Option<AhoCorasick>, Vec<(String, BNDMq)>) = if args.aho_corasick {
-        let ac = AhoCorasick::builder()
-            // Use DFA for better search performance at higher memory cost
-            .kind(Some(aho_corasick::AhoCorasickKind::DFA))
-            .ascii_case_insensitive(args.case_insensitive)
-            .build(pattern_list.clone())
-            .unwrap();
-        (Some(ac), Vec::new())
-    } else {
-        let mut bndmq_collection = Vec::with_capacity(pattern_list.len());
-        for pattern in &pattern_list {
-            // Tune q value for BNDMq based on the pattern length if not provided
-            let q = args
-                .q_size
-                .unwrap_or_else(|| tune_q_value(pattern).unwrap());
-            bndmq_collection.push((pattern.clone(), BNDMq::new(pattern.as_bytes(), q)?));
-        }
-        (None, bndmq_collection)
-    };
+    let matcher = PatternMatcher::new(
+        &pattern_list,
+        args.aho_corasick,
+        args.hash,
+        args.case_insensitive,
+        args.q_size,
+    )?;
 
     fn infer_record_writer(
         threads: u16,
@@ -362,13 +362,14 @@ pub fn tag_records(args: CmdTag) -> Result<()> {
     let mut nb_hits_tot = 0;
     let mut nb_records_hit = 0;
     let mut pattern_hit_counts = vec![0u32; pattern_list.len()];
+    let mut matched_patterns = vec![false; pattern_list.len()];
 
     /// Process a single record, updating statistics and writing to output
     fn process_record(
         record: &mut bam::Record,
-        ac: Option<&AhoCorasick>,
-        bndmq_collection: &[(String, BNDMq)],
+        matcher: &PatternMatcher,
         pattern_list: &[String],
+        matched_patterns: &mut [bool],
         tag_validated: [u8; 2],
         logging_active: bool,
         logger: &mut BufferedLogger,
@@ -385,60 +386,27 @@ pub fn tag_records(args: CmdTag) -> Result<()> {
         json_logger: &mut Option<JsonLogger>,
     ) -> Result<()> {
         let mut kmers_found = Vec::new();
+        matched_patterns.fill(false);
+        let sequence = record.sequence().to_vec();
 
-        let use_ac = ac.is_some();
-
-        // Get occurrences of patterns in the sequence using Aho-Corasick or BNDMq
-        if use_ac {
-            for mat in ac
-                .unwrap()
-                .find_overlapping_iter(&record.sequence().to_vec())
-            {
-                if let Some(pattern) = pattern_list.get(mat.pattern().as_usize()) {
-                    kmers_found.push(pattern.clone());
-                    // Log match information
-                    if logging_active {
-                        *nb_hits_tot += 1;
-
-                        if let Some(count) = pattern_hit_counts.get_mut(mat.pattern().as_usize()) {
-                            *count += 1;
-                        }
-                        logger.log_fields(in_records_filename, record.name(), pattern, mat.start());
-                        if let Some(jl) = json_logger.as_mut() {
-                            jl.log_fields(in_records_filename, record.name(), pattern, mat.start());
-                        }
-                    }
-                } else {
-                    anyhow::bail!("Error retrieving matching pattern by index.")
+        if logging_active {
+            matcher.for_each_match(&sequence, |hit| {
+                matched_patterns[hit.pattern_index] = true;
+                let pattern = &pattern_list[hit.pattern_index];
+                *nb_hits_tot += 1;
+                pattern_hit_counts[hit.pattern_index] += 1;
+                logger.log_fields(in_records_filename, record.name(), pattern, hit.position);
+                if let Some(jl) = json_logger.as_mut() {
+                    jl.log_fields(in_records_filename, record.name(), pattern, hit.position);
                 }
-            }
+            });
         } else {
-            // If logging active, search for matching positions and print them
-            if logging_active {
-                for (idx, (pattern, bndmq)) in bndmq_collection.iter().enumerate() {
-                    let mut found_any = false;
-                    for o in bndmq.find_iter(&record.sequence().to_vec()) {
-                        found_any = true;
-                        logger.log_fields(in_records_filename, record.name(), pattern, o);
-                        if let Some(jl) = json_logger.as_mut() {
-                            jl.log_fields(in_records_filename, record.name(), pattern, o);
-                        }
-                        *nb_hits_tot += 1;
-                        if let Some(count) = pattern_hit_counts.get_mut(idx) {
-                            *count += 1;
-                        }
-                    }
-                    if found_any {
-                        kmers_found.push(pattern.clone());
-                    }
-                }
-            // If logging disabled, only search for a match and break if found
-            } else {
-                for (pattern, bndmq) in bndmq_collection {
-                    if bndmq.find_match(&record.sequence().to_vec()) {
-                        kmers_found.push(pattern.clone());
-                    }
-                }
+            matcher.mark_matching_patterns(&sequence, matched_patterns);
+        }
+
+        for (pattern_index, &matched) in matched_patterns.iter().enumerate() {
+            if matched {
+                kmers_found.push(pattern_list[pattern_index].clone());
             }
         }
 
@@ -532,9 +500,9 @@ pub fn tag_records(args: CmdTag) -> Result<()> {
                     Ok(true) => {
                         process_record(
                             &mut record,
-                            ac.as_ref(),
-                            &bndmq_collection,
+                            &matcher,
                             &pattern_list,
+                            &mut matched_patterns,
                             tag_validated,
                             logging_active,
                             &mut logger,
@@ -587,9 +555,9 @@ pub fn tag_records(args: CmdTag) -> Result<()> {
                     Ok(true) => {
                         process_record(
                             &mut record,
-                            ac.as_ref(),
-                            &bndmq_collection,
+                            &matcher,
                             &pattern_list,
+                            &mut matched_patterns,
                             tag_validated,
                             logging_active,
                             &mut logger,
@@ -663,7 +631,7 @@ pub fn tag_records(args: CmdTag) -> Result<()> {
             "timestamp": Zoned::now().round(Unit::Second)?,
             "subcommand": "tag",
             "command_line": env::args().collect::<Vec<String>>(),
-            "search_algorithm": if args.aho_corasick { "Aho-Corasick" } else { "BNDMq" },
+            "search_algorithm": matcher.algorithm_name(),
             "inverted_matching": args.invert_match,
             "case_insensitive": args.case_insensitive,
             "input_files": input_files_json,
@@ -727,6 +695,7 @@ mod tests {
             invert_match: false,
             q_size: None,
             aho_corasick: false,
+            hash: true,
             case_insensitive: false,
             lowercase: false,
             uppercase: false,
@@ -766,6 +735,7 @@ mod tests {
             invert_match: false,
             q_size: None,
             aho_corasick: false,
+            hash: false,
             case_insensitive: false,
             lowercase: false,
             uppercase: false,
@@ -805,6 +775,7 @@ mod tests {
             invert_match: false,
             q_size: None,
             aho_corasick: false,
+            hash: false,
             case_insensitive: false,
             lowercase: false,
             uppercase: false,
@@ -1032,6 +1003,7 @@ mod tests {
             invert_match: false,
             q_size: None,
             aho_corasick: false,
+            hash: false,
             case_insensitive: false,
             lowercase: false,
             uppercase: false,
@@ -1074,6 +1046,7 @@ mod tests {
             invert_match: true,
             q_size: None,
             aho_corasick: false,
+            hash: false,
             case_insensitive: false,
             lowercase: false,
             uppercase: false,
@@ -1116,6 +1089,7 @@ mod tests {
             invert_match: false,
             q_size: None,
             aho_corasick: false,
+            hash: false,
             case_insensitive: false,
             lowercase: false,
             uppercase: false,

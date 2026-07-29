@@ -15,6 +15,7 @@ struct SingleExtractOptions {
     patterns: Vec<String>,
     threads: usize,
     aho_corasick: bool,
+    hash: bool,
     case_insensitive: bool,
     invert_match: bool,
     suppress_output: bool,
@@ -30,6 +31,7 @@ impl SingleExtractOptions {
             patterns,
             threads,
             aho_corasick: false,
+            hash: false,
             case_insensitive: false,
             invert_match: false,
             suppress_output: false,
@@ -58,6 +60,7 @@ fn run_single_extract(options: SingleExtractOptions) -> Result<SingleExtractRun>
         },
         q_size: None,
         aho_corasick: options.aho_corasick,
+        hash: options.hash,
         reverse_complement: options.reverse_complement,
         canonical: false,
         out_log: options.log.then_some(out_log.clone()),
@@ -311,6 +314,7 @@ fn test_extract_against_fasta_fixtures() -> Result<()> {
         out_fastx: Some(out_fasta.clone()),
         q_size: None,
         aho_corasick: false,
+        hash: false,
         reverse_complement: true,
         canonical: false,
         out_log: Some(out_log.clone()),
@@ -353,6 +357,7 @@ fn test_extract_against_fasta_fixtures_inverted() -> Result<()> {
         out_fastx: Some(out_fasta.clone()),
         q_size: None,
         aho_corasick: false,
+        hash: false,
         reverse_complement: true,
         canonical: false,
         out_log: Some(out_log.clone()),
@@ -398,6 +403,7 @@ fn test_extract_against_fasta_fixtures_fixed_width_aa() -> Result<()> {
         out_fastx: Some(out_fasta.clone()),
         q_size: None,
         aho_corasick: false,
+        hash: false,
         reverse_complement: false,
         canonical: false,
         out_log: Some(out_log.clone()),
@@ -445,6 +451,7 @@ fn test_extract_against_fastq_fixtures_paired() -> Result<()> {
         out_fastx: Some(out_base),
         q_size: None,
         aho_corasick: false,
+        hash: false,
         reverse_complement: false,
         canonical: false,
         out_log: Some(out_log.clone()),
@@ -490,6 +497,7 @@ fn test_extract_parallel_single_end_matches_serial_fixtures() -> Result<()> {
         out_fastx: Some(out_fasta.clone()),
         q_size: None,
         aho_corasick: false,
+        hash: false,
         reverse_complement: true,
         canonical: false,
         out_log: Some(out_log.clone()),
@@ -529,6 +537,7 @@ fn test_extract_parallel_paired_end_matches_serial_fixtures() -> Result<()> {
         out_fastx: Some(out_base),
         q_size: None,
         aho_corasick: false,
+        hash: false,
         reverse_complement: false,
         canonical: false,
         out_log: Some(out_log.clone()),
@@ -601,6 +610,22 @@ fn test_extract_parallel_inverted_matches_serial() -> Result<()> {
 fn test_extract_parallel_aho_corasick_matches_serial() -> Result<()> {
     let mut serial_options = SingleExtractOptions::simple(vec!["ACG".to_string()], 1);
     serial_options.aho_corasick = true;
+    let mut parallel_options = serial_options.clone();
+    parallel_options.threads = 4;
+
+    let serial = run_single_extract(serial_options)?;
+    let parallel = run_single_extract(parallel_options)?;
+
+    assert_single_runs_match(&parallel, &serial)?;
+
+    Ok(())
+}
+
+#[test]
+fn test_extract_parallel_hash_matches_serial() -> Result<()> {
+    let mut serial_options =
+        SingleExtractOptions::simple(vec!["ACG".to_string(), "CGT".to_string()], 1);
+    serial_options.hash = true;
     let mut parallel_options = serial_options.clone();
     parallel_options.threads = 4;
 
@@ -826,6 +851,7 @@ fn test_extract_rejects_zero_chunk_size() {
         out_fastx: None,
         q_size: None,
         aho_corasick: false,
+        hash: false,
         reverse_complement: true,
         canonical: false,
         out_log: None,
@@ -862,6 +888,7 @@ fn test_extract_auto_threads_matches_serial_fixtures() -> Result<()> {
         out_fastx: Some(out_fasta.clone()),
         q_size: None,
         aho_corasick: false,
+        hash: false,
         reverse_complement: true,
         canonical: false,
         out_log: Some(out_log.clone()),
@@ -903,6 +930,7 @@ fn test_extract_paired_fastq_length_mismatch_errors() -> Result<()> {
         out_fastx: None,
         q_size: None,
         aho_corasick: false,
+        hash: false,
         reverse_complement: false,
         canonical: false,
         out_log: None,
@@ -945,6 +973,7 @@ fn test_extract_parallel_paired_fastq_length_mismatch_errors() -> Result<()> {
         out_fastx: None,
         q_size: None,
         aho_corasick: false,
+        hash: false,
         reverse_complement: false,
         canonical: false,
         out_log: None,

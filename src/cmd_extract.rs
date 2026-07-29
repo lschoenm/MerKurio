@@ -509,7 +509,7 @@ group(
     ArgGroup::new("algorithm")
         .required(false)
         .multiple(false)
-        .args(&["q_size", "aho_corasick"]),
+        .args(&["q_size", "aho_corasick", "hash"]),
 ),
 group(
     ArgGroup::new("logging")
@@ -583,7 +583,13 @@ pub struct CmdExtract {
     invert_match: bool,
 
     /// Use case-insensitive matching. Always uses the Aho-Corasick algorithm.
-    #[clap(short = 'I', long, action(ArgAction::SetTrue), default_value("false"))]
+    #[clap(
+        short = 'I',
+        long,
+        action(ArgAction::SetTrue),
+        default_value("false"),
+        conflicts_with("hash")
+    )]
     case_insensitive: bool,
 
     /// Convert all input sequences to lowercase.
@@ -607,6 +613,15 @@ pub struct CmdExtract {
         hide_short_help = true
     )]
     aho_corasick: bool,
+
+    /// Use rolling-hash matching. All query sequences must have the same length.
+    #[clap(
+        long,
+        action(ArgAction::SetTrue),
+        default_value("false"),
+        hide_short_help = true
+    )]
+    hash: bool,
 
     /// Total number of processing threads. One thread reads input and the remaining threads match records. Use 0 to auto-detect available cores.
     #[clap(short = 't', long, default_value_t = 1)]
@@ -752,6 +767,7 @@ pub fn extract_records(args: CmdExtract) -> Result<()> {
     let matcher = Arc::new(PatternMatcher::new(
         &pattern_list,
         args.aho_corasick,
+        args.hash,
         args.case_insensitive,
         args.q_size,
     )?);
