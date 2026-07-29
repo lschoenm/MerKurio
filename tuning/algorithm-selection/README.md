@@ -82,6 +82,14 @@ Use `./run.sh --help` for all options.
 - `algorithm_summary.csv`: median and spread for each successful algorithm;
 - `algorithm_winners.csv`: best and second-best algorithms with their margin;
 - `selection_map.svg`: winner heatmaps for first- and all-match search;
+- `crossover_curves.svg`: per-`k` curves showing each algorithm's runtime
+  relative to the fastest available algorithm as pattern count increases
+  (extreme slowdowns are visibly capped to preserve detail near the crossover);
+- `selector_rules.txt`: shallow decision trees fitted from `k` and pattern
+  count;
+- `selector_regret.csv`: held-out slowdown of the fitted selector relative to
+  the fastest algorithm in each cell;
+- `selector_regret.svg`: heatmaps of selector choices and held-out regret;
 - `metadata.txt`: configuration, compiler, platform, and source revision.
 
 The analyzer verifies that successful algorithms produce the same untimed
@@ -94,3 +102,13 @@ them by running the complete default sweep before deriving selection rules.
 
 The winner map is evidence for a later, deliberately simple production
 selection rule. It should not be copied directly into a large lookup table.
+
+The selector analysis splits timing rounds in chronological order. It fits a
+depth-limited decision tree on the first half and evaluates it on the remaining
+rounds. Regret is the percentage slowdown of the selected algorithm relative
+to the fastest algorithm for that held-out cell. This tests whether a compact
+rule survives timing variation; it does not provide an independent holdout of
+pattern composition because every round uses the same deterministic banks.
+The validation sweep has only two rounds and a sparse grid, so its fitted rules
+and regret values serve only to exercise the analysis. Use the default sweep
+before interpreting either artifact.

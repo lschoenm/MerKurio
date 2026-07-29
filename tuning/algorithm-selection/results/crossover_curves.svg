@@ -1,0 +1,208 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1114" height="1101" viewBox="0 0 1114 1101">
+<rect width="100%" height="100%" fill="#ffffff"/>
+<style>text{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;fill:#202124}.title{font-size:21px;font-weight:650}.subtitle{font-size:14px;fill:#5f6368}.mode{font-size:18px;font-weight:600}.panel{font-size:14px;font-weight:600}.axis{font-size:11px}.grid{stroke:#dadce0;stroke-width:1}.frame{stroke:#5f6368;stroke-width:1;fill:none}</style>
+<text x="28" y="31" class="title">Algorithm crossover curves</text>
+<text x="28" y="53" class="subtitle">Runtime relative to the fastest available algorithm in each cell; values above 5.0× are clipped</text>
+<line x1="28" y1="79" x2="55" y2="79" stroke="#1a73e8" stroke-width="3"/>
+<text x="62" y="83" class="axis">bndmq</text>
+<line x1="183" y1="79" x2="210" y2="79" stroke="#188038" stroke-width="3"/>
+<text x="217" y="83" class="axis">hash</text>
+<line x1="338" y1="79" x2="365" y2="79" stroke="#d93025" stroke-width="3"/>
+<text x="372" y="83" class="axis">aho_corasick</text>
+<text x="28" y="125" class="mode">First match</text>
+<text x="108" y="178" class="panel">k=4</text>
+<line x1="108" y1="326.0" x2="388" y2="326.0" class="grid"/>
+<text x="101" y="330.0" text-anchor="end" class="axis">1.0×</text>
+<line x1="108" y1="256.5" x2="388" y2="256.5" class="grid"/>
+<text x="101" y="260.5" text-anchor="end" class="axis">3.0×</text>
+<line x1="108" y1="187.0" x2="388" y2="187.0" class="grid"/>
+<text x="101" y="191.0" text-anchor="end" class="axis">5.0×</text>
+<rect x="108" y="187" width="280" height="139" class="frame"/>
+<polyline points="108.0,211.5 220.4,190.7 332.8,187.0" fill="none" stroke="#1a73e8" stroke-width="2.0" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="108.0" cy="211.5" r="2.3" fill="#1a73e8"/>
+<circle cx="220.4" cy="190.7" r="2.3" fill="#1a73e8"/>
+<circle cx="332.8" cy="187.0" r="2.3" fill="#1a73e8"/>
+<polyline points="108.0,187.0 220.4,326.0 332.8,326.0" fill="none" stroke="#188038" stroke-width="2.0" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="108.0" cy="187.0" r="2.3" fill="#188038"/>
+<circle cx="220.4" cy="326.0" r="2.3" fill="#188038"/>
+<circle cx="332.8" cy="326.0" r="2.3" fill="#188038"/>
+<polyline points="108.0,326.0 220.4,324.9 332.8,322.5" fill="none" stroke="#d93025" stroke-width="2.0" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="108.0" cy="326.0" r="2.3" fill="#d93025"/>
+<circle cx="220.4" cy="324.9" r="2.3" fill="#d93025"/>
+<circle cx="332.8" cy="322.5" r="2.3" fill="#d93025"/>
+<text transform="translate(108.0 336) rotate(45)" text-anchor="start" class="axis">1</text>
+<text transform="translate(332.8 336) rotate(45)" text-anchor="start" class="axis">256</text>
+<text transform="translate(388.0 336) rotate(45)" text-anchor="start" class="axis">1,000</text>
+<text x="448" y="178" class="panel">k=8</text>
+<line x1="448" y1="326.0" x2="728" y2="326.0" class="grid"/>
+<text x="441" y="330.0" text-anchor="end" class="axis">1.0×</text>
+<line x1="448" y1="256.5" x2="728" y2="256.5" class="grid"/>
+<text x="441" y="260.5" text-anchor="end" class="axis">3.0×</text>
+<line x1="448" y1="187.0" x2="728" y2="187.0" class="grid"/>
+<text x="441" y="191.0" text-anchor="end" class="axis">5.0×</text>
+<rect x="448" y="187" width="280" height="139" class="frame"/>
+<polyline points="448.0,308.8 560.4,255.0 672.8,187.0 728.0,187.0" fill="none" stroke="#1a73e8" stroke-width="2.0" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="448.0" cy="308.8" r="2.3" fill="#1a73e8"/>
+<circle cx="560.4" cy="255.0" r="2.3" fill="#1a73e8"/>
+<circle cx="672.8" cy="187.0" r="2.3" fill="#1a73e8"/>
+<circle cx="728.0" cy="187.0" r="2.3" fill="#1a73e8"/>
+<polyline points="448.0,187.0 560.4,320.3 672.8,318.9 728.0,320.2" fill="none" stroke="#188038" stroke-width="2.0" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="448.0" cy="187.0" r="2.3" fill="#188038"/>
+<circle cx="560.4" cy="320.3" r="2.3" fill="#188038"/>
+<circle cx="672.8" cy="318.9" r="2.3" fill="#188038"/>
+<circle cx="728.0" cy="320.2" r="2.3" fill="#188038"/>
+<polyline points="448.0,326.0 560.4,326.0 672.8,326.0 728.0,326.0" fill="none" stroke="#d93025" stroke-width="2.0" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="448.0" cy="326.0" r="2.3" fill="#d93025"/>
+<circle cx="560.4" cy="326.0" r="2.3" fill="#d93025"/>
+<circle cx="672.8" cy="326.0" r="2.3" fill="#d93025"/>
+<circle cx="728.0" cy="326.0" r="2.3" fill="#d93025"/>
+<text transform="translate(448.0 336) rotate(45)" text-anchor="start" class="axis">1</text>
+<text transform="translate(672.8 336) rotate(45)" text-anchor="start" class="axis">256</text>
+<text transform="translate(728.0 336) rotate(45)" text-anchor="start" class="axis">1,000</text>
+<text x="788" y="178" class="panel">k=31</text>
+<line x1="788" y1="326.0" x2="1068" y2="326.0" class="grid"/>
+<text x="781" y="330.0" text-anchor="end" class="axis">1.0×</text>
+<line x1="788" y1="256.5" x2="1068" y2="256.5" class="grid"/>
+<text x="781" y="260.5" text-anchor="end" class="axis">3.0×</text>
+<line x1="788" y1="187.0" x2="1068" y2="187.0" class="grid"/>
+<text x="781" y="191.0" text-anchor="end" class="axis">5.0×</text>
+<rect x="788" y="187" width="280" height="139" class="frame"/>
+<polyline points="788.0,301.7 900.4,326.0 1012.8,187.0 1068.0,187.0" fill="none" stroke="#1a73e8" stroke-width="2.0" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="788.0" cy="301.7" r="2.3" fill="#1a73e8"/>
+<circle cx="900.4" cy="326.0" r="2.3" fill="#1a73e8"/>
+<circle cx="1012.8" cy="187.0" r="2.3" fill="#1a73e8"/>
+<circle cx="1068.0" cy="187.0" r="2.3" fill="#1a73e8"/>
+<polyline points="788.0,187.0 900.4,312.4 1012.8,317.9 1068.0,324.4" fill="none" stroke="#188038" stroke-width="2.0" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="788.0" cy="187.0" r="2.3" fill="#188038"/>
+<circle cx="900.4" cy="312.4" r="2.3" fill="#188038"/>
+<circle cx="1012.8" cy="317.9" r="2.3" fill="#188038"/>
+<circle cx="1068.0" cy="324.4" r="2.3" fill="#188038"/>
+<polyline points="788.0,326.0 900.4,324.2 1012.8,326.0 1068.0,326.0" fill="none" stroke="#d93025" stroke-width="2.0" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="788.0" cy="326.0" r="2.3" fill="#d93025"/>
+<circle cx="900.4" cy="324.2" r="2.3" fill="#d93025"/>
+<circle cx="1012.8" cy="326.0" r="2.3" fill="#d93025"/>
+<circle cx="1068.0" cy="326.0" r="2.3" fill="#d93025"/>
+<text transform="translate(788.0 336) rotate(45)" text-anchor="start" class="axis">1</text>
+<text transform="translate(1012.8 336) rotate(45)" text-anchor="start" class="axis">256</text>
+<text transform="translate(1068.0 336) rotate(45)" text-anchor="start" class="axis">1,000</text>
+<text x="108" y="383" class="panel">k=80</text>
+<line x1="108" y1="531.0" x2="388" y2="531.0" class="grid"/>
+<text x="101" y="535.0" text-anchor="end" class="axis">1.0×</text>
+<line x1="108" y1="461.5" x2="388" y2="461.5" class="grid"/>
+<text x="101" y="465.5" text-anchor="end" class="axis">3.0×</text>
+<line x1="108" y1="392.0" x2="388" y2="392.0" class="grid"/>
+<text x="101" y="396.0" text-anchor="end" class="axis">5.0×</text>
+<rect x="108" y="392" width="280" height="139" class="frame"/>
+<polyline points="108.0,435.2 220.4,528.8 332.8,521.1 388.0,512.6" fill="none" stroke="#188038" stroke-width="2.0" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="108.0" cy="435.2" r="2.3" fill="#188038"/>
+<circle cx="220.4" cy="528.8" r="2.3" fill="#188038"/>
+<circle cx="332.8" cy="521.1" r="2.3" fill="#188038"/>
+<circle cx="388.0" cy="512.6" r="2.3" fill="#188038"/>
+<polyline points="108.0,531.0 220.4,531.0 332.8,531.0 388.0,531.0" fill="none" stroke="#d93025" stroke-width="2.0" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="108.0" cy="531.0" r="2.3" fill="#d93025"/>
+<circle cx="220.4" cy="531.0" r="2.3" fill="#d93025"/>
+<circle cx="332.8" cy="531.0" r="2.3" fill="#d93025"/>
+<circle cx="388.0" cy="531.0" r="2.3" fill="#d93025"/>
+<text transform="translate(108.0 541) rotate(45)" text-anchor="start" class="axis">1</text>
+<text transform="translate(332.8 541) rotate(45)" text-anchor="start" class="axis">256</text>
+<text transform="translate(388.0 541) rotate(45)" text-anchor="start" class="axis">1,000</text>
+<text x="248.0" y="568" text-anchor="middle" class="axis">patterns</text>
+<text x="28" y="618" class="mode">All overlapping matches</text>
+<text x="108" y="671" class="panel">k=4</text>
+<line x1="108" y1="819.0" x2="388" y2="819.0" class="grid"/>
+<text x="101" y="823.0" text-anchor="end" class="axis">1.0×</text>
+<line x1="108" y1="749.5" x2="388" y2="749.5" class="grid"/>
+<text x="101" y="753.5" text-anchor="end" class="axis">3.0×</text>
+<line x1="108" y1="680.0" x2="388" y2="680.0" class="grid"/>
+<text x="101" y="684.0" text-anchor="end" class="axis">5.0×</text>
+<rect x="108" y="680" width="280" height="139" class="frame"/>
+<polyline points="108.0,747.3 220.4,680.0 332.8,680.0" fill="none" stroke="#1a73e8" stroke-width="2.0" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="108.0" cy="747.3" r="2.3" fill="#1a73e8"/>
+<circle cx="220.4" cy="680.0" r="2.3" fill="#1a73e8"/>
+<circle cx="332.8" cy="680.0" r="2.3" fill="#1a73e8"/>
+<polyline points="108.0,680.0 220.4,812.5 332.8,811.0" fill="none" stroke="#188038" stroke-width="2.0" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="108.0" cy="680.0" r="2.3" fill="#188038"/>
+<circle cx="220.4" cy="812.5" r="2.3" fill="#188038"/>
+<circle cx="332.8" cy="811.0" r="2.3" fill="#188038"/>
+<polyline points="108.0,819.0 220.4,819.0 332.8,819.0" fill="none" stroke="#d93025" stroke-width="2.0" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="108.0" cy="819.0" r="2.3" fill="#d93025"/>
+<circle cx="220.4" cy="819.0" r="2.3" fill="#d93025"/>
+<circle cx="332.8" cy="819.0" r="2.3" fill="#d93025"/>
+<text transform="translate(108.0 829) rotate(45)" text-anchor="start" class="axis">1</text>
+<text transform="translate(332.8 829) rotate(45)" text-anchor="start" class="axis">256</text>
+<text transform="translate(388.0 829) rotate(45)" text-anchor="start" class="axis">1,000</text>
+<text x="448" y="671" class="panel">k=8</text>
+<line x1="448" y1="819.0" x2="728" y2="819.0" class="grid"/>
+<text x="441" y="823.0" text-anchor="end" class="axis">1.0×</text>
+<line x1="448" y1="749.5" x2="728" y2="749.5" class="grid"/>
+<text x="441" y="753.5" text-anchor="end" class="axis">3.0×</text>
+<line x1="448" y1="680.0" x2="728" y2="680.0" class="grid"/>
+<text x="441" y="684.0" text-anchor="end" class="axis">5.0×</text>
+<rect x="448" y="680" width="280" height="139" class="frame"/>
+<polyline points="448.0,803.4 560.4,750.5 672.8,680.0 728.0,680.0" fill="none" stroke="#1a73e8" stroke-width="2.0" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="448.0" cy="803.4" r="2.3" fill="#1a73e8"/>
+<circle cx="560.4" cy="750.5" r="2.3" fill="#1a73e8"/>
+<circle cx="672.8" cy="680.0" r="2.3" fill="#1a73e8"/>
+<circle cx="728.0" cy="680.0" r="2.3" fill="#1a73e8"/>
+<polyline points="448.0,680.0 560.4,805.4 672.8,804.7 728.0,811.0" fill="none" stroke="#188038" stroke-width="2.0" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="448.0" cy="680.0" r="2.3" fill="#188038"/>
+<circle cx="560.4" cy="805.4" r="2.3" fill="#188038"/>
+<circle cx="672.8" cy="804.7" r="2.3" fill="#188038"/>
+<circle cx="728.0" cy="811.0" r="2.3" fill="#188038"/>
+<polyline points="448.0,819.0 560.4,819.0 672.8,819.0 728.0,819.0" fill="none" stroke="#d93025" stroke-width="2.0" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="448.0" cy="819.0" r="2.3" fill="#d93025"/>
+<circle cx="560.4" cy="819.0" r="2.3" fill="#d93025"/>
+<circle cx="672.8" cy="819.0" r="2.3" fill="#d93025"/>
+<circle cx="728.0" cy="819.0" r="2.3" fill="#d93025"/>
+<text transform="translate(448.0 829) rotate(45)" text-anchor="start" class="axis">1</text>
+<text transform="translate(672.8 829) rotate(45)" text-anchor="start" class="axis">256</text>
+<text transform="translate(728.0 829) rotate(45)" text-anchor="start" class="axis">1,000</text>
+<text x="788" y="671" class="panel">k=31</text>
+<line x1="788" y1="819.0" x2="1068" y2="819.0" class="grid"/>
+<text x="781" y="823.0" text-anchor="end" class="axis">1.0×</text>
+<line x1="788" y1="749.5" x2="1068" y2="749.5" class="grid"/>
+<text x="781" y="753.5" text-anchor="end" class="axis">3.0×</text>
+<line x1="788" y1="680.0" x2="1068" y2="680.0" class="grid"/>
+<text x="781" y="684.0" text-anchor="end" class="axis">5.0×</text>
+<rect x="788" y="680" width="280" height="139" class="frame"/>
+<polyline points="788.0,819.0 900.4,819.0 1012.8,680.0 1068.0,680.0" fill="none" stroke="#1a73e8" stroke-width="2.0" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="788.0" cy="819.0" r="2.3" fill="#1a73e8"/>
+<circle cx="900.4" cy="819.0" r="2.3" fill="#1a73e8"/>
+<circle cx="1012.8" cy="680.0" r="2.3" fill="#1a73e8"/>
+<circle cx="1068.0" cy="680.0" r="2.3" fill="#1a73e8"/>
+<polyline points="788.0,680.0 900.4,798.5 1012.8,808.1 1068.0,811.5" fill="none" stroke="#188038" stroke-width="2.0" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="788.0" cy="680.0" r="2.3" fill="#188038"/>
+<circle cx="900.4" cy="798.5" r="2.3" fill="#188038"/>
+<circle cx="1012.8" cy="808.1" r="2.3" fill="#188038"/>
+<circle cx="1068.0" cy="811.5" r="2.3" fill="#188038"/>
+<polyline points="788.0,781.3 900.4,814.6 1012.8,819.0 1068.0,819.0" fill="none" stroke="#d93025" stroke-width="2.0" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="788.0" cy="781.3" r="2.3" fill="#d93025"/>
+<circle cx="900.4" cy="814.6" r="2.3" fill="#d93025"/>
+<circle cx="1012.8" cy="819.0" r="2.3" fill="#d93025"/>
+<circle cx="1068.0" cy="819.0" r="2.3" fill="#d93025"/>
+<text transform="translate(788.0 829) rotate(45)" text-anchor="start" class="axis">1</text>
+<text transform="translate(1012.8 829) rotate(45)" text-anchor="start" class="axis">256</text>
+<text transform="translate(1068.0 829) rotate(45)" text-anchor="start" class="axis">1,000</text>
+<text x="108" y="876" class="panel">k=80</text>
+<line x1="108" y1="1024.0" x2="388" y2="1024.0" class="grid"/>
+<text x="101" y="1028.0" text-anchor="end" class="axis">1.0×</text>
+<line x1="108" y1="954.5" x2="388" y2="954.5" class="grid"/>
+<text x="101" y="958.5" text-anchor="end" class="axis">3.0×</text>
+<line x1="108" y1="885.0" x2="388" y2="885.0" class="grid"/>
+<text x="101" y="889.0" text-anchor="end" class="axis">5.0×</text>
+<rect x="108" y="885" width="280" height="139" class="frame"/>
+<polyline points="108.0,989.6 220.4,1019.9 332.8,1018.9 388.0,1024.0" fill="none" stroke="#188038" stroke-width="2.0" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="108.0" cy="989.6" r="2.3" fill="#188038"/>
+<circle cx="220.4" cy="1019.9" r="2.3" fill="#188038"/>
+<circle cx="332.8" cy="1018.9" r="2.3" fill="#188038"/>
+<circle cx="388.0" cy="1024.0" r="2.3" fill="#188038"/>
+<polyline points="108.0,1024.0 220.4,1024.0 332.8,1024.0 388.0,1010.2" fill="none" stroke="#d93025" stroke-width="2.0" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="108.0" cy="1024.0" r="2.3" fill="#d93025"/>
+<circle cx="220.4" cy="1024.0" r="2.3" fill="#d93025"/>
+<circle cx="332.8" cy="1024.0" r="2.3" fill="#d93025"/>
+<circle cx="388.0" cy="1010.2" r="2.3" fill="#d93025"/>
+<text transform="translate(108.0 1034) rotate(45)" text-anchor="start" class="axis">1</text>
+<text transform="translate(332.8 1034) rotate(45)" text-anchor="start" class="axis">256</text>
+<text transform="translate(388.0 1034) rotate(45)" text-anchor="start" class="axis">1,000</text>
+<text x="248.0" y="1061" text-anchor="middle" class="axis">patterns</text>
+</svg>
