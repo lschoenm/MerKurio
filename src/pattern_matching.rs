@@ -292,7 +292,9 @@ impl<'a> Iterator for Matches<'a> {
 }
 
 /// Tune the size of the _q_-grams for BNDMq based on the pattern length.
-/// Based on the paper by Ďurian et al. (2009) and personal experience.
+///
+/// The ranges are a smoothed fit to the internal DNA q-value tuning benchmark
+/// in `tuning/q-value`, informed by the BNDMq paper by Ďurian et al. (2009).
 pub fn tune_q_value(pattern: &str) -> Result<usize> {
     let pattern_len = pattern.len();
     let q = match pattern_len {
@@ -566,8 +568,31 @@ mod tests {
 
     #[test]
     fn test_tune_q_value() {
-        let q = tune_q_value("AAAAAAAACCCCCCCCGGGGGGGGTTTTTTT").unwrap();
-        assert_eq!(q, 5);
+        let cases = [
+            (0, 1),
+            (1, 1),
+            (2, 2),
+            (3, 2),
+            (4, 3),
+            (5, 3),
+            (6, 4),
+            (12, 4),
+            (13, 5),
+            (25, 5),
+            (26, 6),
+            (64, 6),
+        ];
+
+        for (pattern_len, expected_q) in cases {
+            let pattern = "A".repeat(pattern_len);
+            assert_eq!(
+                tune_q_value(&pattern).unwrap(),
+                expected_q,
+                "unexpected q for pattern length {pattern_len}"
+            );
+        }
+
+        assert!(tune_q_value(&"A".repeat(65)).is_err());
     }
 
     #[test]
