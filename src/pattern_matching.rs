@@ -298,10 +298,10 @@ pub fn tune_q_value(pattern: &str) -> Result<usize> {
     let q = match pattern_len {
         0..=1 => 1,
         2..=3 => 2,
-        4..=8 => 3,
-        9..=30 => 4,
-        31..=55 => 5,
-        56..=64 => 6,
+        4..=5 => 3,
+        6..=12 => 4,
+        13..=25 => 5,
+        26..=64 => 6,
         65.. => anyhow::bail!("Pattern length is too long for BNDMq."),
     };
     Ok(q)
