@@ -12,9 +12,14 @@ ROOT = Path(__file__).resolve().parent
 RESULTS = ROOT / "results"
 RAW = RESULTS / "algorithm_sweep.csv"
 STATUS = RESULTS / "cell_status.csv"
+REFINEMENT_RESULTS = RESULTS / "refinement"
+REFINEMENT_RAW = REFINEMENT_RESULTS / "algorithm_sweep.csv"
+REFINEMENT_STATUS = REFINEMENT_RESULTS / "cell_status.csv"
+REFINEMENT_BASE_RUN = REFINEMENT_RESULTS / "base_run_timestamp.txt"
 SUMMARY = RESULTS / "algorithm_summary.csv"
 WINNERS = RESULTS / "algorithm_winners.csv"
 SELECTION_MAP = RESULTS / "selection_map.svg"
+REFINED_SELECTION_MAP = RESULTS / "refined_selection_map.svg"
 CROSSOVER_PLOT = RESULTS / "crossover_curves.svg"
 CORPUS_REGIONS = RESULTS / "corpus_size_regions.csv"
 CORPUS_CROSSOVERS = RESULTS / "corpus_size_crossovers.csv"
@@ -34,40 +39,68 @@ LABELS = {
 }
 
 
-def load_raw():
+def validate_refinement_provenance():
+    if not REFINEMENT_RAW.exists() and not REFINEMENT_STATUS.exists():
+        return
+    if not REFINEMENT_BASE_RUN.exists():
+        raise SystemExit(
+            "Refinement results have no base-run marker; archive or remove "
+            "results/refinement and rerun the refinement."
+        )
+    base_timestamp = None
+    with (RESULTS / "metadata.txt").open() as handle:
+        for line in handle:
+            if line.startswith("unix_timestamp="):
+                base_timestamp = line.partition("=")[2].strip()
+                break
+    if base_timestamp != REFINEMENT_BASE_RUN.read_text().strip():
+        raise SystemExit(
+            "Refinement results belong to a different base sweep; archive or "
+            "remove results/refinement before analyzing the new sweep."
+        )
+
+
+def load_raw(paths=None):
+    if paths is None:
+        paths = (RAW, REFINEMENT_RAW)
     timings = defaultdict(list)
     search_timings = defaultdict(list)
     build_times = defaultdict(list)
     corpus_model_samples = defaultdict(list)
     validation = defaultdict(dict)
     reference_bases = set()
-    with RAW.open(newline="") as handle:
-        for row in csv.DictReader(handle):
-            key = (
-                int(row["k"]),
-                int(row["patterns"]),
-                row["mode"],
-                row["algorithm"],
-            )
-            timings[key].append(float(row["reference_ns_per_base"]))
-            search_timings[key].append(float(row["search_ns_per_base"]))
-            build_times[key].append(float(row["build_ns_per_matcher"]) / 1_000_000.0)
-            corpus_model_samples[key].append(
-                (
-                    float(row["fixed_ns_per_matcher"]),
-                    float(row["search_ns_per_base"]),
+    for path in paths:
+        if not path.exists():
+            continue
+        with path.open(newline="") as handle:
+            for row in csv.DictReader(handle):
+                key = (
+                    int(row["k"]),
+                    int(row["patterns"]),
+                    row["mode"],
+                    row["algorithm"],
                 )
-            )
-            reference_bases.add(int(row["target_bases_per_cell"]))
-            cell = key[:3]
-            observed = (
-                int(row["validation_checksum"]),
-                int(row["matching_records"]),
-                int(row["matches"]),
-            )
-            previous = validation[cell].setdefault(key[3], observed)
-            if previous != observed:
-                raise SystemExit(f"Inconsistent validation result within {key}")
+                timings[key].append(float(row["reference_ns_per_base"]))
+                search_timings[key].append(float(row["search_ns_per_base"]))
+                build_times[key].append(
+                    float(row["build_ns_per_matcher"]) / 1_000_000.0
+                )
+                corpus_model_samples[key].append(
+                    (
+                        float(row["fixed_ns_per_matcher"]),
+                        float(row["search_ns_per_base"]),
+                    )
+                )
+                reference_bases.add(int(row["target_bases_per_cell"]))
+                cell = key[:3]
+                observed = (
+                    int(row["validation_checksum"]),
+                    int(row["matching_records"]),
+                    int(row["matches"]),
+                )
+                previous = validation[cell].setdefault(key[3], observed)
+                if previous != observed:
+                    raise SystemExit(f"Inconsistent validation result within {key}")
     if len(reference_bases) != 1:
         raise SystemExit("Raw results contain inconsistent target corpus sizes.")
     return (
@@ -80,17 +113,22 @@ def load_raw():
     )
 
 
-def load_statuses():
+def load_statuses(paths=None):
+    if paths is None:
+        paths = (STATUS, REFINEMENT_STATUS)
     statuses = {}
-    with STATUS.open(newline="") as handle:
-        for row in csv.DictReader(handle):
-            key = (
-                int(row["k"]),
-                int(row["patterns"]),
-                row["mode"],
-                row["algorithm"],
-            )
-            statuses[key] = row
+    for path in paths:
+        if not path.exists():
+            continue
+        with path.open(newline="") as handle:
+            for row in csv.DictReader(handle):
+                key = (
+                    int(row["k"]),
+                    int(row["patterns"]),
+                    row["mode"],
+                    row["algorithm"],
+                )
+                statuses[key] = row
     return statuses
 
 
@@ -327,6 +365,160 @@ def write_selection_map(winners, statuses, reference_bases):
 
     svg.append("</svg>")
     SELECTION_MAP.write_text("\n".join(svg) + "\n")
+
+
+def write_refined_selection_map(
+    winners, statuses, base_statuses, refinement_cells, reference_bases
+):
+    k_values = sorted({key[0] for key in base_statuses})
+    base_pattern_counts = sorted({key[1] for key in base_statuses})
+    modes = [mode for mode in MODES if any(key[2] == mode for key in base_statuses)]
+    if not k_values or not base_pattern_counts or not modes:
+        return
+
+    left, right, top = 102, 32, 145
+    plot_width = 1120
+    cell_height = max(25, min(36, 500 // max(1, len(k_values))))
+    panel_gap = 105
+    panel_height = len(k_values) * cell_height
+    width = left + plot_width + right
+    height = top + len(modes) * panel_height + max(0, len(modes) - 1) * panel_gap + 95
+    log_min = math.log10(base_pattern_counts[0])
+    log_max = math.log10(base_pattern_counts[-1])
+
+    def x(patterns):
+        if log_max == log_min:
+            return left + plot_width / 2.0
+        fraction = (math.log10(patterns) - log_min) / (log_max - log_min)
+        return left + fraction * plot_width
+
+    svg = [
+        f'<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" '
+        f'viewBox="0 0 {width} {height}">',
+        '<rect width="100%" height="100%" fill="#ffffff"/>',
+        '<style>text{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;'
+        'fill:#202124}.title{font-size:21px;font-weight:650}.subtitle{font-size:14px;'
+        'fill:#5f6368}.panel{font-size:17px;font-weight:600}.axis{font-size:11px}'
+        '.cell{font-size:11px;font-weight:650;fill:#ffffff}.tie{stroke:#202124;'
+        'stroke-width:2}.missing{fill:#e8eaed}.refined{fill:#ffffff;stroke:#202124;'
+        'stroke-width:1.5}</style>',
+        '<text x="28" y="31" class="title">Refined pattern-matching algorithm selection</text>',
+        '<text x="28" y="53" class="subtitle">Log-scaled pattern counts; bands extend '
+        'halfway between tested counts, dark outline means &lt;3% over runner-up</text>',
+    ]
+
+    legend_x = 28
+    for algorithm in ALGORITHMS:
+        svg.append(
+            f'<rect x="{legend_x}" y="72" width="20" height="14" '
+            f'fill="{COLORS[algorithm]}"/>'
+        )
+        svg.append(
+            f'<text x="{legend_x+27}" y="84" class="axis">{algorithm}</text>'
+        )
+        legend_x += 145
+    svg.append(
+        f'<rect x="{legend_x}" y="72" width="20" height="14" class="missing"/>'
+    )
+    svg.append(
+        f'<text x="{legend_x+27}" y="84" class="axis">unavailable</text>'
+    )
+    legend_x += 115
+    svg.append(
+        f'<circle cx="{legend_x+7}" cy="79" r="5" class="refined"/>'
+    )
+    svg.append(
+        f'<text x="{legend_x+19}" y="84" class="axis">refinement point</text>'
+    )
+    svg.append(
+        f'<text x="{width-28}" y="53" text-anchor="end" class="subtitle">'
+        f'{compact_bases(reference_bases)}-base reference workload</text>'
+    )
+
+    for mode_index, mode in enumerate(modes):
+        panel_top = top + mode_index * (panel_height + panel_gap)
+        svg.append(
+            f'<text x="28" y="{panel_top-16}" class="panel">'
+            f'{"First match" if mode == "first" else "All overlapping matches"}</text>'
+        )
+        for row, k in enumerate(k_values):
+            y = panel_top + row * cell_height
+            svg.append(
+                f'<text x="{left-10}" y="{y+cell_height*0.68:.1f}" '
+                f'text-anchor="end" class="axis">{k}</text>'
+            )
+            svg.append(
+                f'<rect x="{left}" y="{y}" width="{plot_width}" '
+                f'height="{cell_height}" class="missing"/>'
+            )
+            tested = sorted(
+                {
+                    patterns
+                    for candidate_k, patterns, candidate_mode, _algorithm in statuses
+                    if candidate_k == k and candidate_mode == mode
+                }
+            )
+            for index, patterns in enumerate(tested):
+                center = x(patterns)
+                segment_left = (
+                    left
+                    if index == 0
+                    else (x(tested[index - 1]) + center) / 2.0
+                )
+                segment_right = (
+                    left + plot_width
+                    if index + 1 == len(tested)
+                    else (center + x(tested[index + 1])) / 2.0
+                )
+                winner = winners.get((k, patterns, mode))
+                if winner is None:
+                    continue
+                algorithm = winner["algorithm"]
+                tie_class = (
+                    ' class="tie"'
+                    if winner["margin"] is not None and winner["margin"] < 3.0
+                    else ""
+                )
+                svg.append(
+                    f'<rect x="{segment_left:.2f}" y="{y}" '
+                    f'width="{segment_right-segment_left:.2f}" '
+                    f'height="{cell_height}" fill="{COLORS[algorithm]}" '
+                    f'stroke="#ffffff" stroke-width="1"{tie_class}/>'
+                )
+                if segment_right - segment_left >= 22:
+                    svg.append(
+                        f'<text x="{(segment_left+segment_right)/2:.1f}" '
+                        f'y="{y+cell_height*0.68:.1f}" text-anchor="middle" '
+                        f'class="cell">{LABELS[algorithm]}</text>'
+                    )
+                if (k, patterns, mode) in refinement_cells:
+                    svg.append(
+                        f'<circle cx="{center:.2f}" cy="{y+cell_height/2:.2f}" '
+                        'r="4.5" class="refined"/>'
+                    )
+
+        bottom = panel_top + panel_height
+        for patterns in base_pattern_counts:
+            current_x = x(patterns)
+            svg.append(
+                f'<line x1="{current_x:.2f}" y1="{bottom}" '
+                f'x2="{current_x:.2f}" y2="{bottom+5}" stroke="#5f6368"/>'
+            )
+            svg.append(
+                f'<text transform="translate({current_x:.2f} {bottom+10}) rotate(55)" '
+                f'text-anchor="start" class="axis">{patterns:,}</text>'
+            )
+        svg.append(
+            f'<text transform="translate(24 {panel_top+panel_height/2:.1f}) rotate(-90)" '
+            'text-anchor="middle" class="axis">pattern length k</text>'
+        )
+        svg.append(
+            f'<text x="{left+plot_width/2:.1f}" y="{bottom+72}" '
+            'text-anchor="middle" class="axis">number of patterns (log scale)</text>'
+        )
+
+    svg.append("</svg>")
+    REFINED_SELECTION_MAP.write_text("\n".join(svg) + "\n")
 
 
 def polyline(points, color, width=2.0):
@@ -874,6 +1066,7 @@ def write_corpus_crossover_outputs(corpus_model_samples, statuses):
 def main():
     if not RAW.exists() or not STATUS.exists():
         raise SystemExit("Missing algorithm_sweep.csv or cell_status.csv.")
+    validate_refinement_provenance()
     (
         timings,
         search_timings,
@@ -885,10 +1078,20 @@ def main():
     if not timings:
         raise SystemExit("The raw result file contains no successful measurements.")
     statuses = load_statuses()
+    base_statuses = load_statuses((STATUS,))
+    refinement_statuses = load_statuses((REFINEMENT_STATUS,))
+    refinement_cells = {key[:3] for key in refinement_statuses}
     validate_algorithms(validation)
     summary = summarize(timings, search_timings, build_times)
     winners = write_tables(summary)
-    write_selection_map(winners, statuses, reference_bases)
+    write_selection_map(winners, base_statuses, reference_bases)
+    write_refined_selection_map(
+        winners,
+        statuses,
+        base_statuses,
+        refinement_cells,
+        reference_bases,
+    )
     write_crossover_plot(summary, statuses, reference_bases)
     write_corpus_crossover_outputs(corpus_model_samples, statuses)
 

@@ -90,6 +90,45 @@ A small validation run can be launched with:
 
 Use `./run.sh --help` for all options.
 
+## Refine algorithm transitions
+
+After completing the full sweep, run one adaptive refinement wave on the same
+machine:
+
+```bash
+./run-refinement.sh
+```
+
+The refinement driver reads `algorithm_winners.csv`, finds every pair of
+adjacent pattern counts whose winning algorithms differ, and benchmarks all
+three algorithms at the geometric midpoint. Counts that are already adjacent
+integers cannot be refined. The original raw sweep is never modified.
+
+Run the command again to narrow the remaining transition brackets by one more
+level, or request multiple levels at once:
+
+```bash
+./run-refinement.sh --waves 2
+```
+
+To inspect the next wave without running it:
+
+```bash
+./run-refinement.sh --dry-run
+```
+
+Each cell is stored independently under `results/refinement/parts`, making an
+interrupted refinement resumable. Successful and timed-out parts are both
+considered complete. The driver rebuilds the aggregate refinement CSVs and
+runs the analyzer after every wave.
+
+Refinement timings must be collected on the same machine as the base sweep.
+The driver checks the recorded system and refuses to mix machines unless
+`--allow-different-system` is explicitly supplied. It also records the base
+sweep timestamp and refuses to combine refinement parts with a subsequently
+replaced base sweep. Archive or remove `results/refinement` before refining a
+new full sweep.
+
 ## Results
 
 - `algorithm_sweep.csv`: raw build, search, and total timing samples;
@@ -97,7 +136,10 @@ Use `./run.sh --help` for all options.
 - `algorithm_summary.csv`: median per-matcher build, search, and reference
   times plus reference timing spread for each successful algorithm;
 - `algorithm_winners.csv`: best and second-best algorithms with their margin;
-- `selection_map.svg`: winner heatmaps for first- and all-match search;
+- `selection_map.svg`: categorical winner heatmaps for the original full-sweep
+  grid;
+- `refined_selection_map.svg`: combined base and refinement winners on a
+  continuous logarithmic pattern-count axis; white dots mark refinement cells;
 - `crossover_curves.svg`: per-`k` curves showing each algorithm's runtime
   relative to the fastest available algorithm as pattern count increases
   (extreme slowdowns are visibly capped to preserve detail near the crossover);
@@ -110,6 +152,14 @@ Use `./run.sh --help` for all options.
 - `corpus_size_crossovers.svg`: heatmaps of the first corpus-size transition
   for each `k`, pattern count, and search mode;
 - `metadata.txt`: configuration, compiler, platform, and source revision.
+
+The refinement-specific raw data are kept in:
+
+- `refinement/manifest.csv`: transition bracket and completion status for each
+  selected midpoint;
+- `refinement/algorithm_sweep.csv`: aggregated successful refinement timings;
+- `refinement/cell_status.csv`: aggregated refinement statuses;
+- `refinement/parts/`: resumable per-cell raw results and metadata.
 
 The analyzer verifies that successful algorithms produce the same untimed
 result checksum for each cell. A mismatch aborts analysis instead of producing

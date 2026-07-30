@@ -1,0 +1,877 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1254" height="1335" viewBox="0 0 1254 1335">
+<rect width="100%" height="100%" fill="#ffffff"/>
+<style>text{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;fill:#202124}.title{font-size:21px;font-weight:650}.subtitle{font-size:14px;fill:#5f6368}.panel{font-size:17px;font-weight:600}.axis{font-size:11px}.cell{font-size:11px;font-weight:650;fill:#ffffff}.tie{stroke:#202124;stroke-width:2}.missing{fill:#e8eaed}.refined{fill:#ffffff;stroke:#202124;stroke-width:1.5}</style>
+<text x="28" y="31" class="title">Refined pattern-matching algorithm selection</text>
+<text x="28" y="53" class="subtitle">Log-scaled pattern counts; bands extend halfway between tested counts, dark outline means &lt;3% over runner-up</text>
+<rect x="28" y="72" width="20" height="14" fill="#1a73e8"/>
+<text x="55" y="84" class="axis">bndmq</text>
+<rect x="173" y="72" width="20" height="14" fill="#188038"/>
+<text x="200" y="84" class="axis">hash</text>
+<rect x="318" y="72" width="20" height="14" fill="#d93025"/>
+<text x="345" y="84" class="axis">aho_corasick</text>
+<rect x="463" y="72" width="20" height="14" class="missing"/>
+<text x="490" y="84" class="axis">unavailable</text>
+<circle cx="585" cy="79" r="5" class="refined"/>
+<text x="597" y="84" class="axis">refinement point</text>
+<text x="1226" y="53" text-anchor="end" class="subtitle">100M-base reference workload</text>
+<text x="28" y="129" class="panel">First match</text>
+<text x="92" y="167.4" text-anchor="end" class="axis">4</text>
+<rect x="102" y="145" width="1120" height="33" class="missing"/>
+<rect x="102.00" y="145" width="28.10" height="33" fill="#d93025" stroke="#ffffff" stroke-width="1"/>
+<text x="116.0" y="167.4" text-anchor="middle" class="cell">A</text>
+<rect x="130.10" y="145" width="56.19" height="33" fill="#1a73e8" stroke="#ffffff" stroke-width="1" class="tie"/>
+<text x="158.2" y="167.4" text-anchor="middle" class="cell">B</text>
+<rect x="186.29" y="145" width="56.19" height="33" fill="#d93025" stroke="#ffffff" stroke-width="1"/>
+<text x="214.4" y="167.4" text-anchor="middle" class="cell">A</text>
+<rect x="242.48" y="145" width="56.19" height="33" fill="#d93025" stroke="#ffffff" stroke-width="1"/>
+<text x="270.6" y="167.4" text-anchor="middle" class="cell">A</text>
+<rect x="298.67" y="145" width="56.19" height="33" fill="#d93025" stroke="#ffffff" stroke-width="1"/>
+<text x="326.8" y="167.4" text-anchor="middle" class="cell">A</text>
+<rect x="354.87" y="145" width="56.19" height="33" fill="#d93025" stroke="#ffffff" stroke-width="1"/>
+<text x="383.0" y="167.4" text-anchor="middle" class="cell">A</text>
+<rect x="411.06" y="145" width="56.19" height="33" fill="#d93025" stroke="#ffffff" stroke-width="1"/>
+<text x="439.2" y="167.4" text-anchor="middle" class="cell">A</text>
+<rect x="467.25" y="145" width="56.19" height="33" fill="#188038" stroke="#ffffff" stroke-width="1"/>
+<text x="495.3" y="167.4" text-anchor="middle" class="cell">H</text>
+<rect x="523.44" y="145" width="83.33" height="33" fill="#d93025" stroke="#ffffff" stroke-width="1" class="tie"/>
+<text x="565.1" y="167.4" text-anchor="middle" class="cell">A</text>
+<text x="92" y="200.4" text-anchor="end" class="axis">6</text>
+<rect x="102" y="178" width="1120" height="33" class="missing"/>
+<rect x="102.00" y="178" width="28.10" height="33" fill="#d93025" stroke="#ffffff" stroke-width="1"/>
+<text x="116.0" y="200.4" text-anchor="middle" class="cell">A</text>
+<rect x="130.10" y="178" width="56.19" height="33" fill="#1a73e8" stroke="#ffffff" stroke-width="1"/>
+<text x="158.2" y="200.4" text-anchor="middle" class="cell">B</text>
+<rect x="186.29" y="178" width="56.19" height="33" fill="#d93025" stroke="#ffffff" stroke-width="1"/>
+<text x="214.4" y="200.4" text-anchor="middle" class="cell">A</text>
+<rect x="242.48" y="178" width="56.19" height="33" fill="#d93025" stroke="#ffffff" stroke-width="1"/>
+<text x="270.6" y="200.4" text-anchor="middle" class="cell">A</text>
+<rect x="298.67" y="178" width="56.19" height="33" fill="#d93025" stroke="#ffffff" stroke-width="1"/>
+<text x="326.8" y="200.4" text-anchor="middle" class="cell">A</text>
+<rect x="354.87" y="178" width="56.19" height="33" fill="#d93025" stroke="#ffffff" stroke-width="1"/>
+<text x="383.0" y="200.4" text-anchor="middle" class="cell">A</text>
+<rect x="411.06" y="178" width="56.19" height="33" fill="#d93025" stroke="#ffffff" stroke-width="1"/>
+<text x="439.2" y="200.4" text-anchor="middle" class="cell">A</text>
+<rect x="467.25" y="178" width="56.19" height="33" fill="#d93025" stroke="#ffffff" stroke-width="1"/>
+<text x="495.3" y="200.4" text-anchor="middle" class="cell">A</text>
+<rect x="523.44" y="178" width="83.33" height="33" fill="#d93025" stroke="#ffffff" stroke-width="1"/>
+<text x="565.1" y="200.4" text-anchor="middle" class="cell">A</text>
+<rect x="606.77" y="178" width="148.56" height="33" fill="#188038" stroke="#ffffff" stroke-width="1" class="tie"/>
+<text x="681.1" y="200.4" text-anchor="middle" class="cell">H</text>
+<text x="92" y="233.4" text-anchor="end" class="axis">8</text>
+<rect x="102" y="211" width="1120" height="33" class="missing"/>
+<rect x="102.00" y="211" width="28.10" height="33" fill="#d93025" stroke="#ffffff" stroke-width="1"/>
+<text x="116.0" y="233.4" text-anchor="middle" class="cell">A</text>
+<rect x="130.10" y="211" width="56.19" height="33" fill="#1a73e8" stroke="#ffffff" stroke-width="1"/>
+<text x="158.2" y="233.4" text-anchor="middle" class="cell">B</text>
+<rect x="186.29" y="211" width="56.19" height="33" fill="#d93025" stroke="#ffffff" stroke-width="1"/>
+<text x="214.4" y="233.4" text-anchor="middle" class="cell">A</text>
+<rect x="242.48" y="211" width="56.19" height="33" fill="#d93025" stroke="#ffffff" stroke-width="1"/>
+<text x="270.6" y="233.4" text-anchor="middle" class="cell">A</text>
+<rect x="298.67" y="211" width="56.19" height="33" fill="#d93025" stroke="#ffffff" stroke-width="1"/>
+<text x="326.8" y="233.4" text-anchor="middle" class="cell">A</text>
+<rect x="354.87" y="211" width="56.19" height="33" fill="#d93025" stroke="#ffffff" stroke-width="1"/>
+<text x="383.0" y="233.4" text-anchor="middle" class="cell">A</text>
+<rect x="411.06" y="211" width="56.19" height="33" fill="#d93025" stroke="#ffffff" stroke-width="1"/>
+<text x="439.2" y="233.4" text-anchor="middle" class="cell">A</text>
+<rect x="467.25" y="211" width="56.19" height="33" fill="#d93025" stroke="#ffffff" stroke-width="1"/>
+<text x="495.3" y="233.4" text-anchor="middle" class="cell">A</text>
+<rect x="523.44" y="211" width="83.33" height="33" fill="#d93025" stroke="#ffffff" stroke-width="1" class="tie"/>
+<text x="565.1" y="233.4" text-anchor="middle" class="cell">A</text>
+<rect x="606.77" y="211" width="148.56" height="33" fill="#188038" stroke="#ffffff" stroke-width="1"/>
+<text x="681.1" y="233.4" text-anchor="middle" class="cell">H</text>
+<rect x="755.33" y="211" width="186.67" height="33" fill="#188038" stroke="#ffffff" stroke-width="1"/>
+<text x="848.7" y="233.4" text-anchor="middle" class="cell">H</text>
+<text x="92" y="266.4" text-anchor="end" class="axis">10</text>
+<rect x="102" y="244" width="1120" height="33" class="missing"/>
+<rect x="102.00" y="244" width="28.10" height="33" fill="#d93025" stroke="#ffffff" stroke-width="1"/>
+<text x="116.0" y="266.4" text-anchor="middle" class="cell">A</text>
+<rect x="130.10" y="244" width="56.19" height="33" fill="#1a73e8" stroke="#ffffff" stroke-width="1"/>
+<text x="158.2" y="266.4" text-anchor="middle" class="cell">B</text>
+<rect x="186.29" y="244" width="56.19" height="33" fill="#1a73e8" stroke="#ffffff" stroke-width="1"/>
+<text x="214.4" y="266.4" text-anchor="middle" class="cell">B</text>
+<rect x="242.48" y="244" width="56.19" height="33" fill="#d93025" stroke="#ffffff" stroke-width="1"/>
+<text x="270.6" y="266.4" text-anchor="middle" class="cell">A</text>
+<rect x="298.67" y="244" width="56.19" height="33" fill="#d93025" stroke="#ffffff" stroke-width="1"/>
+<text x="326.8" y="266.4" text-anchor="middle" class="cell">A</text>
+<rect x="354.87" y="244" width="56.19" height="33" fill="#d93025" stroke="#ffffff" stroke-width="1"/>
+<text x="383.0" y="266.4" text-anchor="middle" class="cell">A</text>
+<rect x="411.06" y="244" width="56.19" height="33" fill="#d93025" stroke="#ffffff" stroke-width="1"/>
+<text x="439.2" y="266.4" text-anchor="middle" class="cell">A</text>
+<rect x="467.25" y="244" width="56.19" height="33" fill="#d93025" stroke="#ffffff" stroke-width="1"/>
+<text x="495.3" y="266.4" text-anchor="middle" class="cell">A</text>
+<rect x="523.44" y="244" width="83.33" height="33" fill="#188038" stroke="#ffffff" stroke-width="1" class="tie"/>
+<text x="565.1" y="266.4" text-anchor="middle" class="cell">H</text>
+<rect x="606.77" y="244" width="148.56" height="33" fill="#188038" stroke="#ffffff" stroke-width="1"/>
+<text x="681.1" y="266.4" text-anchor="middle" class="cell">H</text>
+<rect x="755.33" y="244" width="186.67" height="33" fill="#188038" stroke="#ffffff" stroke-width="1"/>
+<text x="848.7" y="266.4" text-anchor="middle" class="cell">H</text>
+<rect x="942.00" y="244" width="186.67" height="33" fill="#188038" stroke="#ffffff" stroke-width="1"/>
+<text x="1035.3" y="266.4" text-anchor="middle" class="cell">H</text>
+<rect x="1128.67" y="244" width="93.33" height="33" fill="#188038" stroke="#ffffff" stroke-width="1"/>
+<text x="1175.3" y="266.4" text-anchor="middle" class="cell">H</text>
+<text x="92" y="299.4" text-anchor="end" class="axis">12</text>
+<rect x="102" y="277" width="1120" height="33" class="missing"/>
+<rect x="102.00" y="277" width="28.10" height="33" fill="#1a73e8" stroke="#ffffff" stroke-width="1"/>
+<text x="116.0" y="299.4" text-anchor="middle" class="cell">B</text>
+<rect x="130.10" y="277" width="56.19" height="33" fill="#1a73e8" stroke="#ffffff" stroke-width="1"/>
+<text x="158.2" y="299.4" text-anchor="middle" class="cell">B</text>
+<rect x="186.29" y="277" width="56.19" height="33" fill="#1a73e8" stroke="#ffffff" stroke-width="1"/>
+<text x="214.4" y="299.4" text-anchor="middle" class="cell">B</text>
+<rect x="242.48" y="277" width="56.19" height="33" fill="#d93025" stroke="#ffffff" stroke-width="1"/>
+<text x="270.6" y="299.4" text-anchor="middle" class="cell">A</text>
+<rect x="298.67" y="277" width="56.19" height="33" fill="#d93025" stroke="#ffffff" stroke-width="1"/>
+<text x="326.8" y="299.4" text-anchor="middle" class="cell">A</text>
+<rect x="354.87" y="277" width="56.19" height="33" fill="#d93025" stroke="#ffffff" stroke-width="1"/>
+<text x="383.0" y="299.4" text-anchor="middle" class="cell">A</text>
+<rect x="411.06" y="277" width="56.19" height="33" fill="#d93025" stroke="#ffffff" stroke-width="1"/>
+<text x="439.2" y="299.4" text-anchor="middle" class="cell">A</text>
+<rect x="467.25" y="277" width="56.19" height="33" fill="#d93025" stroke="#ffffff" stroke-width="1"/>
+<text x="495.3" y="299.4" text-anchor="middle" class="cell">A</text>
+<rect x="523.44" y="277" width="83.33" height="33" fill="#188038" stroke="#ffffff" stroke-width="1" class="tie"/>
+<text x="565.1" y="299.4" text-anchor="middle" class="cell">H</text>
+<rect x="606.77" y="277" width="148.56" height="33" fill="#188038" stroke="#ffffff" stroke-width="1"/>
+<text x="681.1" y="299.4" text-anchor="middle" class="cell">H</text>
+<rect x="755.33" y="277" width="186.67" height="33" fill="#188038" stroke="#ffffff" stroke-width="1"/>
+<text x="848.7" y="299.4" text-anchor="middle" class="cell">H</text>
+<rect x="942.00" y="277" width="186.67" height="33" fill="#188038" stroke="#ffffff" stroke-width="1"/>
+<text x="1035.3" y="299.4" text-anchor="middle" class="cell">H</text>
+<rect x="1128.67" y="277" width="93.33" height="33" fill="#188038" stroke="#ffffff" stroke-width="1"/>
+<text x="1175.3" y="299.4" text-anchor="middle" class="cell">H</text>
+<text x="92" y="332.4" text-anchor="end" class="axis">16</text>
+<rect x="102" y="310" width="1120" height="33" class="missing"/>
+<rect x="102.00" y="310" width="28.10" height="33" fill="#1a73e8" stroke="#ffffff" stroke-width="1"/>
+<text x="116.0" y="332.4" text-anchor="middle" class="cell">B</text>
+<rect x="130.10" y="310" width="56.19" height="33" fill="#1a73e8" stroke="#ffffff" stroke-width="1"/>
+<text x="158.2" y="332.4" text-anchor="middle" class="cell">B</text>
+<rect x="186.29" y="310" width="56.19" height="33" fill="#1a73e8" stroke="#ffffff" stroke-width="1"/>
+<text x="214.4" y="332.4" text-anchor="middle" class="cell">B</text>
+<rect x="242.48" y="310" width="56.19" height="33" fill="#1a73e8" stroke="#ffffff" stroke-width="1" class="tie"/>
+<text x="270.6" y="332.4" text-anchor="middle" class="cell">B</text>
+<rect x="298.67" y="310" width="56.19" height="33" fill="#d93025" stroke="#ffffff" stroke-width="1"/>
+<text x="326.8" y="332.4" text-anchor="middle" class="cell">A</text>
+<rect x="354.87" y="310" width="56.19" height="33" fill="#d93025" stroke="#ffffff" stroke-width="1"/>
+<text x="383.0" y="332.4" text-anchor="middle" class="cell">A</text>
+<rect x="411.06" y="310" width="56.19" height="33" fill="#d93025" stroke="#ffffff" stroke-width="1"/>
+<text x="439.2" y="332.4" text-anchor="middle" class="cell">A</text>
+<rect x="467.25" y="310" width="56.19" height="33" fill="#d93025" stroke="#ffffff" stroke-width="1"/>
+<text x="495.3" y="332.4" text-anchor="middle" class="cell">A</text>
+<rect x="523.44" y="310" width="83.33" height="33" fill="#188038" stroke="#ffffff" stroke-width="1"/>
+<text x="565.1" y="332.4" text-anchor="middle" class="cell">H</text>
+<rect x="606.77" y="310" width="148.56" height="33" fill="#188038" stroke="#ffffff" stroke-width="1"/>
+<text x="681.1" y="332.4" text-anchor="middle" class="cell">H</text>
+<rect x="755.33" y="310" width="186.67" height="33" fill="#188038" stroke="#ffffff" stroke-width="1"/>
+<text x="848.7" y="332.4" text-anchor="middle" class="cell">H</text>
+<rect x="942.00" y="310" width="186.67" height="33" fill="#188038" stroke="#ffffff" stroke-width="1"/>
+<text x="1035.3" y="332.4" text-anchor="middle" class="cell">H</text>
+<rect x="1128.67" y="310" width="93.33" height="33" fill="#188038" stroke="#ffffff" stroke-width="1"/>
+<text x="1175.3" y="332.4" text-anchor="middle" class="cell">H</text>
+<text x="92" y="365.4" text-anchor="end" class="axis">20</text>
+<rect x="102" y="343" width="1120" height="33" class="missing"/>
+<rect x="102.00" y="343" width="28.10" height="33" fill="#1a73e8" stroke="#ffffff" stroke-width="1"/>
+<text x="116.0" y="365.4" text-anchor="middle" class="cell">B</text>
+<rect x="130.10" y="343" width="56.19" height="33" fill="#1a73e8" stroke="#ffffff" stroke-width="1"/>
+<text x="158.2" y="365.4" text-anchor="middle" class="cell">B</text>
+<rect x="186.29" y="343" width="56.19" height="33" fill="#1a73e8" stroke="#ffffff" stroke-width="1"/>
+<text x="214.4" y="365.4" text-anchor="middle" class="cell">B</text>
+<rect x="242.48" y="343" width="56.19" height="33" fill="#1a73e8" stroke="#ffffff" stroke-width="1"/>
+<text x="270.6" y="365.4" text-anchor="middle" class="cell">B</text>
+<rect x="298.67" y="343" width="56.19" height="33" fill="#d93025" stroke="#ffffff" stroke-width="1"/>
+<text x="326.8" y="365.4" text-anchor="middle" class="cell">A</text>
+<rect x="354.87" y="343" width="56.19" height="33" fill="#d93025" stroke="#ffffff" stroke-width="1"/>
+<text x="383.0" y="365.4" text-anchor="middle" class="cell">A</text>
+<rect x="411.06" y="343" width="56.19" height="33" fill="#d93025" stroke="#ffffff" stroke-width="1"/>
+<text x="439.2" y="365.4" text-anchor="middle" class="cell">A</text>
+<rect x="467.25" y="343" width="56.19" height="33" fill="#d93025" stroke="#ffffff" stroke-width="1"/>
+<text x="495.3" y="365.4" text-anchor="middle" class="cell">A</text>
+<rect x="523.44" y="343" width="83.33" height="33" fill="#188038" stroke="#ffffff" stroke-width="1"/>
+<text x="565.1" y="365.4" text-anchor="middle" class="cell">H</text>
+<rect x="606.77" y="343" width="148.56" height="33" fill="#188038" stroke="#ffffff" stroke-width="1"/>
+<text x="681.1" y="365.4" text-anchor="middle" class="cell">H</text>
+<rect x="755.33" y="343" width="186.67" height="33" fill="#188038" stroke="#ffffff" stroke-width="1"/>
+<text x="848.7" y="365.4" text-anchor="middle" class="cell">H</text>
+<rect x="942.00" y="343" width="186.67" height="33" fill="#188038" stroke="#ffffff" stroke-width="1"/>
+<text x="1035.3" y="365.4" text-anchor="middle" class="cell">H</text>
+<rect x="1128.67" y="343" width="93.33" height="33" fill="#188038" stroke="#ffffff" stroke-width="1"/>
+<text x="1175.3" y="365.4" text-anchor="middle" class="cell">H</text>
+<text x="92" y="398.4" text-anchor="end" class="axis">24</text>
+<rect x="102" y="376" width="1120" height="33" class="missing"/>
+<rect x="102.00" y="376" width="28.10" height="33" fill="#1a73e8" stroke="#ffffff" stroke-width="1"/>
+<text x="116.0" y="398.4" text-anchor="middle" class="cell">B</text>
+<rect x="130.10" y="376" width="56.19" height="33" fill="#1a73e8" stroke="#ffffff" stroke-width="1"/>
+<text x="158.2" y="398.4" text-anchor="middle" class="cell">B</text>
+<rect x="186.29" y="376" width="56.19" height="33" fill="#1a73e8" stroke="#ffffff" stroke-width="1"/>
+<text x="214.4" y="398.4" text-anchor="middle" class="cell">B</text>
+<rect x="242.48" y="376" width="56.19" height="33" fill="#1a73e8" stroke="#ffffff" stroke-width="1"/>
+<text x="270.6" y="398.4" text-anchor="middle" class="cell">B</text>
+<rect x="298.67" y="376" width="56.19" height="33" fill="#d93025" stroke="#ffffff" stroke-width="1"/>
+<text x="326.8" y="398.4" text-anchor="middle" class="cell">A</text>
+<rect x="354.87" y="376" width="56.19" height="33" fill="#d93025" stroke="#ffffff" stroke-width="1"/>
+<text x="383.0" y="398.4" text-anchor="middle" class="cell">A</text>
+<rect x="411.06" y="376" width="56.19" height="33" fill="#d93025" stroke="#ffffff" stroke-width="1"/>
+<text x="439.2" y="398.4" text-anchor="middle" class="cell">A</text>
+<rect x="467.25" y="376" width="56.19" height="33" fill="#188038" stroke="#ffffff" stroke-width="1"/>
+<text x="495.3" y="398.4" text-anchor="middle" class="cell">H</text>
+<rect x="523.44" y="376" width="83.33" height="33" fill="#188038" stroke="#ffffff" stroke-width="1"/>
+<text x="565.1" y="398.4" text-anchor="middle" class="cell">H</text>
+<rect x="606.77" y="376" width="148.56" height="33" fill="#188038" stroke="#ffffff" stroke-width="1"/>
+<text x="681.1" y="398.4" text-anchor="middle" class="cell">H</text>
+<rect x="755.33" y="376" width="186.67" height="33" fill="#188038" stroke="#ffffff" stroke-width="1"/>
+<text x="848.7" y="398.4" text-anchor="middle" class="cell">H</text>
+<rect x="942.00" y="376" width="186.67" height="33" fill="#188038" stroke="#ffffff" stroke-width="1"/>
+<text x="1035.3" y="398.4" text-anchor="middle" class="cell">H</text>
+<rect x="1128.67" y="376" width="93.33" height="33" fill="#188038" stroke="#ffffff" stroke-width="1"/>
+<text x="1175.3" y="398.4" text-anchor="middle" class="cell">H</text>
+<text x="92" y="431.4" text-anchor="end" class="axis">31</text>
+<rect x="102" y="409" width="1120" height="33" class="missing"/>
+<rect x="102.00" y="409" width="28.10" height="33" fill="#1a73e8" stroke="#ffffff" stroke-width="1"/>
+<text x="116.0" y="431.4" text-anchor="middle" class="cell">B</text>
+<rect x="130.10" y="409" width="56.19" height="33" fill="#1a73e8" stroke="#ffffff" stroke-width="1"/>
+<text x="158.2" y="431.4" text-anchor="middle" class="cell">B</text>
+<rect x="186.29" y="409" width="56.19" height="33" fill="#1a73e8" stroke="#ffffff" stroke-width="1"/>
+<text x="214.4" y="431.4" text-anchor="middle" class="cell">B</text>
+<rect x="242.48" y="409" width="56.19" height="33" fill="#1a73e8" stroke="#ffffff" stroke-width="1"/>
+<text x="270.6" y="431.4" text-anchor="middle" class="cell">B</text>
+<rect x="298.67" y="409" width="56.19" height="33" fill="#1a73e8" stroke="#ffffff" stroke-width="1"/>
+<text x="326.8" y="431.4" text-anchor="middle" class="cell">B</text>
+<rect x="354.87" y="409" width="56.19" height="33" fill="#d93025" stroke="#ffffff" stroke-width="1"/>
+<text x="383.0" y="431.4" text-anchor="middle" class="cell">A</text>
+<rect x="411.06" y="409" width="56.19" height="33" fill="#d93025" stroke="#ffffff" stroke-width="1" class="tie"/>
+<text x="439.2" y="431.4" text-anchor="middle" class="cell">A</text>
+<rect x="467.25" y="409" width="56.19" height="33" fill="#188038" stroke="#ffffff" stroke-width="1"/>
+<text x="495.3" y="431.4" text-anchor="middle" class="cell">H</text>
+<rect x="523.44" y="409" width="83.33" height="33" fill="#188038" stroke="#ffffff" stroke-width="1"/>
+<text x="565.1" y="431.4" text-anchor="middle" class="cell">H</text>
+<rect x="606.77" y="409" width="148.56" height="33" fill="#188038" stroke="#ffffff" stroke-width="1"/>
+<text x="681.1" y="431.4" text-anchor="middle" class="cell">H</text>
+<rect x="755.33" y="409" width="186.67" height="33" fill="#188038" stroke="#ffffff" stroke-width="1"/>
+<text x="848.7" y="431.4" text-anchor="middle" class="cell">H</text>
+<rect x="942.00" y="409" width="186.67" height="33" fill="#188038" stroke="#ffffff" stroke-width="1"/>
+<text x="1035.3" y="431.4" text-anchor="middle" class="cell">H</text>
+<rect x="1128.67" y="409" width="93.33" height="33" fill="#188038" stroke="#ffffff" stroke-width="1"/>
+<text x="1175.3" y="431.4" text-anchor="middle" class="cell">H</text>
+<text x="92" y="464.4" text-anchor="end" class="axis">40</text>
+<rect x="102" y="442" width="1120" height="33" class="missing"/>
+<rect x="102.00" y="442" width="28.10" height="33" fill="#1a73e8" stroke="#ffffff" stroke-width="1"/>
+<text x="116.0" y="464.4" text-anchor="middle" class="cell">B</text>
+<rect x="130.10" y="442" width="56.19" height="33" fill="#1a73e8" stroke="#ffffff" stroke-width="1"/>
+<text x="158.2" y="464.4" text-anchor="middle" class="cell">B</text>
+<rect x="186.29" y="442" width="56.19" height="33" fill="#1a73e8" stroke="#ffffff" stroke-width="1"/>
+<text x="214.4" y="464.4" text-anchor="middle" class="cell">B</text>
+<rect x="242.48" y="442" width="56.19" height="33" fill="#1a73e8" stroke="#ffffff" stroke-width="1"/>
+<text x="270.6" y="464.4" text-anchor="middle" class="cell">B</text>
+<rect x="298.67" y="442" width="56.19" height="33" fill="#1a73e8" stroke="#ffffff" stroke-width="1"/>
+<text x="326.8" y="464.4" text-anchor="middle" class="cell">B</text>
+<rect x="354.87" y="442" width="56.19" height="33" fill="#d93025" stroke="#ffffff" stroke-width="1" class="tie"/>
+<text x="383.0" y="464.4" text-anchor="middle" class="cell">A</text>
+<rect x="411.06" y="442" width="56.19" height="33" fill="#188038" stroke="#ffffff" stroke-width="1"/>
+<text x="439.2" y="464.4" text-anchor="middle" class="cell">H</text>
+<rect x="467.25" y="442" width="56.19" height="33" fill="#188038" stroke="#ffffff" stroke-width="1"/>
+<text x="495.3" y="464.4" text-anchor="middle" class="cell">H</text>
+<rect x="523.44" y="442" width="83.33" height="33" fill="#188038" stroke="#ffffff" stroke-width="1"/>
+<text x="565.1" y="464.4" text-anchor="middle" class="cell">H</text>
+<rect x="606.77" y="442" width="148.56" height="33" fill="#188038" stroke="#ffffff" stroke-width="1"/>
+<text x="681.1" y="464.4" text-anchor="middle" class="cell">H</text>
+<rect x="755.33" y="442" width="186.67" height="33" fill="#188038" stroke="#ffffff" stroke-width="1"/>
+<text x="848.7" y="464.4" text-anchor="middle" class="cell">H</text>
+<rect x="942.00" y="442" width="186.67" height="33" fill="#188038" stroke="#ffffff" stroke-width="1"/>
+<text x="1035.3" y="464.4" text-anchor="middle" class="cell">H</text>
+<rect x="1128.67" y="442" width="93.33" height="33" fill="#188038" stroke="#ffffff" stroke-width="1"/>
+<text x="1175.3" y="464.4" text-anchor="middle" class="cell">H</text>
+<text x="92" y="497.4" text-anchor="end" class="axis">48</text>
+<rect x="102" y="475" width="1120" height="33" class="missing"/>
+<rect x="102.00" y="475" width="28.10" height="33" fill="#1a73e8" stroke="#ffffff" stroke-width="1"/>
+<text x="116.0" y="497.4" text-anchor="middle" class="cell">B</text>
+<rect x="130.10" y="475" width="56.19" height="33" fill="#1a73e8" stroke="#ffffff" stroke-width="1"/>
+<text x="158.2" y="497.4" text-anchor="middle" class="cell">B</text>
+<rect x="186.29" y="475" width="56.19" height="33" fill="#1a73e8" stroke="#ffffff" stroke-width="1"/>
+<text x="214.4" y="497.4" text-anchor="middle" class="cell">B</text>
+<rect x="242.48" y="475" width="56.19" height="33" fill="#1a73e8" stroke="#ffffff" stroke-width="1"/>
+<text x="270.6" y="497.4" text-anchor="middle" class="cell">B</text>
+<rect x="298.67" y="475" width="56.19" height="33" fill="#1a73e8" stroke="#ffffff" stroke-width="1"/>
+<text x="326.8" y="497.4" text-anchor="middle" class="cell">B</text>
+<rect x="354.87" y="475" width="56.19" height="33" fill="#188038" stroke="#ffffff" stroke-width="1"/>
+<text x="383.0" y="497.4" text-anchor="middle" class="cell">H</text>
+<rect x="411.06" y="475" width="56.19" height="33" fill="#188038" stroke="#ffffff" stroke-width="1" class="tie"/>
+<text x="439.2" y="497.4" text-anchor="middle" class="cell">H</text>
+<rect x="467.25" y="475" width="56.19" height="33" fill="#188038" stroke="#ffffff" stroke-width="1"/>
+<text x="495.3" y="497.4" text-anchor="middle" class="cell">H</text>
+<rect x="523.44" y="475" width="83.33" height="33" fill="#188038" stroke="#ffffff" stroke-width="1"/>
+<text x="565.1" y="497.4" text-anchor="middle" class="cell">H</text>
+<rect x="606.77" y="475" width="148.56" height="33" fill="#188038" stroke="#ffffff" stroke-width="1"/>
+<text x="681.1" y="497.4" text-anchor="middle" class="cell">H</text>
+<rect x="755.33" y="475" width="186.67" height="33" fill="#188038" stroke="#ffffff" stroke-width="1"/>
+<text x="848.7" y="497.4" text-anchor="middle" class="cell">H</text>
+<rect x="942.00" y="475" width="186.67" height="33" fill="#188038" stroke="#ffffff" stroke-width="1"/>
+<text x="1035.3" y="497.4" text-anchor="middle" class="cell">H</text>
+<rect x="1128.67" y="475" width="93.33" height="33" fill="#188038" stroke="#ffffff" stroke-width="1"/>
+<text x="1175.3" y="497.4" text-anchor="middle" class="cell">H</text>
+<text x="92" y="530.4" text-anchor="end" class="axis">64</text>
+<rect x="102" y="508" width="1120" height="33" class="missing"/>
+<rect x="102.00" y="508" width="28.10" height="33" fill="#1a73e8" stroke="#ffffff" stroke-width="1"/>
+<text x="116.0" y="530.4" text-anchor="middle" class="cell">B</text>
+<rect x="130.10" y="508" width="56.19" height="33" fill="#1a73e8" stroke="#ffffff" stroke-width="1"/>
+<text x="158.2" y="530.4" text-anchor="middle" class="cell">B</text>
+<rect x="186.29" y="508" width="56.19" height="33" fill="#1a73e8" stroke="#ffffff" stroke-width="1"/>
+<text x="214.4" y="530.4" text-anchor="middle" class="cell">B</text>
+<rect x="242.48" y="508" width="56.19" height="33" fill="#1a73e8" stroke="#ffffff" stroke-width="1"/>
+<text x="270.6" y="530.4" text-anchor="middle" class="cell">B</text>
+<rect x="298.67" y="508" width="56.19" height="33" fill="#1a73e8" stroke="#ffffff" stroke-width="1"/>
+<text x="326.8" y="530.4" text-anchor="middle" class="cell">B</text>
+<rect x="354.87" y="508" width="56.19" height="33" fill="#1a73e8" stroke="#ffffff" stroke-width="1"/>
+<text x="383.0" y="530.4" text-anchor="middle" class="cell">B</text>
+<rect x="411.06" y="508" width="56.19" height="33" fill="#188038" stroke="#ffffff" stroke-width="1"/>
+<text x="439.2" y="530.4" text-anchor="middle" class="cell">H</text>
+<rect x="467.25" y="508" width="56.19" height="33" fill="#188038" stroke="#ffffff" stroke-width="1"/>
+<text x="495.3" y="530.4" text-anchor="middle" class="cell">H</text>
+<rect x="523.44" y="508" width="83.33" height="33" fill="#188038" stroke="#ffffff" stroke-width="1"/>
+<text x="565.1" y="530.4" text-anchor="middle" class="cell">H</text>
+<rect x="606.77" y="508" width="148.56" height="33" fill="#188038" stroke="#ffffff" stroke-width="1"/>
+<text x="681.1" y="530.4" text-anchor="middle" class="cell">H</text>
+<rect x="755.33" y="508" width="186.67" height="33" fill="#188038" stroke="#ffffff" stroke-width="1"/>
+<text x="848.7" y="530.4" text-anchor="middle" class="cell">H</text>
+<rect x="942.00" y="508" width="186.67" height="33" fill="#188038" stroke="#ffffff" stroke-width="1"/>
+<text x="1035.3" y="530.4" text-anchor="middle" class="cell">H</text>
+<rect x="1128.67" y="508" width="93.33" height="33" fill="#188038" stroke="#ffffff" stroke-width="1"/>
+<text x="1175.3" y="530.4" text-anchor="middle" class="cell">H</text>
+<text x="92" y="563.4" text-anchor="end" class="axis">80</text>
+<rect x="102" y="541" width="1120" height="33" class="missing"/>
+<rect x="102.00" y="541" width="28.10" height="33" fill="#d93025" stroke="#ffffff" stroke-width="1"/>
+<text x="116.0" y="563.4" text-anchor="middle" class="cell">A</text>
+<rect x="130.10" y="541" width="56.19" height="33" fill="#188038" stroke="#ffffff" stroke-width="1"/>
+<text x="158.2" y="563.4" text-anchor="middle" class="cell">H</text>
+<rect x="186.29" y="541" width="56.19" height="33" fill="#188038" stroke="#ffffff" stroke-width="1"/>
+<text x="214.4" y="563.4" text-anchor="middle" class="cell">H</text>
+<rect x="242.48" y="541" width="56.19" height="33" fill="#188038" stroke="#ffffff" stroke-width="1"/>
+<text x="270.6" y="563.4" text-anchor="middle" class="cell">H</text>
+<rect x="298.67" y="541" width="56.19" height="33" fill="#188038" stroke="#ffffff" stroke-width="1"/>
+<text x="326.8" y="563.4" text-anchor="middle" class="cell">H</text>
+<rect x="354.87" y="541" width="56.19" height="33" fill="#188038" stroke="#ffffff" stroke-width="1"/>
+<text x="383.0" y="563.4" text-anchor="middle" class="cell">H</text>
+<rect x="411.06" y="541" width="56.19" height="33" fill="#188038" stroke="#ffffff" stroke-width="1"/>
+<text x="439.2" y="563.4" text-anchor="middle" class="cell">H</text>
+<rect x="467.25" y="541" width="56.19" height="33" fill="#188038" stroke="#ffffff" stroke-width="1"/>
+<text x="495.3" y="563.4" text-anchor="middle" class="cell">H</text>
+<rect x="523.44" y="541" width="83.33" height="33" fill="#188038" stroke="#ffffff" stroke-width="1"/>
+<text x="565.1" y="563.4" text-anchor="middle" class="cell">H</text>
+<rect x="606.77" y="541" width="148.56" height="33" fill="#188038" stroke="#ffffff" stroke-width="1"/>
+<text x="681.1" y="563.4" text-anchor="middle" class="cell">H</text>
+<rect x="755.33" y="541" width="186.67" height="33" fill="#188038" stroke="#ffffff" stroke-width="1"/>
+<text x="848.7" y="563.4" text-anchor="middle" class="cell">H</text>
+<rect x="942.00" y="541" width="186.67" height="33" fill="#188038" stroke="#ffffff" stroke-width="1"/>
+<text x="1035.3" y="563.4" text-anchor="middle" class="cell">H</text>
+<rect x="1128.67" y="541" width="93.33" height="33" fill="#188038" stroke="#ffffff" stroke-width="1"/>
+<text x="1175.3" y="563.4" text-anchor="middle" class="cell">H</text>
+<text x="92" y="596.4" text-anchor="end" class="axis">96</text>
+<rect x="102" y="574" width="1120" height="33" class="missing"/>
+<rect x="102.00" y="574" width="28.10" height="33" fill="#d93025" stroke="#ffffff" stroke-width="1"/>
+<text x="116.0" y="596.4" text-anchor="middle" class="cell">A</text>
+<rect x="130.10" y="574" width="56.19" height="33" fill="#188038" stroke="#ffffff" stroke-width="1"/>
+<text x="158.2" y="596.4" text-anchor="middle" class="cell">H</text>
+<rect x="186.29" y="574" width="56.19" height="33" fill="#188038" stroke="#ffffff" stroke-width="1"/>
+<text x="214.4" y="596.4" text-anchor="middle" class="cell">H</text>
+<rect x="242.48" y="574" width="56.19" height="33" fill="#188038" stroke="#ffffff" stroke-width="1"/>
+<text x="270.6" y="596.4" text-anchor="middle" class="cell">H</text>
+<rect x="298.67" y="574" width="56.19" height="33" fill="#188038" stroke="#ffffff" stroke-width="1"/>
+<text x="326.8" y="596.4" text-anchor="middle" class="cell">H</text>
+<rect x="354.87" y="574" width="56.19" height="33" fill="#188038" stroke="#ffffff" stroke-width="1"/>
+<text x="383.0" y="596.4" text-anchor="middle" class="cell">H</text>
+<rect x="411.06" y="574" width="56.19" height="33" fill="#188038" stroke="#ffffff" stroke-width="1"/>
+<text x="439.2" y="596.4" text-anchor="middle" class="cell">H</text>
+<rect x="467.25" y="574" width="56.19" height="33" fill="#188038" stroke="#ffffff" stroke-width="1"/>
+<text x="495.3" y="596.4" text-anchor="middle" class="cell">H</text>
+<rect x="523.44" y="574" width="83.33" height="33" fill="#188038" stroke="#ffffff" stroke-width="1"/>
+<text x="565.1" y="596.4" text-anchor="middle" class="cell">H</text>
+<rect x="606.77" y="574" width="148.56" height="33" fill="#188038" stroke="#ffffff" stroke-width="1"/>
+<text x="681.1" y="596.4" text-anchor="middle" class="cell">H</text>
+<rect x="755.33" y="574" width="186.67" height="33" fill="#188038" stroke="#ffffff" stroke-width="1"/>
+<text x="848.7" y="596.4" text-anchor="middle" class="cell">H</text>
+<rect x="942.00" y="574" width="186.67" height="33" fill="#188038" stroke="#ffffff" stroke-width="1"/>
+<text x="1035.3" y="596.4" text-anchor="middle" class="cell">H</text>
+<rect x="1128.67" y="574" width="93.33" height="33" fill="#188038" stroke="#ffffff" stroke-width="1"/>
+<text x="1175.3" y="596.4" text-anchor="middle" class="cell">H</text>
+<text x="92" y="629.4" text-anchor="end" class="axis">128</text>
+<rect x="102" y="607" width="1120" height="33" class="missing"/>
+<rect x="102.00" y="607" width="28.10" height="33" fill="#d93025" stroke="#ffffff" stroke-width="1"/>
+<text x="116.0" y="629.4" text-anchor="middle" class="cell">A</text>
+<rect x="130.10" y="607" width="56.19" height="33" fill="#188038" stroke="#ffffff" stroke-width="1"/>
+<text x="158.2" y="629.4" text-anchor="middle" class="cell">H</text>
+<rect x="186.29" y="607" width="56.19" height="33" fill="#188038" stroke="#ffffff" stroke-width="1"/>
+<text x="214.4" y="629.4" text-anchor="middle" class="cell">H</text>
+<rect x="242.48" y="607" width="56.19" height="33" fill="#188038" stroke="#ffffff" stroke-width="1"/>
+<text x="270.6" y="629.4" text-anchor="middle" class="cell">H</text>
+<rect x="298.67" y="607" width="56.19" height="33" fill="#188038" stroke="#ffffff" stroke-width="1"/>
+<text x="326.8" y="629.4" text-anchor="middle" class="cell">H</text>
+<rect x="354.87" y="607" width="56.19" height="33" fill="#188038" stroke="#ffffff" stroke-width="1"/>
+<text x="383.0" y="629.4" text-anchor="middle" class="cell">H</text>
+<rect x="411.06" y="607" width="56.19" height="33" fill="#188038" stroke="#ffffff" stroke-width="1"/>
+<text x="439.2" y="629.4" text-anchor="middle" class="cell">H</text>
+<rect x="467.25" y="607" width="56.19" height="33" fill="#188038" stroke="#ffffff" stroke-width="1"/>
+<text x="495.3" y="629.4" text-anchor="middle" class="cell">H</text>
+<rect x="523.44" y="607" width="83.33" height="33" fill="#188038" stroke="#ffffff" stroke-width="1"/>
+<text x="565.1" y="629.4" text-anchor="middle" class="cell">H</text>
+<rect x="606.77" y="607" width="148.56" height="33" fill="#188038" stroke="#ffffff" stroke-width="1"/>
+<text x="681.1" y="629.4" text-anchor="middle" class="cell">H</text>
+<rect x="755.33" y="607" width="186.67" height="33" fill="#188038" stroke="#ffffff" stroke-width="1"/>
+<text x="848.7" y="629.4" text-anchor="middle" class="cell">H</text>
+<rect x="942.00" y="607" width="186.67" height="33" fill="#188038" stroke="#ffffff" stroke-width="1"/>
+<text x="1035.3" y="629.4" text-anchor="middle" class="cell">H</text>
+<rect x="1128.67" y="607" width="93.33" height="33" fill="#188038" stroke="#ffffff" stroke-width="1"/>
+<text x="1175.3" y="629.4" text-anchor="middle" class="cell">H</text>
+<line x1="102.00" y1="640" x2="102.00" y2="645" stroke="#5f6368"/>
+<text transform="translate(102.00 650) rotate(55)" text-anchor="start" class="axis">1</text>
+<line x1="158.19" y1="640" x2="158.19" y2="645" stroke="#5f6368"/>
+<text transform="translate(158.19 650) rotate(55)" text-anchor="start" class="axis">2</text>
+<line x1="214.38" y1="640" x2="214.38" y2="645" stroke="#5f6368"/>
+<text transform="translate(214.38 650) rotate(55)" text-anchor="start" class="axis">4</text>
+<line x1="270.58" y1="640" x2="270.58" y2="645" stroke="#5f6368"/>
+<text transform="translate(270.58 650) rotate(55)" text-anchor="start" class="axis">8</text>
+<line x1="326.77" y1="640" x2="326.77" y2="645" stroke="#5f6368"/>
+<text transform="translate(326.77 650) rotate(55)" text-anchor="start" class="axis">16</text>
+<line x1="382.96" y1="640" x2="382.96" y2="645" stroke="#5f6368"/>
+<text transform="translate(382.96 650) rotate(55)" text-anchor="start" class="axis">32</text>
+<line x1="439.15" y1="640" x2="439.15" y2="645" stroke="#5f6368"/>
+<text transform="translate(439.15 650) rotate(55)" text-anchor="start" class="axis">64</text>
+<line x1="495.35" y1="640" x2="495.35" y2="645" stroke="#5f6368"/>
+<text transform="translate(495.35 650) rotate(55)" text-anchor="start" class="axis">128</text>
+<line x1="551.54" y1="640" x2="551.54" y2="645" stroke="#5f6368"/>
+<text transform="translate(551.54 650) rotate(55)" text-anchor="start" class="axis">256</text>
+<line x1="662.00" y1="640" x2="662.00" y2="645" stroke="#5f6368"/>
+<text transform="translate(662.00 650) rotate(55)" text-anchor="start" class="axis">1,000</text>
+<line x1="848.67" y1="640" x2="848.67" y2="645" stroke="#5f6368"/>
+<text transform="translate(848.67 650) rotate(55)" text-anchor="start" class="axis">10,000</text>
+<line x1="1035.33" y1="640" x2="1035.33" y2="645" stroke="#5f6368"/>
+<text transform="translate(1035.33 650) rotate(55)" text-anchor="start" class="axis">100,000</text>
+<line x1="1222.00" y1="640" x2="1222.00" y2="645" stroke="#5f6368"/>
+<text transform="translate(1222.00 650) rotate(55)" text-anchor="start" class="axis">1,000,000</text>
+<text transform="translate(24 392.5) rotate(-90)" text-anchor="middle" class="axis">pattern length k</text>
+<text x="662.0" y="712" text-anchor="middle" class="axis">number of patterns (log scale)</text>
+<text x="28" y="729" class="panel">All overlapping matches</text>
+<text x="92" y="767.4" text-anchor="end" class="axis">4</text>
+<rect x="102" y="745" width="1120" height="33" class="missing"/>
+<rect x="102.00" y="745" width="28.10" height="33" fill="#d93025" stroke="#ffffff" stroke-width="1"/>
+<text x="116.0" y="767.4" text-anchor="middle" class="cell">A</text>
+<rect x="130.10" y="745" width="56.19" height="33" fill="#1a73e8" stroke="#ffffff" stroke-width="1"/>
+<text x="158.2" y="767.4" text-anchor="middle" class="cell">B</text>
+<rect x="186.29" y="745" width="56.19" height="33" fill="#d93025" stroke="#ffffff" stroke-width="1"/>
+<text x="214.4" y="767.4" text-anchor="middle" class="cell">A</text>
+<rect x="242.48" y="745" width="56.19" height="33" fill="#d93025" stroke="#ffffff" stroke-width="1"/>
+<text x="270.6" y="767.4" text-anchor="middle" class="cell">A</text>
+<rect x="298.67" y="745" width="56.19" height="33" fill="#d93025" stroke="#ffffff" stroke-width="1"/>
+<text x="326.8" y="767.4" text-anchor="middle" class="cell">A</text>
+<rect x="354.87" y="745" width="56.19" height="33" fill="#d93025" stroke="#ffffff" stroke-width="1"/>
+<text x="383.0" y="767.4" text-anchor="middle" class="cell">A</text>
+<rect x="411.06" y="745" width="56.19" height="33" fill="#d93025" stroke="#ffffff" stroke-width="1"/>
+<text x="439.2" y="767.4" text-anchor="middle" class="cell">A</text>
+<rect x="467.25" y="745" width="56.19" height="33" fill="#d93025" stroke="#ffffff" stroke-width="1"/>
+<text x="495.3" y="767.4" text-anchor="middle" class="cell">A</text>
+<rect x="523.44" y="745" width="83.33" height="33" fill="#d93025" stroke="#ffffff" stroke-width="1"/>
+<text x="565.1" y="767.4" text-anchor="middle" class="cell">A</text>
+<text x="92" y="800.4" text-anchor="end" class="axis">6</text>
+<rect x="102" y="778" width="1120" height="33" class="missing"/>
+<rect x="102.00" y="778" width="28.10" height="33" fill="#d93025" stroke="#ffffff" stroke-width="1"/>
+<text x="116.0" y="800.4" text-anchor="middle" class="cell">A</text>
+<rect x="130.10" y="778" width="56.19" height="33" fill="#1a73e8" stroke="#ffffff" stroke-width="1"/>
+<text x="158.2" y="800.4" text-anchor="middle" class="cell">B</text>
+<rect x="186.29" y="778" width="56.19" height="33" fill="#d93025" stroke="#ffffff" stroke-width="1"/>
+<text x="214.4" y="800.4" text-anchor="middle" class="cell">A</text>
+<rect x="242.48" y="778" width="56.19" height="33" fill="#d93025" stroke="#ffffff" stroke-width="1"/>
+<text x="270.6" y="800.4" text-anchor="middle" class="cell">A</text>
+<rect x="298.67" y="778" width="56.19" height="33" fill="#d93025" stroke="#ffffff" stroke-width="1"/>
+<text x="326.8" y="800.4" text-anchor="middle" class="cell">A</text>
+<rect x="354.87" y="778" width="56.19" height="33" fill="#d93025" stroke="#ffffff" stroke-width="1"/>
+<text x="383.0" y="800.4" text-anchor="middle" class="cell">A</text>
+<rect x="411.06" y="778" width="56.19" height="33" fill="#d93025" stroke="#ffffff" stroke-width="1"/>
+<text x="439.2" y="800.4" text-anchor="middle" class="cell">A</text>
+<rect x="467.25" y="778" width="56.19" height="33" fill="#d93025" stroke="#ffffff" stroke-width="1"/>
+<text x="495.3" y="800.4" text-anchor="middle" class="cell">A</text>
+<rect x="523.44" y="778" width="83.33" height="33" fill="#d93025" stroke="#ffffff" stroke-width="1"/>
+<text x="565.1" y="800.4" text-anchor="middle" class="cell">A</text>
+<rect x="606.77" y="778" width="148.56" height="33" fill="#d93025" stroke="#ffffff" stroke-width="1"/>
+<text x="681.1" y="800.4" text-anchor="middle" class="cell">A</text>
+<text x="92" y="833.4" text-anchor="end" class="axis">8</text>
+<rect x="102" y="811" width="1120" height="33" class="missing"/>
+<rect x="102.00" y="811" width="28.10" height="33" fill="#1a73e8" stroke="#ffffff" stroke-width="1" class="tie"/>
+<text x="116.0" y="833.4" text-anchor="middle" class="cell">B</text>
+<rect x="130.10" y="811" width="56.19" height="33" fill="#1a73e8" stroke="#ffffff" stroke-width="1"/>
+<text x="158.2" y="833.4" text-anchor="middle" class="cell">B</text>
+<rect x="186.29" y="811" width="56.19" height="33" fill="#1a73e8" stroke="#ffffff" stroke-width="1" class="tie"/>
+<text x="214.4" y="833.4" text-anchor="middle" class="cell">B</text>
+<rect x="242.48" y="811" width="56.19" height="33" fill="#d93025" stroke="#ffffff" stroke-width="1"/>
+<text x="270.6" y="833.4" text-anchor="middle" class="cell">A</text>
+<rect x="298.67" y="811" width="56.19" height="33" fill="#d93025" stroke="#ffffff" stroke-width="1"/>
+<text x="326.8" y="833.4" text-anchor="middle" class="cell">A</text>
+<rect x="354.87" y="811" width="56.19" height="33" fill="#d93025" stroke="#ffffff" stroke-width="1"/>
+<text x="383.0" y="833.4" text-anchor="middle" class="cell">A</text>
+<rect x="411.06" y="811" width="56.19" height="33" fill="#d93025" stroke="#ffffff" stroke-width="1"/>
+<text x="439.2" y="833.4" text-anchor="middle" class="cell">A</text>
+<rect x="467.25" y="811" width="56.19" height="33" fill="#d93025" stroke="#ffffff" stroke-width="1"/>
+<text x="495.3" y="833.4" text-anchor="middle" class="cell">A</text>
+<rect x="523.44" y="811" width="83.33" height="33" fill="#d93025" stroke="#ffffff" stroke-width="1"/>
+<text x="565.1" y="833.4" text-anchor="middle" class="cell">A</text>
+<rect x="606.77" y="811" width="148.56" height="33" fill="#188038" stroke="#ffffff" stroke-width="1"/>
+<text x="681.1" y="833.4" text-anchor="middle" class="cell">H</text>
+<rect x="755.33" y="811" width="186.67" height="33" fill="#188038" stroke="#ffffff" stroke-width="1"/>
+<text x="848.7" y="833.4" text-anchor="middle" class="cell">H</text>
+<text x="92" y="866.4" text-anchor="end" class="axis">10</text>
+<rect x="102" y="844" width="1120" height="33" class="missing"/>
+<rect x="102.00" y="844" width="28.10" height="33" fill="#1a73e8" stroke="#ffffff" stroke-width="1"/>
+<text x="116.0" y="866.4" text-anchor="middle" class="cell">B</text>
+<rect x="130.10" y="844" width="56.19" height="33" fill="#1a73e8" stroke="#ffffff" stroke-width="1"/>
+<text x="158.2" y="866.4" text-anchor="middle" class="cell">B</text>
+<rect x="186.29" y="844" width="56.19" height="33" fill="#1a73e8" stroke="#ffffff" stroke-width="1"/>
+<text x="214.4" y="866.4" text-anchor="middle" class="cell">B</text>
+<rect x="242.48" y="844" width="56.19" height="33" fill="#d93025" stroke="#ffffff" stroke-width="1"/>
+<text x="270.6" y="866.4" text-anchor="middle" class="cell">A</text>
+<rect x="298.67" y="844" width="56.19" height="33" fill="#d93025" stroke="#ffffff" stroke-width="1"/>
+<text x="326.8" y="866.4" text-anchor="middle" class="cell">A</text>
+<rect x="354.87" y="844" width="56.19" height="33" fill="#d93025" stroke="#ffffff" stroke-width="1"/>
+<text x="383.0" y="866.4" text-anchor="middle" class="cell">A</text>
+<rect x="411.06" y="844" width="56.19" height="33" fill="#d93025" stroke="#ffffff" stroke-width="1"/>
+<text x="439.2" y="866.4" text-anchor="middle" class="cell">A</text>
+<rect x="467.25" y="844" width="56.19" height="33" fill="#d93025" stroke="#ffffff" stroke-width="1"/>
+<text x="495.3" y="866.4" text-anchor="middle" class="cell">A</text>
+<rect x="523.44" y="844" width="83.33" height="33" fill="#d93025" stroke="#ffffff" stroke-width="1"/>
+<text x="565.1" y="866.4" text-anchor="middle" class="cell">A</text>
+<rect x="606.77" y="844" width="148.56" height="33" fill="#188038" stroke="#ffffff" stroke-width="1"/>
+<text x="681.1" y="866.4" text-anchor="middle" class="cell">H</text>
+<rect x="755.33" y="844" width="186.67" height="33" fill="#188038" stroke="#ffffff" stroke-width="1"/>
+<text x="848.7" y="866.4" text-anchor="middle" class="cell">H</text>
+<rect x="942.00" y="844" width="186.67" height="33" fill="#188038" stroke="#ffffff" stroke-width="1"/>
+<text x="1035.3" y="866.4" text-anchor="middle" class="cell">H</text>
+<text x="92" y="899.4" text-anchor="end" class="axis">12</text>
+<rect x="102" y="877" width="1120" height="33" class="missing"/>
+<rect x="102.00" y="877" width="28.10" height="33" fill="#1a73e8" stroke="#ffffff" stroke-width="1"/>
+<text x="116.0" y="899.4" text-anchor="middle" class="cell">B</text>
+<rect x="130.10" y="877" width="56.19" height="33" fill="#1a73e8" stroke="#ffffff" stroke-width="1"/>
+<text x="158.2" y="899.4" text-anchor="middle" class="cell">B</text>
+<rect x="186.29" y="877" width="56.19" height="33" fill="#1a73e8" stroke="#ffffff" stroke-width="1"/>
+<text x="214.4" y="899.4" text-anchor="middle" class="cell">B</text>
+<rect x="242.48" y="877" width="56.19" height="33" fill="#d93025" stroke="#ffffff" stroke-width="1"/>
+<text x="270.6" y="899.4" text-anchor="middle" class="cell">A</text>
+<rect x="298.67" y="877" width="56.19" height="33" fill="#d93025" stroke="#ffffff" stroke-width="1"/>
+<text x="326.8" y="899.4" text-anchor="middle" class="cell">A</text>
+<rect x="354.87" y="877" width="56.19" height="33" fill="#d93025" stroke="#ffffff" stroke-width="1"/>
+<text x="383.0" y="899.4" text-anchor="middle" class="cell">A</text>
+<rect x="411.06" y="877" width="56.19" height="33" fill="#d93025" stroke="#ffffff" stroke-width="1"/>
+<text x="439.2" y="899.4" text-anchor="middle" class="cell">A</text>
+<rect x="467.25" y="877" width="56.19" height="33" fill="#d93025" stroke="#ffffff" stroke-width="1"/>
+<text x="495.3" y="899.4" text-anchor="middle" class="cell">A</text>
+<rect x="523.44" y="877" width="83.33" height="33" fill="#d93025" stroke="#ffffff" stroke-width="1" class="tie"/>
+<text x="565.1" y="899.4" text-anchor="middle" class="cell">A</text>
+<rect x="606.77" y="877" width="148.56" height="33" fill="#188038" stroke="#ffffff" stroke-width="1"/>
+<text x="681.1" y="899.4" text-anchor="middle" class="cell">H</text>
+<rect x="755.33" y="877" width="186.67" height="33" fill="#188038" stroke="#ffffff" stroke-width="1"/>
+<text x="848.7" y="899.4" text-anchor="middle" class="cell">H</text>
+<rect x="942.00" y="877" width="186.67" height="33" fill="#188038" stroke="#ffffff" stroke-width="1"/>
+<text x="1035.3" y="899.4" text-anchor="middle" class="cell">H</text>
+<rect x="1128.67" y="877" width="93.33" height="33" fill="#188038" stroke="#ffffff" stroke-width="1"/>
+<text x="1175.3" y="899.4" text-anchor="middle" class="cell">H</text>
+<text x="92" y="932.4" text-anchor="end" class="axis">16</text>
+<rect x="102" y="910" width="1120" height="33" class="missing"/>
+<rect x="102.00" y="910" width="28.10" height="33" fill="#1a73e8" stroke="#ffffff" stroke-width="1"/>
+<text x="116.0" y="932.4" text-anchor="middle" class="cell">B</text>
+<rect x="130.10" y="910" width="56.19" height="33" fill="#1a73e8" stroke="#ffffff" stroke-width="1"/>
+<text x="158.2" y="932.4" text-anchor="middle" class="cell">B</text>
+<rect x="186.29" y="910" width="56.19" height="33" fill="#1a73e8" stroke="#ffffff" stroke-width="1"/>
+<text x="214.4" y="932.4" text-anchor="middle" class="cell">B</text>
+<rect x="242.48" y="910" width="56.19" height="33" fill="#1a73e8" stroke="#ffffff" stroke-width="1"/>
+<text x="270.6" y="932.4" text-anchor="middle" class="cell">B</text>
+<rect x="298.67" y="910" width="56.19" height="33" fill="#d93025" stroke="#ffffff" stroke-width="1"/>
+<text x="326.8" y="932.4" text-anchor="middle" class="cell">A</text>
+<rect x="354.87" y="910" width="56.19" height="33" fill="#d93025" stroke="#ffffff" stroke-width="1"/>
+<text x="383.0" y="932.4" text-anchor="middle" class="cell">A</text>
+<rect x="411.06" y="910" width="56.19" height="33" fill="#d93025" stroke="#ffffff" stroke-width="1"/>
+<text x="439.2" y="932.4" text-anchor="middle" class="cell">A</text>
+<rect x="467.25" y="910" width="56.19" height="33" fill="#d93025" stroke="#ffffff" stroke-width="1"/>
+<text x="495.3" y="932.4" text-anchor="middle" class="cell">A</text>
+<rect x="523.44" y="910" width="83.33" height="33" fill="#188038" stroke="#ffffff" stroke-width="1" class="tie"/>
+<text x="565.1" y="932.4" text-anchor="middle" class="cell">H</text>
+<rect x="606.77" y="910" width="148.56" height="33" fill="#188038" stroke="#ffffff" stroke-width="1"/>
+<text x="681.1" y="932.4" text-anchor="middle" class="cell">H</text>
+<rect x="755.33" y="910" width="186.67" height="33" fill="#188038" stroke="#ffffff" stroke-width="1"/>
+<text x="848.7" y="932.4" text-anchor="middle" class="cell">H</text>
+<rect x="942.00" y="910" width="186.67" height="33" fill="#188038" stroke="#ffffff" stroke-width="1"/>
+<text x="1035.3" y="932.4" text-anchor="middle" class="cell">H</text>
+<rect x="1128.67" y="910" width="93.33" height="33" fill="#188038" stroke="#ffffff" stroke-width="1"/>
+<text x="1175.3" y="932.4" text-anchor="middle" class="cell">H</text>
+<text x="92" y="965.4" text-anchor="end" class="axis">20</text>
+<rect x="102" y="943" width="1120" height="33" class="missing"/>
+<rect x="102.00" y="943" width="28.10" height="33" fill="#1a73e8" stroke="#ffffff" stroke-width="1"/>
+<text x="116.0" y="965.4" text-anchor="middle" class="cell">B</text>
+<rect x="130.10" y="943" width="56.19" height="33" fill="#1a73e8" stroke="#ffffff" stroke-width="1"/>
+<text x="158.2" y="965.4" text-anchor="middle" class="cell">B</text>
+<rect x="186.29" y="943" width="56.19" height="33" fill="#1a73e8" stroke="#ffffff" stroke-width="1"/>
+<text x="214.4" y="965.4" text-anchor="middle" class="cell">B</text>
+<rect x="242.48" y="943" width="56.19" height="33" fill="#1a73e8" stroke="#ffffff" stroke-width="1"/>
+<text x="270.6" y="965.4" text-anchor="middle" class="cell">B</text>
+<rect x="298.67" y="943" width="56.19" height="33" fill="#d93025" stroke="#ffffff" stroke-width="1"/>
+<text x="326.8" y="965.4" text-anchor="middle" class="cell">A</text>
+<rect x="354.87" y="943" width="56.19" height="33" fill="#d93025" stroke="#ffffff" stroke-width="1"/>
+<text x="383.0" y="965.4" text-anchor="middle" class="cell">A</text>
+<rect x="411.06" y="943" width="56.19" height="33" fill="#d93025" stroke="#ffffff" stroke-width="1"/>
+<text x="439.2" y="965.4" text-anchor="middle" class="cell">A</text>
+<rect x="467.25" y="943" width="56.19" height="33" fill="#d93025" stroke="#ffffff" stroke-width="1"/>
+<text x="495.3" y="965.4" text-anchor="middle" class="cell">A</text>
+<rect x="523.44" y="943" width="83.33" height="33" fill="#188038" stroke="#ffffff" stroke-width="1" class="tie"/>
+<text x="565.1" y="965.4" text-anchor="middle" class="cell">H</text>
+<rect x="606.77" y="943" width="148.56" height="33" fill="#188038" stroke="#ffffff" stroke-width="1"/>
+<text x="681.1" y="965.4" text-anchor="middle" class="cell">H</text>
+<rect x="755.33" y="943" width="186.67" height="33" fill="#188038" stroke="#ffffff" stroke-width="1"/>
+<text x="848.7" y="965.4" text-anchor="middle" class="cell">H</text>
+<rect x="942.00" y="943" width="186.67" height="33" fill="#188038" stroke="#ffffff" stroke-width="1"/>
+<text x="1035.3" y="965.4" text-anchor="middle" class="cell">H</text>
+<rect x="1128.67" y="943" width="93.33" height="33" fill="#188038" stroke="#ffffff" stroke-width="1"/>
+<text x="1175.3" y="965.4" text-anchor="middle" class="cell">H</text>
+<text x="92" y="998.4" text-anchor="end" class="axis">24</text>
+<rect x="102" y="976" width="1120" height="33" class="missing"/>
+<rect x="102.00" y="976" width="28.10" height="33" fill="#1a73e8" stroke="#ffffff" stroke-width="1"/>
+<text x="116.0" y="998.4" text-anchor="middle" class="cell">B</text>
+<rect x="130.10" y="976" width="56.19" height="33" fill="#1a73e8" stroke="#ffffff" stroke-width="1"/>
+<text x="158.2" y="998.4" text-anchor="middle" class="cell">B</text>
+<rect x="186.29" y="976" width="56.19" height="33" fill="#1a73e8" stroke="#ffffff" stroke-width="1"/>
+<text x="214.4" y="998.4" text-anchor="middle" class="cell">B</text>
+<rect x="242.48" y="976" width="56.19" height="33" fill="#1a73e8" stroke="#ffffff" stroke-width="1"/>
+<text x="270.6" y="998.4" text-anchor="middle" class="cell">B</text>
+<rect x="298.67" y="976" width="56.19" height="33" fill="#d93025" stroke="#ffffff" stroke-width="1"/>
+<text x="326.8" y="998.4" text-anchor="middle" class="cell">A</text>
+<rect x="354.87" y="976" width="56.19" height="33" fill="#d93025" stroke="#ffffff" stroke-width="1"/>
+<text x="383.0" y="998.4" text-anchor="middle" class="cell">A</text>
+<rect x="411.06" y="976" width="56.19" height="33" fill="#d93025" stroke="#ffffff" stroke-width="1"/>
+<text x="439.2" y="998.4" text-anchor="middle" class="cell">A</text>
+<rect x="467.25" y="976" width="56.19" height="33" fill="#d93025" stroke="#ffffff" stroke-width="1"/>
+<text x="495.3" y="998.4" text-anchor="middle" class="cell">A</text>
+<rect x="523.44" y="976" width="83.33" height="33" fill="#188038" stroke="#ffffff" stroke-width="1"/>
+<text x="565.1" y="998.4" text-anchor="middle" class="cell">H</text>
+<rect x="606.77" y="976" width="148.56" height="33" fill="#188038" stroke="#ffffff" stroke-width="1"/>
+<text x="681.1" y="998.4" text-anchor="middle" class="cell">H</text>
+<rect x="755.33" y="976" width="186.67" height="33" fill="#188038" stroke="#ffffff" stroke-width="1"/>
+<text x="848.7" y="998.4" text-anchor="middle" class="cell">H</text>
+<rect x="942.00" y="976" width="186.67" height="33" fill="#188038" stroke="#ffffff" stroke-width="1"/>
+<text x="1035.3" y="998.4" text-anchor="middle" class="cell">H</text>
+<rect x="1128.67" y="976" width="93.33" height="33" fill="#188038" stroke="#ffffff" stroke-width="1"/>
+<text x="1175.3" y="998.4" text-anchor="middle" class="cell">H</text>
+<text x="92" y="1031.4" text-anchor="end" class="axis">31</text>
+<rect x="102" y="1009" width="1120" height="33" class="missing"/>
+<rect x="102.00" y="1009" width="28.10" height="33" fill="#1a73e8" stroke="#ffffff" stroke-width="1"/>
+<text x="116.0" y="1031.4" text-anchor="middle" class="cell">B</text>
+<rect x="130.10" y="1009" width="56.19" height="33" fill="#1a73e8" stroke="#ffffff" stroke-width="1"/>
+<text x="158.2" y="1031.4" text-anchor="middle" class="cell">B</text>
+<rect x="186.29" y="1009" width="56.19" height="33" fill="#1a73e8" stroke="#ffffff" stroke-width="1"/>
+<text x="214.4" y="1031.4" text-anchor="middle" class="cell">B</text>
+<rect x="242.48" y="1009" width="56.19" height="33" fill="#1a73e8" stroke="#ffffff" stroke-width="1"/>
+<text x="270.6" y="1031.4" text-anchor="middle" class="cell">B</text>
+<rect x="298.67" y="1009" width="56.19" height="33" fill="#1a73e8" stroke="#ffffff" stroke-width="1"/>
+<text x="326.8" y="1031.4" text-anchor="middle" class="cell">B</text>
+<rect x="354.87" y="1009" width="56.19" height="33" fill="#d93025" stroke="#ffffff" stroke-width="1"/>
+<text x="383.0" y="1031.4" text-anchor="middle" class="cell">A</text>
+<rect x="411.06" y="1009" width="56.19" height="33" fill="#d93025" stroke="#ffffff" stroke-width="1"/>
+<text x="439.2" y="1031.4" text-anchor="middle" class="cell">A</text>
+<rect x="467.25" y="1009" width="56.19" height="33" fill="#d93025" stroke="#ffffff" stroke-width="1" class="tie"/>
+<text x="495.3" y="1031.4" text-anchor="middle" class="cell">A</text>
+<rect x="523.44" y="1009" width="83.33" height="33" fill="#188038" stroke="#ffffff" stroke-width="1"/>
+<text x="565.1" y="1031.4" text-anchor="middle" class="cell">H</text>
+<rect x="606.77" y="1009" width="148.56" height="33" fill="#188038" stroke="#ffffff" stroke-width="1"/>
+<text x="681.1" y="1031.4" text-anchor="middle" class="cell">H</text>
+<rect x="755.33" y="1009" width="186.67" height="33" fill="#188038" stroke="#ffffff" stroke-width="1"/>
+<text x="848.7" y="1031.4" text-anchor="middle" class="cell">H</text>
+<rect x="942.00" y="1009" width="186.67" height="33" fill="#188038" stroke="#ffffff" stroke-width="1"/>
+<text x="1035.3" y="1031.4" text-anchor="middle" class="cell">H</text>
+<rect x="1128.67" y="1009" width="93.33" height="33" fill="#188038" stroke="#ffffff" stroke-width="1"/>
+<text x="1175.3" y="1031.4" text-anchor="middle" class="cell">H</text>
+<text x="92" y="1064.4" text-anchor="end" class="axis">40</text>
+<rect x="102" y="1042" width="1120" height="33" class="missing"/>
+<rect x="102.00" y="1042" width="28.10" height="33" fill="#1a73e8" stroke="#ffffff" stroke-width="1"/>
+<text x="116.0" y="1064.4" text-anchor="middle" class="cell">B</text>
+<rect x="130.10" y="1042" width="56.19" height="33" fill="#1a73e8" stroke="#ffffff" stroke-width="1"/>
+<text x="158.2" y="1064.4" text-anchor="middle" class="cell">B</text>
+<rect x="186.29" y="1042" width="56.19" height="33" fill="#1a73e8" stroke="#ffffff" stroke-width="1"/>
+<text x="214.4" y="1064.4" text-anchor="middle" class="cell">B</text>
+<rect x="242.48" y="1042" width="56.19" height="33" fill="#1a73e8" stroke="#ffffff" stroke-width="1"/>
+<text x="270.6" y="1064.4" text-anchor="middle" class="cell">B</text>
+<rect x="298.67" y="1042" width="56.19" height="33" fill="#1a73e8" stroke="#ffffff" stroke-width="1"/>
+<text x="326.8" y="1064.4" text-anchor="middle" class="cell">B</text>
+<rect x="354.87" y="1042" width="56.19" height="33" fill="#d93025" stroke="#ffffff" stroke-width="1"/>
+<text x="383.0" y="1064.4" text-anchor="middle" class="cell">A</text>
+<rect x="411.06" y="1042" width="56.19" height="33" fill="#d93025" stroke="#ffffff" stroke-width="1"/>
+<text x="439.2" y="1064.4" text-anchor="middle" class="cell">A</text>
+<rect x="467.25" y="1042" width="56.19" height="33" fill="#d93025" stroke="#ffffff" stroke-width="1" class="tie"/>
+<text x="495.3" y="1064.4" text-anchor="middle" class="cell">A</text>
+<rect x="523.44" y="1042" width="83.33" height="33" fill="#188038" stroke="#ffffff" stroke-width="1"/>
+<text x="565.1" y="1064.4" text-anchor="middle" class="cell">H</text>
+<rect x="606.77" y="1042" width="148.56" height="33" fill="#188038" stroke="#ffffff" stroke-width="1"/>
+<text x="681.1" y="1064.4" text-anchor="middle" class="cell">H</text>
+<rect x="755.33" y="1042" width="186.67" height="33" fill="#188038" stroke="#ffffff" stroke-width="1"/>
+<text x="848.7" y="1064.4" text-anchor="middle" class="cell">H</text>
+<rect x="942.00" y="1042" width="186.67" height="33" fill="#188038" stroke="#ffffff" stroke-width="1"/>
+<text x="1035.3" y="1064.4" text-anchor="middle" class="cell">H</text>
+<rect x="1128.67" y="1042" width="93.33" height="33" fill="#188038" stroke="#ffffff" stroke-width="1"/>
+<text x="1175.3" y="1064.4" text-anchor="middle" class="cell">H</text>
+<text x="92" y="1097.4" text-anchor="end" class="axis">48</text>
+<rect x="102" y="1075" width="1120" height="33" class="missing"/>
+<rect x="102.00" y="1075" width="28.10" height="33" fill="#1a73e8" stroke="#ffffff" stroke-width="1"/>
+<text x="116.0" y="1097.4" text-anchor="middle" class="cell">B</text>
+<rect x="130.10" y="1075" width="56.19" height="33" fill="#1a73e8" stroke="#ffffff" stroke-width="1"/>
+<text x="158.2" y="1097.4" text-anchor="middle" class="cell">B</text>
+<rect x="186.29" y="1075" width="56.19" height="33" fill="#1a73e8" stroke="#ffffff" stroke-width="1"/>
+<text x="214.4" y="1097.4" text-anchor="middle" class="cell">B</text>
+<rect x="242.48" y="1075" width="56.19" height="33" fill="#1a73e8" stroke="#ffffff" stroke-width="1"/>
+<text x="270.6" y="1097.4" text-anchor="middle" class="cell">B</text>
+<rect x="298.67" y="1075" width="56.19" height="33" fill="#1a73e8" stroke="#ffffff" stroke-width="1"/>
+<text x="326.8" y="1097.4" text-anchor="middle" class="cell">B</text>
+<rect x="354.87" y="1075" width="56.19" height="33" fill="#d93025" stroke="#ffffff" stroke-width="1" class="tie"/>
+<text x="383.0" y="1097.4" text-anchor="middle" class="cell">A</text>
+<rect x="411.06" y="1075" width="56.19" height="33" fill="#d93025" stroke="#ffffff" stroke-width="1" class="tie"/>
+<text x="439.2" y="1097.4" text-anchor="middle" class="cell">A</text>
+<rect x="467.25" y="1075" width="56.19" height="33" fill="#188038" stroke="#ffffff" stroke-width="1"/>
+<text x="495.3" y="1097.4" text-anchor="middle" class="cell">H</text>
+<rect x="523.44" y="1075" width="83.33" height="33" fill="#188038" stroke="#ffffff" stroke-width="1"/>
+<text x="565.1" y="1097.4" text-anchor="middle" class="cell">H</text>
+<rect x="606.77" y="1075" width="148.56" height="33" fill="#188038" stroke="#ffffff" stroke-width="1"/>
+<text x="681.1" y="1097.4" text-anchor="middle" class="cell">H</text>
+<rect x="755.33" y="1075" width="186.67" height="33" fill="#188038" stroke="#ffffff" stroke-width="1"/>
+<text x="848.7" y="1097.4" text-anchor="middle" class="cell">H</text>
+<rect x="942.00" y="1075" width="186.67" height="33" fill="#188038" stroke="#ffffff" stroke-width="1"/>
+<text x="1035.3" y="1097.4" text-anchor="middle" class="cell">H</text>
+<rect x="1128.67" y="1075" width="93.33" height="33" fill="#188038" stroke="#ffffff" stroke-width="1"/>
+<text x="1175.3" y="1097.4" text-anchor="middle" class="cell">H</text>
+<text x="92" y="1130.4" text-anchor="end" class="axis">64</text>
+<rect x="102" y="1108" width="1120" height="33" class="missing"/>
+<rect x="102.00" y="1108" width="28.10" height="33" fill="#1a73e8" stroke="#ffffff" stroke-width="1"/>
+<text x="116.0" y="1130.4" text-anchor="middle" class="cell">B</text>
+<rect x="130.10" y="1108" width="56.19" height="33" fill="#1a73e8" stroke="#ffffff" stroke-width="1"/>
+<text x="158.2" y="1130.4" text-anchor="middle" class="cell">B</text>
+<rect x="186.29" y="1108" width="56.19" height="33" fill="#1a73e8" stroke="#ffffff" stroke-width="1"/>
+<text x="214.4" y="1130.4" text-anchor="middle" class="cell">B</text>
+<rect x="242.48" y="1108" width="56.19" height="33" fill="#1a73e8" stroke="#ffffff" stroke-width="1"/>
+<text x="270.6" y="1130.4" text-anchor="middle" class="cell">B</text>
+<rect x="298.67" y="1108" width="56.19" height="33" fill="#1a73e8" stroke="#ffffff" stroke-width="1"/>
+<text x="326.8" y="1130.4" text-anchor="middle" class="cell">B</text>
+<rect x="354.87" y="1108" width="56.19" height="33" fill="#1a73e8" stroke="#ffffff" stroke-width="1"/>
+<text x="383.0" y="1130.4" text-anchor="middle" class="cell">B</text>
+<rect x="411.06" y="1108" width="56.19" height="33" fill="#188038" stroke="#ffffff" stroke-width="1"/>
+<text x="439.2" y="1130.4" text-anchor="middle" class="cell">H</text>
+<rect x="467.25" y="1108" width="56.19" height="33" fill="#188038" stroke="#ffffff" stroke-width="1"/>
+<text x="495.3" y="1130.4" text-anchor="middle" class="cell">H</text>
+<rect x="523.44" y="1108" width="83.33" height="33" fill="#188038" stroke="#ffffff" stroke-width="1"/>
+<text x="565.1" y="1130.4" text-anchor="middle" class="cell">H</text>
+<rect x="606.77" y="1108" width="148.56" height="33" fill="#188038" stroke="#ffffff" stroke-width="1"/>
+<text x="681.1" y="1130.4" text-anchor="middle" class="cell">H</text>
+<rect x="755.33" y="1108" width="186.67" height="33" fill="#188038" stroke="#ffffff" stroke-width="1"/>
+<text x="848.7" y="1130.4" text-anchor="middle" class="cell">H</text>
+<rect x="942.00" y="1108" width="186.67" height="33" fill="#188038" stroke="#ffffff" stroke-width="1"/>
+<text x="1035.3" y="1130.4" text-anchor="middle" class="cell">H</text>
+<rect x="1128.67" y="1108" width="93.33" height="33" fill="#188038" stroke="#ffffff" stroke-width="1"/>
+<text x="1175.3" y="1130.4" text-anchor="middle" class="cell">H</text>
+<text x="92" y="1163.4" text-anchor="end" class="axis">80</text>
+<rect x="102" y="1141" width="1120" height="33" class="missing"/>
+<rect x="102.00" y="1141" width="28.10" height="33" fill="#d93025" stroke="#ffffff" stroke-width="1"/>
+<text x="116.0" y="1163.4" text-anchor="middle" class="cell">A</text>
+<rect x="130.10" y="1141" width="56.19" height="33" fill="#188038" stroke="#ffffff" stroke-width="1"/>
+<text x="158.2" y="1163.4" text-anchor="middle" class="cell">H</text>
+<rect x="186.29" y="1141" width="56.19" height="33" fill="#188038" stroke="#ffffff" stroke-width="1"/>
+<text x="214.4" y="1163.4" text-anchor="middle" class="cell">H</text>
+<rect x="242.48" y="1141" width="56.19" height="33" fill="#188038" stroke="#ffffff" stroke-width="1"/>
+<text x="270.6" y="1163.4" text-anchor="middle" class="cell">H</text>
+<rect x="298.67" y="1141" width="56.19" height="33" fill="#188038" stroke="#ffffff" stroke-width="1"/>
+<text x="326.8" y="1163.4" text-anchor="middle" class="cell">H</text>
+<rect x="354.87" y="1141" width="56.19" height="33" fill="#188038" stroke="#ffffff" stroke-width="1"/>
+<text x="383.0" y="1163.4" text-anchor="middle" class="cell">H</text>
+<rect x="411.06" y="1141" width="56.19" height="33" fill="#188038" stroke="#ffffff" stroke-width="1"/>
+<text x="439.2" y="1163.4" text-anchor="middle" class="cell">H</text>
+<rect x="467.25" y="1141" width="56.19" height="33" fill="#188038" stroke="#ffffff" stroke-width="1"/>
+<text x="495.3" y="1163.4" text-anchor="middle" class="cell">H</text>
+<rect x="523.44" y="1141" width="83.33" height="33" fill="#188038" stroke="#ffffff" stroke-width="1"/>
+<text x="565.1" y="1163.4" text-anchor="middle" class="cell">H</text>
+<rect x="606.77" y="1141" width="148.56" height="33" fill="#188038" stroke="#ffffff" stroke-width="1"/>
+<text x="681.1" y="1163.4" text-anchor="middle" class="cell">H</text>
+<rect x="755.33" y="1141" width="186.67" height="33" fill="#188038" stroke="#ffffff" stroke-width="1"/>
+<text x="848.7" y="1163.4" text-anchor="middle" class="cell">H</text>
+<rect x="942.00" y="1141" width="186.67" height="33" fill="#188038" stroke="#ffffff" stroke-width="1"/>
+<text x="1035.3" y="1163.4" text-anchor="middle" class="cell">H</text>
+<rect x="1128.67" y="1141" width="93.33" height="33" fill="#188038" stroke="#ffffff" stroke-width="1"/>
+<text x="1175.3" y="1163.4" text-anchor="middle" class="cell">H</text>
+<text x="92" y="1196.4" text-anchor="end" class="axis">96</text>
+<rect x="102" y="1174" width="1120" height="33" class="missing"/>
+<rect x="102.00" y="1174" width="28.10" height="33" fill="#d93025" stroke="#ffffff" stroke-width="1"/>
+<text x="116.0" y="1196.4" text-anchor="middle" class="cell">A</text>
+<rect x="130.10" y="1174" width="56.19" height="33" fill="#188038" stroke="#ffffff" stroke-width="1"/>
+<text x="158.2" y="1196.4" text-anchor="middle" class="cell">H</text>
+<rect x="186.29" y="1174" width="56.19" height="33" fill="#188038" stroke="#ffffff" stroke-width="1"/>
+<text x="214.4" y="1196.4" text-anchor="middle" class="cell">H</text>
+<rect x="242.48" y="1174" width="56.19" height="33" fill="#188038" stroke="#ffffff" stroke-width="1"/>
+<text x="270.6" y="1196.4" text-anchor="middle" class="cell">H</text>
+<rect x="298.67" y="1174" width="56.19" height="33" fill="#188038" stroke="#ffffff" stroke-width="1"/>
+<text x="326.8" y="1196.4" text-anchor="middle" class="cell">H</text>
+<rect x="354.87" y="1174" width="56.19" height="33" fill="#188038" stroke="#ffffff" stroke-width="1"/>
+<text x="383.0" y="1196.4" text-anchor="middle" class="cell">H</text>
+<rect x="411.06" y="1174" width="56.19" height="33" fill="#188038" stroke="#ffffff" stroke-width="1"/>
+<text x="439.2" y="1196.4" text-anchor="middle" class="cell">H</text>
+<rect x="467.25" y="1174" width="56.19" height="33" fill="#188038" stroke="#ffffff" stroke-width="1"/>
+<text x="495.3" y="1196.4" text-anchor="middle" class="cell">H</text>
+<rect x="523.44" y="1174" width="83.33" height="33" fill="#188038" stroke="#ffffff" stroke-width="1"/>
+<text x="565.1" y="1196.4" text-anchor="middle" class="cell">H</text>
+<rect x="606.77" y="1174" width="148.56" height="33" fill="#188038" stroke="#ffffff" stroke-width="1"/>
+<text x="681.1" y="1196.4" text-anchor="middle" class="cell">H</text>
+<rect x="755.33" y="1174" width="186.67" height="33" fill="#188038" stroke="#ffffff" stroke-width="1"/>
+<text x="848.7" y="1196.4" text-anchor="middle" class="cell">H</text>
+<rect x="942.00" y="1174" width="186.67" height="33" fill="#188038" stroke="#ffffff" stroke-width="1"/>
+<text x="1035.3" y="1196.4" text-anchor="middle" class="cell">H</text>
+<rect x="1128.67" y="1174" width="93.33" height="33" fill="#188038" stroke="#ffffff" stroke-width="1"/>
+<text x="1175.3" y="1196.4" text-anchor="middle" class="cell">H</text>
+<text x="92" y="1229.4" text-anchor="end" class="axis">128</text>
+<rect x="102" y="1207" width="1120" height="33" class="missing"/>
+<rect x="102.00" y="1207" width="28.10" height="33" fill="#d93025" stroke="#ffffff" stroke-width="1" class="tie"/>
+<text x="116.0" y="1229.4" text-anchor="middle" class="cell">A</text>
+<rect x="130.10" y="1207" width="56.19" height="33" fill="#188038" stroke="#ffffff" stroke-width="1"/>
+<text x="158.2" y="1229.4" text-anchor="middle" class="cell">H</text>
+<rect x="186.29" y="1207" width="56.19" height="33" fill="#188038" stroke="#ffffff" stroke-width="1"/>
+<text x="214.4" y="1229.4" text-anchor="middle" class="cell">H</text>
+<rect x="242.48" y="1207" width="56.19" height="33" fill="#188038" stroke="#ffffff" stroke-width="1"/>
+<text x="270.6" y="1229.4" text-anchor="middle" class="cell">H</text>
+<rect x="298.67" y="1207" width="56.19" height="33" fill="#188038" stroke="#ffffff" stroke-width="1"/>
+<text x="326.8" y="1229.4" text-anchor="middle" class="cell">H</text>
+<rect x="354.87" y="1207" width="56.19" height="33" fill="#188038" stroke="#ffffff" stroke-width="1"/>
+<text x="383.0" y="1229.4" text-anchor="middle" class="cell">H</text>
+<rect x="411.06" y="1207" width="56.19" height="33" fill="#188038" stroke="#ffffff" stroke-width="1"/>
+<text x="439.2" y="1229.4" text-anchor="middle" class="cell">H</text>
+<rect x="467.25" y="1207" width="56.19" height="33" fill="#188038" stroke="#ffffff" stroke-width="1"/>
+<text x="495.3" y="1229.4" text-anchor="middle" class="cell">H</text>
+<rect x="523.44" y="1207" width="83.33" height="33" fill="#188038" stroke="#ffffff" stroke-width="1"/>
+<text x="565.1" y="1229.4" text-anchor="middle" class="cell">H</text>
+<rect x="606.77" y="1207" width="148.56" height="33" fill="#188038" stroke="#ffffff" stroke-width="1"/>
+<text x="681.1" y="1229.4" text-anchor="middle" class="cell">H</text>
+<rect x="755.33" y="1207" width="186.67" height="33" fill="#188038" stroke="#ffffff" stroke-width="1"/>
+<text x="848.7" y="1229.4" text-anchor="middle" class="cell">H</text>
+<rect x="942.00" y="1207" width="186.67" height="33" fill="#188038" stroke="#ffffff" stroke-width="1"/>
+<text x="1035.3" y="1229.4" text-anchor="middle" class="cell">H</text>
+<rect x="1128.67" y="1207" width="93.33" height="33" fill="#188038" stroke="#ffffff" stroke-width="1"/>
+<text x="1175.3" y="1229.4" text-anchor="middle" class="cell">H</text>
+<line x1="102.00" y1="1240" x2="102.00" y2="1245" stroke="#5f6368"/>
+<text transform="translate(102.00 1250) rotate(55)" text-anchor="start" class="axis">1</text>
+<line x1="158.19" y1="1240" x2="158.19" y2="1245" stroke="#5f6368"/>
+<text transform="translate(158.19 1250) rotate(55)" text-anchor="start" class="axis">2</text>
+<line x1="214.38" y1="1240" x2="214.38" y2="1245" stroke="#5f6368"/>
+<text transform="translate(214.38 1250) rotate(55)" text-anchor="start" class="axis">4</text>
+<line x1="270.58" y1="1240" x2="270.58" y2="1245" stroke="#5f6368"/>
+<text transform="translate(270.58 1250) rotate(55)" text-anchor="start" class="axis">8</text>
+<line x1="326.77" y1="1240" x2="326.77" y2="1245" stroke="#5f6368"/>
+<text transform="translate(326.77 1250) rotate(55)" text-anchor="start" class="axis">16</text>
+<line x1="382.96" y1="1240" x2="382.96" y2="1245" stroke="#5f6368"/>
+<text transform="translate(382.96 1250) rotate(55)" text-anchor="start" class="axis">32</text>
+<line x1="439.15" y1="1240" x2="439.15" y2="1245" stroke="#5f6368"/>
+<text transform="translate(439.15 1250) rotate(55)" text-anchor="start" class="axis">64</text>
+<line x1="495.35" y1="1240" x2="495.35" y2="1245" stroke="#5f6368"/>
+<text transform="translate(495.35 1250) rotate(55)" text-anchor="start" class="axis">128</text>
+<line x1="551.54" y1="1240" x2="551.54" y2="1245" stroke="#5f6368"/>
+<text transform="translate(551.54 1250) rotate(55)" text-anchor="start" class="axis">256</text>
+<line x1="662.00" y1="1240" x2="662.00" y2="1245" stroke="#5f6368"/>
+<text transform="translate(662.00 1250) rotate(55)" text-anchor="start" class="axis">1,000</text>
+<line x1="848.67" y1="1240" x2="848.67" y2="1245" stroke="#5f6368"/>
+<text transform="translate(848.67 1250) rotate(55)" text-anchor="start" class="axis">10,000</text>
+<line x1="1035.33" y1="1240" x2="1035.33" y2="1245" stroke="#5f6368"/>
+<text transform="translate(1035.33 1250) rotate(55)" text-anchor="start" class="axis">100,000</text>
+<line x1="1222.00" y1="1240" x2="1222.00" y2="1245" stroke="#5f6368"/>
+<text transform="translate(1222.00 1250) rotate(55)" text-anchor="start" class="axis">1,000,000</text>
+<text transform="translate(24 992.5) rotate(-90)" text-anchor="middle" class="axis">pattern length k</text>
+<text x="662.0" y="1312" text-anchor="middle" class="axis">number of patterns (log scale)</text>
+</svg>

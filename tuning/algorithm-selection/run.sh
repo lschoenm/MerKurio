@@ -9,6 +9,13 @@ if [[ "${1:-}" == "-h" || "${1:-}" == "--help" ]]; then
     exit 0
 fi
 
+if [[ -e "$SCRIPT_DIR/results/refinement/algorithm_sweep.csv" ||
+      -e "$SCRIPT_DIR/results/refinement/cell_status.csv" ]]; then
+    echo "Existing refinement results belong to the current base sweep." >&2
+    echo "Archive or remove results/refinement before replacing the base sweep." >&2
+    exit 1
+fi
+
 cargo run --release --manifest-path "$SCRIPT_DIR/Cargo.toml" -- "$@"
 python3 "$SCRIPT_DIR/analyze.py"
 
