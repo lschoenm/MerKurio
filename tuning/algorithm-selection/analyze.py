@@ -368,7 +368,7 @@ def write_selection_map(winners, statuses, reference_bases):
 
 
 def write_refined_selection_map(
-    winners, statuses, base_statuses, refinement_cells, reference_bases
+    winners, base_statuses, refinement_cells, reference_bases
 ):
     k_values = sorted({key[0] for key in base_statuses})
     base_pattern_counts = sorted({key[1] for key in base_statuses})
@@ -376,15 +376,21 @@ def write_refined_selection_map(
     if not k_values or not base_pattern_counts or not modes:
         return
 
-    left, right, top = 102, 32, 145
+    left, right, top = 102, 34, 145
     plot_width = 1120
-    cell_height = max(25, min(36, 500 // max(1, len(k_values))))
+    plot_height = 620
     panel_gap = 105
-    panel_height = len(k_values) * cell_height
     width = left + plot_width + right
-    height = top + len(modes) * panel_height + max(0, len(modes) - 1) * panel_gap + 95
+    height = (
+        top
+        + len(modes) * plot_height
+        + max(0, len(modes) - 1) * panel_gap
+        + 95
+    )
     log_min = math.log10(base_pattern_counts[0])
     log_max = math.log10(base_pattern_counts[-1])
+    k_min = min(k_values)
+    k_max = max(k_values)
 
     def x(patterns):
         if log_max == log_min:
@@ -399,121 +405,109 @@ def write_refined_selection_map(
         '<style>text{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;'
         'fill:#202124}.title{font-size:21px;font-weight:650}.subtitle{font-size:14px;'
         'fill:#5f6368}.panel{font-size:17px;font-weight:600}.axis{font-size:11px}'
-        '.cell{font-size:11px;font-weight:650;fill:#ffffff}.tie{stroke:#202124;'
-        'stroke-width:2}.missing{fill:#e8eaed}.refined{fill:#ffffff;stroke:#202124;'
-        'stroke-width:1.5}</style>',
+        '.grid{stroke:#e1e4e8;stroke-width:1}.frame{fill:none;stroke:#5f6368;'
+        'stroke-width:1}.point{stroke:#ffffff;stroke-width:1}.tie{stroke:#202124;'
+        'stroke-width:2.5}</style>',
         '<text x="28" y="31" class="title">Refined pattern-matching algorithm selection</text>',
-        '<text x="28" y="53" class="subtitle">Log-scaled pattern counts; bands extend '
-        'halfway between tested counts, dark outline means &lt;3% over runner-up</text>',
+        '<text x="28" y="53" class="subtitle">Measured winners on continuous axes; '
+        'dark outline means &lt;3% over runner-up</text>',
     ]
 
     legend_x = 28
     for algorithm in ALGORITHMS:
+        svg.append(f'<circle cx="{legend_x+8}" cy="79" r="6" fill="{COLORS[algorithm]}"/>')
         svg.append(
-            f'<rect x="{legend_x}" y="72" width="20" height="14" '
-            f'fill="{COLORS[algorithm]}"/>'
-        )
-        svg.append(
-            f'<text x="{legend_x+27}" y="84" class="axis">{algorithm}</text>'
+            f'<text x="{legend_x+21}" y="84" class="axis">{algorithm}</text>'
         )
         legend_x += 145
+    svg.append(f'<circle cx="{legend_x+7}" cy="79" r="6" fill="#5f6368"/>')
+    svg.append(f'<text x="{legend_x+20}" y="84" class="axis">base sweep</text>')
+    legend_x += 105
     svg.append(
-        f'<rect x="{legend_x}" y="72" width="20" height="14" class="missing"/>'
+        f'<polygon points="{legend_x+7},72 {legend_x+14},79 '
+        f'{legend_x+7},86 {legend_x},79" fill="#5f6368"/>'
     )
-    svg.append(
-        f'<text x="{legend_x+27}" y="84" class="axis">unavailable</text>'
-    )
-    legend_x += 115
-    svg.append(
-        f'<circle cx="{legend_x+7}" cy="79" r="5" class="refined"/>'
-    )
-    svg.append(
-        f'<text x="{legend_x+19}" y="84" class="axis">refinement point</text>'
-    )
+    svg.append(f'<text x="{legend_x+20}" y="84" class="axis">refinement</text>')
     svg.append(
         f'<text x="{width-28}" y="53" text-anchor="end" class="subtitle">'
         f'{compact_bases(reference_bases)}-base reference workload</text>'
     )
 
     for mode_index, mode in enumerate(modes):
-        panel_top = top + mode_index * (panel_height + panel_gap)
+        panel_top = top + mode_index * (plot_height + panel_gap)
+        panel_bottom = panel_top + plot_height
+
+        def y(k):
+            if k_max == k_min:
+                return (panel_top + panel_bottom) / 2.0
+            return panel_top + (k - k_min) / (k_max - k_min) * plot_height
+
         svg.append(
             f'<text x="28" y="{panel_top-16}" class="panel">'
             f'{"First match" if mode == "first" else "All overlapping matches"}</text>'
         )
-        for row, k in enumerate(k_values):
-            y = panel_top + row * cell_height
-            svg.append(
-                f'<text x="{left-10}" y="{y+cell_height*0.68:.1f}" '
-                f'text-anchor="end" class="axis">{k}</text>'
-            )
-            svg.append(
-                f'<rect x="{left}" y="{y}" width="{plot_width}" '
-                f'height="{cell_height}" class="missing"/>'
-            )
-            tested = sorted(
-                {
-                    patterns
-                    for candidate_k, patterns, candidate_mode, _algorithm in statuses
-                    if candidate_k == k and candidate_mode == mode
-                }
-            )
-            for index, patterns in enumerate(tested):
-                center = x(patterns)
-                segment_left = (
-                    left
-                    if index == 0
-                    else (x(tested[index - 1]) + center) / 2.0
-                )
-                segment_right = (
-                    left + plot_width
-                    if index + 1 == len(tested)
-                    else (center + x(tested[index + 1])) / 2.0
-                )
-                winner = winners.get((k, patterns, mode))
-                if winner is None:
-                    continue
-                algorithm = winner["algorithm"]
-                tie_class = (
-                    ' class="tie"'
-                    if winner["margin"] is not None and winner["margin"] < 3.0
-                    else ""
-                )
-                svg.append(
-                    f'<rect x="{segment_left:.2f}" y="{y}" '
-                    f'width="{segment_right-segment_left:.2f}" '
-                    f'height="{cell_height}" fill="{COLORS[algorithm]}" '
-                    f'stroke="#ffffff" stroke-width="1"{tie_class}/>'
-                )
-                if segment_right - segment_left >= 22:
-                    svg.append(
-                        f'<text x="{(segment_left+segment_right)/2:.1f}" '
-                        f'y="{y+cell_height*0.68:.1f}" text-anchor="middle" '
-                        f'class="cell">{LABELS[algorithm]}</text>'
-                    )
-                if (k, patterns, mode) in refinement_cells:
-                    svg.append(
-                        f'<circle cx="{center:.2f}" cy="{y+cell_height/2:.2f}" '
-                        'r="4.5" class="refined"/>'
-                    )
-
-        bottom = panel_top + panel_height
         for patterns in base_pattern_counts:
             current_x = x(patterns)
             svg.append(
-                f'<line x1="{current_x:.2f}" y1="{bottom}" '
-                f'x2="{current_x:.2f}" y2="{bottom+5}" stroke="#5f6368"/>'
+                f'<line x1="{current_x:.2f}" y1="{panel_top}" '
+                f'x2="{current_x:.2f}" y2="{panel_bottom}" class="grid"/>'
+            )
+        for k in k_values:
+            current_y = y(k)
+            svg.append(
+                f'<line x1="{left}" y1="{current_y:.2f}" '
+                f'x2="{left+plot_width}" y2="{current_y:.2f}" class="grid"/>'
             )
             svg.append(
-                f'<text transform="translate({current_x:.2f} {bottom+10}) rotate(55)" '
+                f'<text x="{left-10}" y="{current_y+4:.2f}" '
+                f'text-anchor="end" class="axis">{k}</text>'
+            )
+        svg.append(
+            f'<rect x="{left}" y="{panel_top}" width="{plot_width}" '
+            f'height="{plot_height}" class="frame"/>'
+        )
+
+        for (k, patterns, candidate_mode), winner in sorted(winners.items()):
+            if candidate_mode != mode:
+                continue
+            current_x = x(patterns)
+            current_y = y(k)
+            color = COLORS[winner["algorithm"]]
+            point_class = (
+                "tie"
+                if winner["margin"] is not None and winner["margin"] < 3.0
+                else "point"
+            )
+            if (k, patterns, mode) in refinement_cells:
+                svg.append(
+                    f'<polygon points="{current_x:.2f},{current_y-6.5:.2f} '
+                    f'{current_x+6.5:.2f},{current_y:.2f} '
+                    f'{current_x:.2f},{current_y+6.5:.2f} '
+                    f'{current_x-6.5:.2f},{current_y:.2f}" '
+                    f'fill="{color}" class="{point_class}"/>'
+                )
+            else:
+                svg.append(
+                    f'<circle cx="{current_x:.2f}" cy="{current_y:.2f}" '
+                    f'r="5.5" fill="{color}" class="{point_class}"/>'
+                )
+
+        for patterns in base_pattern_counts:
+            current_x = x(patterns)
+            svg.append(
+                f'<line x1="{current_x:.2f}" y1="{panel_bottom}" '
+                f'x2="{current_x:.2f}" y2="{panel_bottom+5}" stroke="#5f6368"/>'
+            )
+            svg.append(
+                f'<text transform="translate({current_x:.2f} {panel_bottom+10}) rotate(55)" '
                 f'text-anchor="start" class="axis">{patterns:,}</text>'
             )
         svg.append(
-            f'<text transform="translate(24 {panel_top+panel_height/2:.1f}) rotate(-90)" '
+            f'<text transform="translate(24 {panel_top+plot_height/2:.1f}) rotate(-90)" '
             'text-anchor="middle" class="axis">pattern length k</text>'
         )
         svg.append(
-            f'<text x="{left+plot_width/2:.1f}" y="{bottom+72}" '
+            f'<text x="{left+plot_width/2:.1f}" y="{panel_bottom+72}" '
             'text-anchor="middle" class="axis">number of patterns (log scale)</text>'
         )
 
@@ -648,7 +642,16 @@ def write_crossover_plot(summary, statuses, reference_bases):
             for algorithm in ALGORITHMS:
                 segments = []
                 current = []
-                for patterns in pattern_counts:
+                tested_counts = sorted(
+                    {
+                        patterns
+                        for candidate_k, patterns, candidate_mode, candidate_algorithm in statuses
+                        if candidate_k == k
+                        and candidate_mode == mode
+                        and candidate_algorithm == algorithm
+                    }
+                )
+                for patterns in tested_counts:
                     key = (k, patterns, mode, algorithm)
                     if key in relative:
                         current.append((x(patterns), y(relative[key])))
@@ -1087,7 +1090,6 @@ def main():
     write_selection_map(winners, base_statuses, reference_bases)
     write_refined_selection_map(
         winners,
-        statuses,
         base_statuses,
         refinement_cells,
         reference_bases,

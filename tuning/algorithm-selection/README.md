@@ -99,10 +99,17 @@ machine:
 ./run-refinement.sh
 ```
 
-The refinement driver reads `algorithm_winners.csv`, finds every pair of
-adjacent pattern counts whose winning algorithms differ, and benchmarks all
-three algorithms at the geometric midpoint. Counts that are already adjacent
-integers cannot be refined. The original raw sweep is never modified.
+The refinement driver reads `algorithm_winners.csv` and finds adjacent
+measurements whose winning algorithms differ. It benchmarks all three
+algorithms at:
+
+- the geometric midpoint between adjacent pattern counts at the same `k`;
+- the arithmetic midpoint between adjacent pattern lengths at the same pattern
+  count.
+
+The BNDMq word-size boundary is anchored directly at `k=65` rather than
+bisected. Counts or pattern lengths that are already adjacent integers cannot
+be refined. The original raw sweep is never modified.
 
 Run the command again to narrow the remaining transition brackets by one more
 level, or request multiple levels at once:
@@ -138,8 +145,9 @@ new full sweep.
 - `algorithm_winners.csv`: best and second-best algorithms with their margin;
 - `selection_map.svg`: categorical winner heatmaps for the original full-sweep
   grid;
-- `refined_selection_map.svg`: combined base and refinement winners on a
-  continuous logarithmic pattern-count axis; white dots mark refinement cells;
+- `refined_selection_map.svg`: scatterplots of combined base and refinement
+  winners on continuous pattern-length and logarithmic pattern-count axes;
+  circles are base measurements and diamonds are refinement measurements;
 - `crossover_curves.svg`: per-`k` curves showing each algorithm's runtime
   relative to the fastest available algorithm as pattern count increases
   (extreme slowdowns are visibly capped to preserve detail near the crossover);

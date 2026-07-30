@@ -36,8 +36,8 @@ CONFIG_FLAGS = {
 def parse_args():
     parser = argparse.ArgumentParser(
         description=(
-            "Refine every adjacent algorithm-winner transition with one "
-            "geometric-midpoint measurement wave."
+            "Refine adjacent algorithm-winner transitions along pattern count "
+            "and pattern length with one midpoint measurement wave."
         )
     )
     parser.add_argument("--binary", type=Path, required=True)
@@ -150,16 +150,59 @@ def transition_targets(grouped_winners):
                 continue
             targets.append(
                 {
+                    "axis": "patterns",
                     "k": k,
                     "mode": mode,
                     "patterns": geometric_midpoint(lower, upper),
+                    "lower_k": k,
+                    "upper_k": k,
                     "lower_patterns": lower,
                     "upper_patterns": upper,
                     "lower_algorithm": left["algorithm"],
                     "upper_algorithm": right["algorithm"],
                 }
             )
-    return targets
+
+    modes = sorted({mode for _k, mode in grouped_winners})
+    for mode in modes:
+        k_values = sorted(k for k, candidate_mode in grouped_winners if candidate_mode == mode)
+        for lower_k, upper_k in zip(k_values, k_values[1:]):
+            if upper_k - lower_k <= 1:
+                continue
+            midpoint_k = 65 if lower_k <= 64 < upper_k else (lower_k + upper_k) // 2
+            lower_by_patterns = {
+                row["patterns"]: row["algorithm"]
+                for row in grouped_winners[(lower_k, mode)]
+            }
+            upper_by_patterns = {
+                row["patterns"]: row["algorithm"]
+                for row in grouped_winners[(upper_k, mode)]
+            }
+            for patterns in sorted(lower_by_patterns.keys() & upper_by_patterns.keys()):
+                lower_algorithm = lower_by_patterns[patterns]
+                upper_algorithm = upper_by_patterns[patterns]
+                if lower_algorithm == upper_algorithm:
+                    continue
+                targets.append(
+                    {
+                        "axis": "k",
+                        "k": midpoint_k,
+                        "mode": mode,
+                        "patterns": patterns,
+                        "lower_k": lower_k,
+                        "upper_k": upper_k,
+                        "lower_patterns": patterns,
+                        "upper_patterns": patterns,
+                        "lower_algorithm": lower_algorithm,
+                        "upper_algorithm": upper_algorithm,
+                    }
+                )
+
+    unique = {}
+    for target in targets:
+        key = (target["k"], target["patterns"], target["mode"])
+        unique[key] = target
+    return [unique[key] for key in sorted(unique)]
 
 
 def part_directory(target):
@@ -209,7 +252,9 @@ def run_cell(binary, target, metadata, runs):
     print(
         f"refining {target['mode']} k={target['k']} "
         f"patterns={target['patterns']} "
-        f"({target['lower_patterns']}..{target['upper_patterns']})",
+        f"({target['axis']} transition: "
+        f"k={target['lower_k']}..{target['upper_k']}, "
+        f"patterns={target['lower_patterns']}..{target['upper_patterns']})",
         flush=True,
     )
     subprocess.run(command, check=True)
@@ -268,9 +313,12 @@ def write_manifest(targets, wave):
     with MANIFEST.open("w", newline="") as handle:
         fields = [
             "wave",
+            "axis",
             "k",
             "patterns",
             "mode",
+            "lower_k",
+            "upper_k",
             "lower_patterns",
             "upper_patterns",
             "lower_algorithm",
@@ -318,7 +366,10 @@ def main():
                 print(
                     f"{target['mode']},k={target['k']},"
                     f"patterns={target['patterns']},"
-                    f"bracket={target['lower_patterns']}..{target['upper_patterns']}"
+                    f"axis={target['axis']},"
+                    f"k_bracket={target['lower_k']}..{target['upper_k']},"
+                    f"pattern_bracket="
+                    f"{target['lower_patterns']}..{target['upper_patterns']}"
                 )
             return
         for target in pending:
