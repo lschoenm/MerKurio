@@ -147,7 +147,10 @@ new full sweep.
   grid;
 - `refined_selection_map.svg`: scatterplots of combined base and refinement
   winners on continuous pattern-length and logarithmic pattern-count axes;
-  circles are base measurements and diamonds are refinement measurements;
+  circles are base measurements and diamonds are refinement measurements.
+  Faint background cells use the four original-grid corner winners: unanimous
+  cells receive one color, while disagreements split the cell into four
+  corner-colored quadrants;
 - `crossover_curves.svg`: per-`k` curves showing each algorithm's runtime
   relative to the fastest available algorithm as pattern count increases
   (extreme slowdowns are visibly capped to preserve detail near the crossover);
@@ -172,6 +175,12 @@ The refinement-specific raw data are kept in:
 The analyzer verifies that successful algorithms produce the same untimed
 result checksum for each cell. A mismatch aborts analysis instead of producing
 a recommendation.
+
+The winner tables and refined scatterplot combine the base and refinement
+measurements. Runtime crossover curves and all corpus-size crossover outputs
+use only the original regular parameter grid. This keeps sparse, targeted
+refinement cells from cluttering those plots or changing the corpus-size
+models.
 
 The current result files predate the 100-million-base corpus-budget design.
 Rerun the complete sweep before deriving selection rules from this version.

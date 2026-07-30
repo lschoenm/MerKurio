@@ -407,10 +407,11 @@ def write_refined_selection_map(
         'fill:#5f6368}.panel{font-size:17px;font-weight:600}.axis{font-size:11px}'
         '.grid{stroke:#e1e4e8;stroke-width:1}.frame{fill:none;stroke:#5f6368;'
         'stroke-width:1}.point{stroke:#ffffff;stroke-width:1}.tie{stroke:#202124;'
-        'stroke-width:2.5}</style>',
+        'stroke-width:2.5}.region{fill-opacity:0.12}</style>',
         '<text x="28" y="31" class="title">Refined pattern-matching algorithm selection</text>',
         '<text x="28" y="53" class="subtitle">Measured winners on continuous axes; '
-        'dark outline means &lt;3% over runner-up</text>',
+        'faint cells summarize original-grid corners, dark outline means '
+        '&lt;3% over runner-up</text>',
     ]
 
     legend_x = 28
@@ -446,6 +447,52 @@ def write_refined_selection_map(
             f'<text x="28" y="{panel_top-16}" class="panel">'
             f'{"First match" if mode == "first" else "All overlapping matches"}</text>'
         )
+        for lower_k, upper_k in zip(k_values, k_values[1:]):
+            y1 = y(lower_k)
+            y2 = y(upper_k)
+            for lower_patterns, upper_patterns in zip(
+                base_pattern_counts,
+                base_pattern_counts[1:],
+            ):
+                x1 = x(lower_patterns)
+                x2 = x(upper_patterns)
+                corner_keys = (
+                    (lower_k, lower_patterns, mode),
+                    (lower_k, upper_patterns, mode),
+                    (upper_k, lower_patterns, mode),
+                    (upper_k, upper_patterns, mode),
+                )
+                if any(key not in winners for key in corner_keys):
+                    continue
+                corner_algorithms = [
+                    winners[key]["algorithm"] for key in corner_keys
+                ]
+                if len(set(corner_algorithms)) == 1:
+                    svg.append(
+                        f'<rect x="{x1:.2f}" y="{y1:.2f}" '
+                        f'width="{x2-x1:.2f}" height="{y2-y1:.2f}" '
+                        f'fill="{COLORS[corner_algorithms[0]]}" class="region"/>'
+                    )
+                    continue
+
+                middle_x = (x1 + x2) / 2.0
+                middle_y = (y1 + y2) / 2.0
+                quadrants = (
+                    ((x1, y1), (middle_x, y1), (middle_x, middle_y), (x1, middle_y)),
+                    ((middle_x, y1), (x2, y1), (x2, middle_y), (middle_x, middle_y)),
+                    ((x1, middle_y), (middle_x, middle_y), (middle_x, y2), (x1, y2)),
+                    ((middle_x, middle_y), (x2, middle_y), (x2, y2), (middle_x, y2)),
+                )
+                for algorithm, points in zip(corner_algorithms, quadrants):
+                    point_text = " ".join(
+                        f"{point_x:.2f},{point_y:.2f}"
+                        for point_x, point_y in points
+                    )
+                    svg.append(
+                        f'<polygon points="{point_text}" '
+                        f'fill="{COLORS[algorithm]}" class="region"/>'
+                    )
+
         for patterns in base_pattern_counts:
             current_x = x(patterns)
             svg.append(
@@ -1074,18 +1121,33 @@ def main():
         timings,
         search_timings,
         build_times,
-        corpus_model_samples,
+        _corpus_model_samples,
         validation,
         reference_bases,
     ) = load_raw()
+    (
+        base_timings,
+        base_search_timings,
+        base_build_times,
+        base_corpus_model_samples,
+        _base_validation,
+        base_reference_bases,
+    ) = load_raw((RAW,))
     if not timings:
         raise SystemExit("The raw result file contains no successful measurements.")
+    if reference_bases != base_reference_bases:
+        raise SystemExit("Base and refinement results use different corpus sizes.")
     statuses = load_statuses()
     base_statuses = load_statuses((STATUS,))
     refinement_statuses = load_statuses((REFINEMENT_STATUS,))
     refinement_cells = {key[:3] for key in refinement_statuses}
     validate_algorithms(validation)
     summary = summarize(timings, search_timings, build_times)
+    base_summary = summarize(
+        base_timings,
+        base_search_timings,
+        base_build_times,
+    )
     winners = write_tables(summary)
     write_selection_map(winners, base_statuses, reference_bases)
     write_refined_selection_map(
@@ -1094,8 +1156,11 @@ def main():
         refinement_cells,
         reference_bases,
     )
-    write_crossover_plot(summary, statuses, reference_bases)
-    write_corpus_crossover_outputs(corpus_model_samples, statuses)
+    write_crossover_plot(base_summary, base_statuses, reference_bases)
+    write_corpus_crossover_outputs(
+        base_corpus_model_samples,
+        base_statuses,
+    )
 
 
 if __name__ == "__main__":
