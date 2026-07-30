@@ -1,9 +1,0 @@
-Shallow selector fitted on the first half of timing rounds.
-Regret is evaluated on the held-out second half.
-Missing/timed-out algorithms receive a 10x training penalty.
-
-[first]
-use aho_corasick
-
-[all]
-use aho_corasick

@@ -1,0 +1,842 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1502" height="1515" viewBox="0 0 1502 1515">
+<rect width="100%" height="100%" fill="#ffffff"/>
+<style>text{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;fill:#202124}.title{font-size:21px;font-weight:650}.subtitle{font-size:14px;fill:#5f6368}.panel{font-size:17px;font-weight:600}.axis{font-size:11px}.cell{font-size:10px;font-weight:650}.missing{fill:#e8eaed;stroke:#ffffff;stroke-width:1}</style>
+<text x="28" y="31" class="title">Corpus-size algorithm crossovers</text>
+<text x="28" y="53" class="subtitle">First lower-envelope transition among successful algorithms; +N marks additional transitions</text>
+<text x="28" y="82" class="axis">earlier crossover</text>
+<rect x="125" y="69" width="42" height="14" fill="#fee599"/>
+<text x="146" y="96" text-anchor="middle" class="axis">100</text>
+<rect x="200" y="69" width="42" height="14" fill="#dcbf97"/>
+<text x="221" y="96" text-anchor="middle" class="axis">10k</text>
+<rect x="275" y="69" width="42" height="14" fill="#ba9995"/>
+<text x="296" y="96" text-anchor="middle" class="axis">1M</text>
+<rect x="350" y="69" width="42" height="14" fill="#987393"/>
+<text x="371" y="96" text-anchor="middle" class="axis">100M</text>
+<rect x="425" y="69" width="42" height="14" fill="#764d91"/>
+<text x="446" y="96" text-anchor="middle" class="axis">10G</text>
+<text x="504" y="82" class="axis">later crossover · gray = no observed transition</text>
+<text x="28" y="125" class="panel">First match</text>
+<text x="86" y="170.1" text-anchor="end" class="axis">4</text>
+<rect x="96" y="145" width="106" height="38" fill="#fee599" stroke="#ffffff" stroke-width="1"/>
+<text x="149.0" y="170.1" text-anchor="middle" class="cell" style="fill:#202124">H→B 27 +1</text>
+<rect x="202" y="145" width="106" height="38" fill="#f7de99" stroke="#ffffff" stroke-width="1"/>
+<text x="255.0" y="170.1" text-anchor="middle" class="cell" style="fill:#202124">H→B 247</text>
+<rect x="308" y="145" width="106" height="38" fill="#d5b797" stroke="#ffffff" stroke-width="1"/>
+<text x="361.0" y="170.1" text-anchor="middle" class="cell" style="fill:#202124">H→A 27k</text>
+<rect x="414" y="145" width="106" height="38" fill="#d0b196" stroke="#ffffff" stroke-width="1"/>
+<text x="467.0" y="170.1" text-anchor="middle" class="cell" style="fill:#202124">H→A 53k</text>
+<rect x="520" y="145" width="106" height="38" fill="#c8a996" stroke="#ffffff" stroke-width="1"/>
+<text x="573.0" y="170.1" text-anchor="middle" class="cell" style="fill:#202124">H→A 140k</text>
+<rect x="626" y="145" width="106" height="38" fill="#c2a295" stroke="#ffffff" stroke-width="1"/>
+<text x="679.0" y="170.1" text-anchor="middle" class="cell" style="fill:#202124">H→A 323k</text>
+<rect x="732" y="145" width="106" height="38" fill="#b49295" stroke="#ffffff" stroke-width="1"/>
+<text x="785.0" y="170.1" text-anchor="middle" class="cell" style="fill:#202124">H→A 2.3M</text>
+<rect x="838" y="145" width="106" height="38" fill="#f1f3f4" stroke="#ffffff" stroke-width="1"/>
+<text x="891.0" y="170.1" text-anchor="middle" class="cell" style="fill:#202124">H throughout</text>
+<rect x="944" y="145" width="106" height="38" fill="#a27e94" stroke="#ffffff" stroke-width="1"/>
+<text x="997.0" y="170.1" text-anchor="middle" class="cell" style="fill:#ffffff">H→A 26M</text>
+<rect x="1050" y="145" width="106" height="38" class="missing"/>
+<rect x="1156" y="145" width="106" height="38" class="missing"/>
+<rect x="1262" y="145" width="106" height="38" class="missing"/>
+<rect x="1368" y="145" width="106" height="38" class="missing"/>
+<text x="86" y="208.1" text-anchor="end" class="axis">6</text>
+<rect x="96" y="183" width="106" height="38" fill="#fee599" stroke="#ffffff" stroke-width="1"/>
+<text x="149.0" y="208.1" text-anchor="middle" class="cell" style="fill:#202124">H→B 25</text>
+<rect x="202" y="183" width="106" height="38" fill="#fbe199" stroke="#ffffff" stroke-width="1"/>
+<text x="255.0" y="208.1" text-anchor="middle" class="cell" style="fill:#202124">H→B 158</text>
+<rect x="308" y="183" width="106" height="38" fill="#e6ca98" stroke="#ffffff" stroke-width="1"/>
+<text x="361.0" y="208.1" text-anchor="middle" class="cell" style="fill:#202124">H→B 2.6k +1</text>
+<rect x="414" y="183" width="106" height="38" fill="#d3b596" stroke="#ffffff" stroke-width="1"/>
+<text x="467.0" y="208.1" text-anchor="middle" class="cell" style="fill:#202124">H→A 32k</text>
+<rect x="520" y="183" width="106" height="38" fill="#d1b396" stroke="#ffffff" stroke-width="1"/>
+<text x="573.0" y="208.1" text-anchor="middle" class="cell" style="fill:#202124">H→A 41k</text>
+<rect x="626" y="183" width="106" height="38" fill="#cdaf96" stroke="#ffffff" stroke-width="1"/>
+<text x="679.0" y="208.1" text-anchor="middle" class="cell" style="fill:#202124">H→A 73k</text>
+<rect x="732" y="183" width="106" height="38" fill="#c7a896" stroke="#ffffff" stroke-width="1"/>
+<text x="785.0" y="208.1" text-anchor="middle" class="cell" style="fill:#202124">H→A 165k</text>
+<rect x="838" y="183" width="106" height="38" fill="#c09f95" stroke="#ffffff" stroke-width="1"/>
+<text x="891.0" y="208.1" text-anchor="middle" class="cell" style="fill:#202124">H→A 473k</text>
+<rect x="944" y="183" width="106" height="38" fill="#af8d94" stroke="#ffffff" stroke-width="1"/>
+<text x="997.0" y="208.1" text-anchor="middle" class="cell" style="fill:#202124">H→A 4.1M</text>
+<rect x="1050" y="183" width="106" height="38" fill="#a07c93" stroke="#ffffff" stroke-width="1"/>
+<text x="1103.0" y="208.1" text-anchor="middle" class="cell" style="fill:#ffffff">H→A 35M</text>
+<rect x="1156" y="183" width="106" height="38" class="missing"/>
+<rect x="1262" y="183" width="106" height="38" class="missing"/>
+<rect x="1368" y="183" width="106" height="38" class="missing"/>
+<text x="86" y="246.1" text-anchor="end" class="axis">8</text>
+<rect x="96" y="221" width="106" height="38" fill="#fee599" stroke="#ffffff" stroke-width="1"/>
+<text x="149.0" y="246.1" text-anchor="middle" class="cell" style="fill:#202124">H→B 7</text>
+<rect x="202" y="221" width="106" height="38" fill="#fee599" stroke="#ffffff" stroke-width="1"/>
+<text x="255.0" y="246.1" text-anchor="middle" class="cell" style="fill:#202124">H→B 83</text>
+<rect x="308" y="221" width="106" height="38" fill="#f4da98" stroke="#ffffff" stroke-width="1"/>
+<text x="361.0" y="246.1" text-anchor="middle" class="cell" style="fill:#202124">H→B 387</text>
+<rect x="414" y="221" width="106" height="38" fill="#d3b496" stroke="#ffffff" stroke-width="1"/>
+<text x="467.0" y="246.1" text-anchor="middle" class="cell" style="fill:#202124">H→A 36k</text>
+<rect x="520" y="221" width="106" height="38" fill="#d0b296" stroke="#ffffff" stroke-width="1"/>
+<text x="573.0" y="246.1" text-anchor="middle" class="cell" style="fill:#202124">H→A 48k</text>
+<rect x="626" y="221" width="106" height="38" fill="#ceaf96" stroke="#ffffff" stroke-width="1"/>
+<text x="679.0" y="246.1" text-anchor="middle" class="cell" style="fill:#202124">H→A 71k</text>
+<rect x="732" y="221" width="106" height="38" fill="#ccad96" stroke="#ffffff" stroke-width="1"/>
+<text x="785.0" y="246.1" text-anchor="middle" class="cell" style="fill:#202124">H→A 93k</text>
+<rect x="838" y="221" width="106" height="38" fill="#c3a396" stroke="#ffffff" stroke-width="1"/>
+<text x="891.0" y="246.1" text-anchor="middle" class="cell" style="fill:#202124">H→A 283k</text>
+<rect x="944" y="221" width="106" height="38" fill="#bf9f95" stroke="#ffffff" stroke-width="1"/>
+<text x="997.0" y="246.1" text-anchor="middle" class="cell" style="fill:#202124">H→A 486k</text>
+<rect x="1050" y="221" width="106" height="38" fill="#f1f3f4" stroke="#ffffff" stroke-width="1"/>
+<text x="1103.0" y="246.1" text-anchor="middle" class="cell" style="fill:#202124">H throughout</text>
+<rect x="1156" y="221" width="106" height="38" fill="#f1f3f4" stroke="#ffffff" stroke-width="1"/>
+<text x="1209.0" y="246.1" text-anchor="middle" class="cell" style="fill:#202124">H throughout</text>
+<rect x="1262" y="221" width="106" height="38" class="missing"/>
+<rect x="1368" y="221" width="106" height="38" class="missing"/>
+<text x="86" y="284.1" text-anchor="end" class="axis">10</text>
+<rect x="96" y="259" width="106" height="38" fill="#f1f3f4" stroke="#ffffff" stroke-width="1"/>
+<text x="149.0" y="284.1" text-anchor="middle" class="cell" style="fill:#202124">B throughout</text>
+<rect x="202" y="259" width="106" height="38" fill="#fee599" stroke="#ffffff" stroke-width="1"/>
+<text x="255.0" y="284.1" text-anchor="middle" class="cell" style="fill:#202124">H→B 80</text>
+<rect x="308" y="259" width="106" height="38" fill="#f3d998" stroke="#ffffff" stroke-width="1"/>
+<text x="361.0" y="284.1" text-anchor="middle" class="cell" style="fill:#202124">H→B 415</text>
+<rect x="414" y="259" width="106" height="38" fill="#dfc397" stroke="#ffffff" stroke-width="1"/>
+<text x="467.0" y="284.1" text-anchor="middle" class="cell" style="fill:#202124">H→B 6.4k +1</text>
+<rect x="520" y="259" width="106" height="38" fill="#ceb096" stroke="#ffffff" stroke-width="1"/>
+<text x="573.0" y="284.1" text-anchor="middle" class="cell" style="fill:#202124">H→A 63k</text>
+<rect x="626" y="259" width="106" height="38" fill="#cdae96" stroke="#ffffff" stroke-width="1"/>
+<text x="679.0" y="284.1" text-anchor="middle" class="cell" style="fill:#202124">H→A 78k</text>
+<rect x="732" y="259" width="106" height="38" fill="#c6a796" stroke="#ffffff" stroke-width="1"/>
+<text x="785.0" y="284.1" text-anchor="middle" class="cell" style="fill:#202124">H→A 194k</text>
+<rect x="838" y="259" width="106" height="38" fill="#c3a396" stroke="#ffffff" stroke-width="1"/>
+<text x="891.0" y="284.1" text-anchor="middle" class="cell" style="fill:#202124">H→A 286k</text>
+<rect x="944" y="259" width="106" height="38" fill="#be9e95" stroke="#ffffff" stroke-width="1"/>
+<text x="997.0" y="284.1" text-anchor="middle" class="cell" style="fill:#202124">H→A 562k</text>
+<rect x="1050" y="259" width="106" height="38" fill="#a48194" stroke="#ffffff" stroke-width="1"/>
+<text x="1103.0" y="284.1" text-anchor="middle" class="cell" style="fill:#ffffff">H→A 19M</text>
+<rect x="1156" y="259" width="106" height="38" fill="#f1f3f4" stroke="#ffffff" stroke-width="1"/>
+<text x="1209.0" y="284.1" text-anchor="middle" class="cell" style="fill:#202124">H throughout</text>
+<rect x="1262" y="259" width="106" height="38" fill="#f1f3f4" stroke="#ffffff" stroke-width="1"/>
+<text x="1315.0" y="284.1" text-anchor="middle" class="cell" style="fill:#202124">H throughout</text>
+<rect x="1368" y="259" width="106" height="38" fill="#f1f3f4" stroke="#ffffff" stroke-width="1"/>
+<text x="1421.0" y="284.1" text-anchor="middle" class="cell" style="fill:#202124">H throughout</text>
+<text x="86" y="322.1" text-anchor="end" class="axis">12</text>
+<rect x="96" y="297" width="106" height="38" fill="#f1f3f4" stroke="#ffffff" stroke-width="1"/>
+<text x="149.0" y="322.1" text-anchor="middle" class="cell" style="fill:#202124">B throughout</text>
+<rect x="202" y="297" width="106" height="38" fill="#fee599" stroke="#ffffff" stroke-width="1"/>
+<text x="255.0" y="322.1" text-anchor="middle" class="cell" style="fill:#202124">H→B 55</text>
+<rect x="308" y="297" width="106" height="38" fill="#f7dd99" stroke="#ffffff" stroke-width="1"/>
+<text x="361.0" y="322.1" text-anchor="middle" class="cell" style="fill:#202124">H→B 265</text>
+<rect x="414" y="297" width="106" height="38" fill="#e9cd98" stroke="#ffffff" stroke-width="1"/>
+<text x="467.0" y="322.1" text-anchor="middle" class="cell" style="fill:#202124">H→B 1.8k +1</text>
+<rect x="520" y="297" width="106" height="38" fill="#cfb096" stroke="#ffffff" stroke-width="1"/>
+<text x="573.0" y="322.1" text-anchor="middle" class="cell" style="fill:#202124">H→A 61k</text>
+<rect x="626" y="297" width="106" height="38" fill="#c9aa96" stroke="#ffffff" stroke-width="1"/>
+<text x="679.0" y="322.1" text-anchor="middle" class="cell" style="fill:#202124">H→A 135k</text>
+<rect x="732" y="297" width="106" height="38" fill="#c6a796" stroke="#ffffff" stroke-width="1"/>
+<text x="785.0" y="322.1" text-anchor="middle" class="cell" style="fill:#202124">H→A 192k</text>
+<rect x="838" y="297" width="106" height="38" fill="#c2a295" stroke="#ffffff" stroke-width="1"/>
+<text x="891.0" y="322.1" text-anchor="middle" class="cell" style="fill:#202124">H→A 320k</text>
+<rect x="944" y="297" width="106" height="38" fill="#bc9b95" stroke="#ffffff" stroke-width="1"/>
+<text x="997.0" y="322.1" text-anchor="middle" class="cell" style="fill:#202124">H→A 771k</text>
+<rect x="1050" y="297" width="106" height="38" fill="#f1f3f4" stroke="#ffffff" stroke-width="1"/>
+<text x="1103.0" y="322.1" text-anchor="middle" class="cell" style="fill:#202124">H throughout</text>
+<rect x="1156" y="297" width="106" height="38" fill="#f1f3f4" stroke="#ffffff" stroke-width="1"/>
+<text x="1209.0" y="322.1" text-anchor="middle" class="cell" style="fill:#202124">H throughout</text>
+<rect x="1262" y="297" width="106" height="38" fill="#f1f3f4" stroke="#ffffff" stroke-width="1"/>
+<text x="1315.0" y="322.1" text-anchor="middle" class="cell" style="fill:#202124">H throughout 2/3</text>
+<rect x="1368" y="297" width="106" height="38" fill="#f1f3f4" stroke="#ffffff" stroke-width="1"/>
+<text x="1421.0" y="322.1" text-anchor="middle" class="cell" style="fill:#202124">H throughout 1/3</text>
+<text x="86" y="360.1" text-anchor="end" class="axis">16</text>
+<rect x="96" y="335" width="106" height="38" fill="#f1f3f4" stroke="#ffffff" stroke-width="1"/>
+<text x="149.0" y="360.1" text-anchor="middle" class="cell" style="fill:#202124">B throughout</text>
+<rect x="202" y="335" width="106" height="38" fill="#fee599" stroke="#ffffff" stroke-width="1"/>
+<text x="255.0" y="360.1" text-anchor="middle" class="cell" style="fill:#202124">H→B 67</text>
+<rect x="308" y="335" width="106" height="38" fill="#f8de99" stroke="#ffffff" stroke-width="1"/>
+<text x="361.0" y="360.1" text-anchor="middle" class="cell" style="fill:#202124">H→B 232</text>
+<rect x="414" y="335" width="106" height="38" fill="#edd298" stroke="#ffffff" stroke-width="1"/>
+<text x="467.0" y="360.1" text-anchor="middle" class="cell" style="fill:#202124">H→B 1.0k</text>
+<rect x="520" y="335" width="106" height="38" fill="#d5b797" stroke="#ffffff" stroke-width="1"/>
+<text x="573.0" y="360.1" text-anchor="middle" class="cell" style="fill:#202124">H→B 26k +1</text>
+<rect x="626" y="335" width="106" height="38" fill="#c8a896" stroke="#ffffff" stroke-width="1"/>
+<text x="679.0" y="360.1" text-anchor="middle" class="cell" style="fill:#202124">H→A 153k</text>
+<rect x="732" y="335" width="106" height="38" fill="#c4a496" stroke="#ffffff" stroke-width="1"/>
+<text x="785.0" y="360.1" text-anchor="middle" class="cell" style="fill:#202124">H→A 270k</text>
+<rect x="838" y="335" width="106" height="38" fill="#bc9b95" stroke="#ffffff" stroke-width="1"/>
+<text x="891.0" y="360.1" text-anchor="middle" class="cell" style="fill:#202124">H→A 747k</text>
+<rect x="944" y="335" width="106" height="38" fill="#b79595" stroke="#ffffff" stroke-width="1"/>
+<text x="997.0" y="360.1" text-anchor="middle" class="cell" style="fill:#202124">H→A 1.6M</text>
+<rect x="1050" y="335" width="106" height="38" fill="#f1f3f4" stroke="#ffffff" stroke-width="1"/>
+<text x="1103.0" y="360.1" text-anchor="middle" class="cell" style="fill:#202124">H throughout</text>
+<rect x="1156" y="335" width="106" height="38" fill="#f1f3f4" stroke="#ffffff" stroke-width="1"/>
+<text x="1209.0" y="360.1" text-anchor="middle" class="cell" style="fill:#202124">H throughout</text>
+<rect x="1262" y="335" width="106" height="38" fill="#f1f3f4" stroke="#ffffff" stroke-width="1"/>
+<text x="1315.0" y="360.1" text-anchor="middle" class="cell" style="fill:#202124">H throughout 2/3</text>
+<rect x="1368" y="335" width="106" height="38" fill="#f1f3f4" stroke="#ffffff" stroke-width="1"/>
+<text x="1421.0" y="360.1" text-anchor="middle" class="cell" style="fill:#202124">H throughout 1/3</text>
+<text x="86" y="398.1" text-anchor="end" class="axis">20</text>
+<rect x="96" y="373" width="106" height="38" fill="#f1f3f4" stroke="#ffffff" stroke-width="1"/>
+<text x="149.0" y="398.1" text-anchor="middle" class="cell" style="fill:#202124">B throughout</text>
+<rect x="202" y="373" width="106" height="38" fill="#fee599" stroke="#ffffff" stroke-width="1"/>
+<text x="255.0" y="398.1" text-anchor="middle" class="cell" style="fill:#202124">H→B 55</text>
+<rect x="308" y="373" width="106" height="38" fill="#fae199" stroke="#ffffff" stroke-width="1"/>
+<text x="361.0" y="398.1" text-anchor="middle" class="cell" style="fill:#202124">H→B 169</text>
+<rect x="414" y="373" width="106" height="38" fill="#eed498" stroke="#ffffff" stroke-width="1"/>
+<text x="467.0" y="398.1" text-anchor="middle" class="cell" style="fill:#202124">H→B 820</text>
+<rect x="520" y="373" width="106" height="38" fill="#e3c797" stroke="#ffffff" stroke-width="1"/>
+<text x="573.0" y="398.1" text-anchor="middle" class="cell" style="fill:#202124">H→B 3.8k +1</text>
+<rect x="626" y="373" width="106" height="38" fill="#c8a896" stroke="#ffffff" stroke-width="1"/>
+<text x="679.0" y="398.1" text-anchor="middle" class="cell" style="fill:#202124">H→A 159k</text>
+<rect x="732" y="373" width="106" height="38" fill="#c1a195" stroke="#ffffff" stroke-width="1"/>
+<text x="785.0" y="398.1" text-anchor="middle" class="cell" style="fill:#202124">H→A 367k</text>
+<rect x="838" y="373" width="106" height="38" fill="#be9e95" stroke="#ffffff" stroke-width="1"/>
+<text x="891.0" y="398.1" text-anchor="middle" class="cell" style="fill:#202124">H→A 557k</text>
+<rect x="944" y="373" width="106" height="38" fill="#b59395" stroke="#ffffff" stroke-width="1"/>
+<text x="997.0" y="398.1" text-anchor="middle" class="cell" style="fill:#202124">H→A 2.1M</text>
+<rect x="1050" y="373" width="106" height="38" fill="#f1f3f4" stroke="#ffffff" stroke-width="1"/>
+<text x="1103.0" y="398.1" text-anchor="middle" class="cell" style="fill:#202124">H throughout</text>
+<rect x="1156" y="373" width="106" height="38" fill="#f1f3f4" stroke="#ffffff" stroke-width="1"/>
+<text x="1209.0" y="398.1" text-anchor="middle" class="cell" style="fill:#202124">H throughout</text>
+<rect x="1262" y="373" width="106" height="38" fill="#f1f3f4" stroke="#ffffff" stroke-width="1"/>
+<text x="1315.0" y="398.1" text-anchor="middle" class="cell" style="fill:#202124">H throughout 2/3</text>
+<rect x="1368" y="373" width="106" height="38" fill="#f1f3f4" stroke="#ffffff" stroke-width="1"/>
+<text x="1421.0" y="398.1" text-anchor="middle" class="cell" style="fill:#202124">H throughout 1/3</text>
+<text x="86" y="436.1" text-anchor="end" class="axis">24</text>
+<rect x="96" y="411" width="106" height="38" fill="#f1f3f4" stroke="#ffffff" stroke-width="1"/>
+<text x="149.0" y="436.1" text-anchor="middle" class="cell" style="fill:#202124">B throughout</text>
+<rect x="202" y="411" width="106" height="38" fill="#fee599" stroke="#ffffff" stroke-width="1"/>
+<text x="255.0" y="436.1" text-anchor="middle" class="cell" style="fill:#202124">H→B 31</text>
+<rect x="308" y="411" width="106" height="38" fill="#fae099" stroke="#ffffff" stroke-width="1"/>
+<text x="361.0" y="436.1" text-anchor="middle" class="cell" style="fill:#202124">H→B 181</text>
+<rect x="414" y="411" width="106" height="38" fill="#efd598" stroke="#ffffff" stroke-width="1"/>
+<text x="467.0" y="436.1" text-anchor="middle" class="cell" style="fill:#202124">H→B 714</text>
+<rect x="520" y="411" width="106" height="38" fill="#e7cb98" stroke="#ffffff" stroke-width="1"/>
+<text x="573.0" y="436.1" text-anchor="middle" class="cell" style="fill:#202124">H→B 2.4k +1</text>
+<rect x="626" y="411" width="106" height="38" fill="#c3a396" stroke="#ffffff" stroke-width="1"/>
+<text x="679.0" y="436.1" text-anchor="middle" class="cell" style="fill:#202124">H→A 284k</text>
+<rect x="732" y="411" width="106" height="38" fill="#c2a295" stroke="#ffffff" stroke-width="1"/>
+<text x="785.0" y="436.1" text-anchor="middle" class="cell" style="fill:#202124">H→A 329k</text>
+<rect x="838" y="411" width="106" height="38" fill="#b99795" stroke="#ffffff" stroke-width="1"/>
+<text x="891.0" y="436.1" text-anchor="middle" class="cell" style="fill:#202124">H→A 1.2M</text>
+<rect x="944" y="411" width="106" height="38" fill="#b59395" stroke="#ffffff" stroke-width="1"/>
+<text x="997.0" y="436.1" text-anchor="middle" class="cell" style="fill:#202124">H→A 2.1M</text>
+<rect x="1050" y="411" width="106" height="38" fill="#f1f3f4" stroke="#ffffff" stroke-width="1"/>
+<text x="1103.0" y="436.1" text-anchor="middle" class="cell" style="fill:#202124">H throughout</text>
+<rect x="1156" y="411" width="106" height="38" fill="#f1f3f4" stroke="#ffffff" stroke-width="1"/>
+<text x="1209.0" y="436.1" text-anchor="middle" class="cell" style="fill:#202124">H throughout</text>
+<rect x="1262" y="411" width="106" height="38" fill="#f1f3f4" stroke="#ffffff" stroke-width="1"/>
+<text x="1315.0" y="436.1" text-anchor="middle" class="cell" style="fill:#202124">H throughout 2/3</text>
+<rect x="1368" y="411" width="106" height="38" fill="#f1f3f4" stroke="#ffffff" stroke-width="1"/>
+<text x="1421.0" y="436.1" text-anchor="middle" class="cell" style="fill:#202124">H throughout 1/3</text>
+<text x="86" y="474.1" text-anchor="end" class="axis">31</text>
+<rect x="96" y="449" width="106" height="38" fill="#fee599" stroke="#ffffff" stroke-width="1"/>
+<text x="149.0" y="474.1" text-anchor="middle" class="cell" style="fill:#202124">H→B 18</text>
+<rect x="202" y="449" width="106" height="38" fill="#fee599" stroke="#ffffff" stroke-width="1"/>
+<text x="255.0" y="474.1" text-anchor="middle" class="cell" style="fill:#202124">H→B 70</text>
+<rect x="308" y="449" width="106" height="38" fill="#fbe299" stroke="#ffffff" stroke-width="1"/>
+<text x="361.0" y="474.1" text-anchor="middle" class="cell" style="fill:#202124">H→B 148</text>
+<rect x="414" y="449" width="106" height="38" fill="#f0d598" stroke="#ffffff" stroke-width="1"/>
+<text x="467.0" y="474.1" text-anchor="middle" class="cell" style="fill:#202124">H→B 678</text>
+<rect x="520" y="449" width="106" height="38" fill="#e8cc98" stroke="#ffffff" stroke-width="1"/>
+<text x="573.0" y="474.1" text-anchor="middle" class="cell" style="fill:#202124">H→B 2.1k</text>
+<rect x="626" y="449" width="106" height="38" fill="#d1b296" stroke="#ffffff" stroke-width="1"/>
+<text x="679.0" y="474.1" text-anchor="middle" class="cell" style="fill:#202124">H→B 46k +1</text>
+<rect x="732" y="449" width="106" height="38" fill="#be9d95" stroke="#ffffff" stroke-width="1"/>
+<text x="785.0" y="474.1" text-anchor="middle" class="cell" style="fill:#202124">H→A 588k</text>
+<rect x="838" y="449" width="106" height="38" fill="#ba9995" stroke="#ffffff" stroke-width="1"/>
+<text x="891.0" y="474.1" text-anchor="middle" class="cell" style="fill:#202124">H→A 973k</text>
+<rect x="944" y="449" width="106" height="38" fill="#b08e94" stroke="#ffffff" stroke-width="1"/>
+<text x="997.0" y="474.1" text-anchor="middle" class="cell" style="fill:#202124">H→A 3.8M</text>
+<rect x="1050" y="449" width="106" height="38" fill="#f1f3f4" stroke="#ffffff" stroke-width="1"/>
+<text x="1103.0" y="474.1" text-anchor="middle" class="cell" style="fill:#202124">H throughout</text>
+<rect x="1156" y="449" width="106" height="38" fill="#f1f3f4" stroke="#ffffff" stroke-width="1"/>
+<text x="1209.0" y="474.1" text-anchor="middle" class="cell" style="fill:#202124">H throughout</text>
+<rect x="1262" y="449" width="106" height="38" fill="#f1f3f4" stroke="#ffffff" stroke-width="1"/>
+<text x="1315.0" y="474.1" text-anchor="middle" class="cell" style="fill:#202124">H throughout 2/3</text>
+<rect x="1368" y="449" width="106" height="38" fill="#f1f3f4" stroke="#ffffff" stroke-width="1"/>
+<text x="1421.0" y="474.1" text-anchor="middle" class="cell" style="fill:#202124">H throughout 1/3</text>
+<text x="86" y="512.1" text-anchor="end" class="axis">40</text>
+<rect x="96" y="487" width="106" height="38" fill="#fee599" stroke="#ffffff" stroke-width="1"/>
+<text x="149.0" y="512.1" text-anchor="middle" class="cell" style="fill:#202124">H→B 7</text>
+<rect x="202" y="487" width="106" height="38" fill="#fee599" stroke="#ffffff" stroke-width="1"/>
+<text x="255.0" y="512.1" text-anchor="middle" class="cell" style="fill:#202124">H→B 46</text>
+<rect x="308" y="487" width="106" height="38" fill="#fce299" stroke="#ffffff" stroke-width="1"/>
+<text x="361.0" y="512.1" text-anchor="middle" class="cell" style="fill:#202124">H→B 140</text>
+<rect x="414" y="487" width="106" height="38" fill="#f1d698" stroke="#ffffff" stroke-width="1"/>
+<text x="467.0" y="512.1" text-anchor="middle" class="cell" style="fill:#202124">H→B 596</text>
+<rect x="520" y="487" width="106" height="38" fill="#e8cd98" stroke="#ffffff" stroke-width="1"/>
+<text x="573.0" y="512.1" text-anchor="middle" class="cell" style="fill:#202124">H→B 1.9k</text>
+<rect x="626" y="487" width="106" height="38" fill="#dec197" stroke="#ffffff" stroke-width="1"/>
+<text x="679.0" y="512.1" text-anchor="middle" class="cell" style="fill:#202124">H→B 8.0k +1</text>
+<rect x="732" y="487" width="106" height="38" fill="#bc9b95" stroke="#ffffff" stroke-width="1"/>
+<text x="785.0" y="512.1" text-anchor="middle" class="cell" style="fill:#202124">H→A 795k</text>
+<rect x="838" y="487" width="106" height="38" fill="#b89695" stroke="#ffffff" stroke-width="1"/>
+<text x="891.0" y="512.1" text-anchor="middle" class="cell" style="fill:#202124">H→A 1.4M</text>
+<rect x="944" y="487" width="106" height="38" fill="#a27e94" stroke="#ffffff" stroke-width="1"/>
+<text x="997.0" y="512.1" text-anchor="middle" class="cell" style="fill:#ffffff">H→A 27M</text>
+<rect x="1050" y="487" width="106" height="38" fill="#f1f3f4" stroke="#ffffff" stroke-width="1"/>
+<text x="1103.0" y="512.1" text-anchor="middle" class="cell" style="fill:#202124">H throughout</text>
+<rect x="1156" y="487" width="106" height="38" fill="#f1f3f4" stroke="#ffffff" stroke-width="1"/>
+<text x="1209.0" y="512.1" text-anchor="middle" class="cell" style="fill:#202124">H throughout</text>
+<rect x="1262" y="487" width="106" height="38" fill="#f1f3f4" stroke="#ffffff" stroke-width="1"/>
+<text x="1315.0" y="512.1" text-anchor="middle" class="cell" style="fill:#202124">H throughout 2/3</text>
+<rect x="1368" y="487" width="106" height="38" fill="#f1f3f4" stroke="#ffffff" stroke-width="1"/>
+<text x="1421.0" y="512.1" text-anchor="middle" class="cell" style="fill:#202124">H throughout 1/3</text>
+<text x="86" y="550.1" text-anchor="end" class="axis">48</text>
+<rect x="96" y="525" width="106" height="38" fill="#f1f3f4" stroke="#ffffff" stroke-width="1"/>
+<text x="149.0" y="550.1" text-anchor="middle" class="cell" style="fill:#202124">B throughout</text>
+<rect x="202" y="525" width="106" height="38" fill="#fee599" stroke="#ffffff" stroke-width="1"/>
+<text x="255.0" y="550.1" text-anchor="middle" class="cell" style="fill:#202124">H→B 82</text>
+<rect x="308" y="525" width="106" height="38" fill="#fae199" stroke="#ffffff" stroke-width="1"/>
+<text x="361.0" y="550.1" text-anchor="middle" class="cell" style="fill:#202124">H→B 166</text>
+<rect x="414" y="525" width="106" height="38" fill="#f1d798" stroke="#ffffff" stroke-width="1"/>
+<text x="467.0" y="550.1" text-anchor="middle" class="cell" style="fill:#202124">H→B 569</text>
+<rect x="520" y="525" width="106" height="38" fill="#eacf98" stroke="#ffffff" stroke-width="1"/>
+<text x="573.0" y="550.1" text-anchor="middle" class="cell" style="fill:#202124">H→B 1.4k</text>
+<rect x="626" y="525" width="106" height="38" fill="#dfc397" stroke="#ffffff" stroke-width="1"/>
+<text x="679.0" y="550.1" text-anchor="middle" class="cell" style="fill:#202124">H→B 6.5k</text>
+<rect x="732" y="525" width="106" height="38" fill="#b99895" stroke="#ffffff" stroke-width="1"/>
+<text x="785.0" y="550.1" text-anchor="middle" class="cell" style="fill:#202124">H→A 1.1M</text>
+<rect x="838" y="525" width="106" height="38" fill="#b39195" stroke="#ffffff" stroke-width="1"/>
+<text x="891.0" y="550.1" text-anchor="middle" class="cell" style="fill:#202124">H→A 2.7M</text>
+<rect x="944" y="525" width="106" height="38" fill="#a48194" stroke="#ffffff" stroke-width="1"/>
+<text x="997.0" y="550.1" text-anchor="middle" class="cell" style="fill:#ffffff">H→A 19M</text>
+<rect x="1050" y="525" width="106" height="38" fill="#f1f3f4" stroke="#ffffff" stroke-width="1"/>
+<text x="1103.0" y="550.1" text-anchor="middle" class="cell" style="fill:#202124">H throughout</text>
+<rect x="1156" y="525" width="106" height="38" fill="#f1f3f4" stroke="#ffffff" stroke-width="1"/>
+<text x="1209.0" y="550.1" text-anchor="middle" class="cell" style="fill:#202124">H throughout</text>
+<rect x="1262" y="525" width="106" height="38" fill="#f1f3f4" stroke="#ffffff" stroke-width="1"/>
+<text x="1315.0" y="550.1" text-anchor="middle" class="cell" style="fill:#202124">H throughout 2/3</text>
+<rect x="1368" y="525" width="106" height="38" fill="#f1f3f4" stroke="#ffffff" stroke-width="1"/>
+<text x="1421.0" y="550.1" text-anchor="middle" class="cell" style="fill:#202124">H throughout 1/3</text>
+<text x="86" y="588.1" text-anchor="end" class="axis">64</text>
+<rect x="96" y="563" width="106" height="38" fill="#f1f3f4" stroke="#ffffff" stroke-width="1"/>
+<text x="149.0" y="588.1" text-anchor="middle" class="cell" style="fill:#202124">B throughout</text>
+<rect x="202" y="563" width="106" height="38" fill="#fee599" stroke="#ffffff" stroke-width="1"/>
+<text x="255.0" y="588.1" text-anchor="middle" class="cell" style="fill:#202124">H→B 61</text>
+<rect x="308" y="563" width="106" height="38" fill="#f9e099" stroke="#ffffff" stroke-width="1"/>
+<text x="361.0" y="588.1" text-anchor="middle" class="cell" style="fill:#202124">H→B 188</text>
+<rect x="414" y="563" width="106" height="38" fill="#f0d698" stroke="#ffffff" stroke-width="1"/>
+<text x="467.0" y="588.1" text-anchor="middle" class="cell" style="fill:#202124">H→B 628</text>
+<rect x="520" y="563" width="106" height="38" fill="#ebcf98" stroke="#ffffff" stroke-width="1"/>
+<text x="573.0" y="588.1" text-anchor="middle" class="cell" style="fill:#202124">H→B 1.4k</text>
+<rect x="626" y="563" width="106" height="38" fill="#e2c697" stroke="#ffffff" stroke-width="1"/>
+<text x="679.0" y="588.1" text-anchor="middle" class="cell" style="fill:#202124">H→B 4.5k</text>
+<rect x="732" y="563" width="106" height="38" fill="#d3b496" stroke="#ffffff" stroke-width="1"/>
+<text x="785.0" y="588.1" text-anchor="middle" class="cell" style="fill:#202124">H→B 36k +1</text>
+<rect x="838" y="563" width="106" height="38" fill="#a88594" stroke="#ffffff" stroke-width="1"/>
+<text x="891.0" y="588.1" text-anchor="middle" class="cell" style="fill:#ffffff">H→A 12M</text>
+<rect x="944" y="563" width="106" height="38" fill="#f1f3f4" stroke="#ffffff" stroke-width="1"/>
+<text x="997.0" y="588.1" text-anchor="middle" class="cell" style="fill:#202124">H throughout</text>
+<rect x="1050" y="563" width="106" height="38" fill="#f1f3f4" stroke="#ffffff" stroke-width="1"/>
+<text x="1103.0" y="588.1" text-anchor="middle" class="cell" style="fill:#202124">H throughout</text>
+<rect x="1156" y="563" width="106" height="38" fill="#f1f3f4" stroke="#ffffff" stroke-width="1"/>
+<text x="1209.0" y="588.1" text-anchor="middle" class="cell" style="fill:#202124">H throughout</text>
+<rect x="1262" y="563" width="106" height="38" fill="#f1f3f4" stroke="#ffffff" stroke-width="1"/>
+<text x="1315.0" y="588.1" text-anchor="middle" class="cell" style="fill:#202124">H throughout 1/3</text>
+<rect x="1368" y="563" width="106" height="38" fill="#f1f3f4" stroke="#ffffff" stroke-width="1"/>
+<text x="1421.0" y="588.1" text-anchor="middle" class="cell" style="fill:#202124">H throughout 1/3</text>
+<text x="86" y="626.1" text-anchor="end" class="axis">80</text>
+<rect x="96" y="601" width="106" height="38" fill="#d5b797" stroke="#ffffff" stroke-width="1"/>
+<text x="149.0" y="626.1" text-anchor="middle" class="cell" style="fill:#202124">H→A 27k</text>
+<rect x="202" y="601" width="106" height="38" fill="#f1f3f4" stroke="#ffffff" stroke-width="1"/>
+<text x="255.0" y="626.1" text-anchor="middle" class="cell" style="fill:#202124">H throughout</text>
+<rect x="308" y="601" width="106" height="38" fill="#c5a596" stroke="#ffffff" stroke-width="1"/>
+<text x="361.0" y="626.1" text-anchor="middle" class="cell" style="fill:#202124">H→A 235k</text>
+<rect x="414" y="601" width="106" height="38" fill="#bf9f95" stroke="#ffffff" stroke-width="1"/>
+<text x="467.0" y="626.1" text-anchor="middle" class="cell" style="fill:#202124">H→A 487k</text>
+<rect x="520" y="601" width="106" height="38" fill="#bc9c95" stroke="#ffffff" stroke-width="1"/>
+<text x="573.0" y="626.1" text-anchor="middle" class="cell" style="fill:#202124">H→A 733k</text>
+<rect x="626" y="601" width="106" height="38" fill="#b39295" stroke="#ffffff" stroke-width="1"/>
+<text x="679.0" y="626.1" text-anchor="middle" class="cell" style="fill:#202124">H→A 2.5M</text>
+<rect x="732" y="601" width="106" height="38" fill="#a98594" stroke="#ffffff" stroke-width="1"/>
+<text x="785.0" y="626.1" text-anchor="middle" class="cell" style="fill:#ffffff">H→A 11M</text>
+<rect x="838" y="601" width="106" height="38" fill="#f1f3f4" stroke="#ffffff" stroke-width="1"/>
+<text x="891.0" y="626.1" text-anchor="middle" class="cell" style="fill:#202124">H throughout</text>
+<rect x="944" y="601" width="106" height="38" fill="#f1f3f4" stroke="#ffffff" stroke-width="1"/>
+<text x="997.0" y="626.1" text-anchor="middle" class="cell" style="fill:#202124">H throughout</text>
+<rect x="1050" y="601" width="106" height="38" fill="#f1f3f4" stroke="#ffffff" stroke-width="1"/>
+<text x="1103.0" y="626.1" text-anchor="middle" class="cell" style="fill:#202124">H throughout</text>
+<rect x="1156" y="601" width="106" height="38" fill="#f1f3f4" stroke="#ffffff" stroke-width="1"/>
+<text x="1209.0" y="626.1" text-anchor="middle" class="cell" style="fill:#202124">H throughout</text>
+<rect x="1262" y="601" width="106" height="38" fill="#f1f3f4" stroke="#ffffff" stroke-width="1"/>
+<text x="1315.0" y="626.1" text-anchor="middle" class="cell" style="fill:#202124">H throughout 1/2</text>
+<rect x="1368" y="601" width="106" height="38" fill="#f1f3f4" stroke="#ffffff" stroke-width="1"/>
+<text x="1421.0" y="626.1" text-anchor="middle" class="cell" style="fill:#202124">H throughout 1/2</text>
+<text x="86" y="664.1" text-anchor="end" class="axis">96</text>
+<rect x="96" y="639" width="106" height="38" fill="#d4b697" stroke="#ffffff" stroke-width="1"/>
+<text x="149.0" y="664.1" text-anchor="middle" class="cell" style="fill:#202124">H→A 28k</text>
+<rect x="202" y="639" width="106" height="38" fill="#f1f3f4" stroke="#ffffff" stroke-width="1"/>
+<text x="255.0" y="664.1" text-anchor="middle" class="cell" style="fill:#202124">H throughout</text>
+<rect x="308" y="639" width="106" height="38" fill="#c2a295" stroke="#ffffff" stroke-width="1"/>
+<text x="361.0" y="664.1" text-anchor="middle" class="cell" style="fill:#202124">H→A 350k</text>
+<rect x="414" y="639" width="106" height="38" fill="#bc9b95" stroke="#ffffff" stroke-width="1"/>
+<text x="467.0" y="664.1" text-anchor="middle" class="cell" style="fill:#202124">H→A 762k</text>
+<rect x="520" y="639" width="106" height="38" fill="#ba9995" stroke="#ffffff" stroke-width="1"/>
+<text x="573.0" y="664.1" text-anchor="middle" class="cell" style="fill:#202124">H→A 1.0M</text>
+<rect x="626" y="639" width="106" height="38" fill="#ae8c94" stroke="#ffffff" stroke-width="1"/>
+<text x="679.0" y="664.1" text-anchor="middle" class="cell" style="fill:#202124">H→A 5.0M</text>
+<rect x="732" y="639" width="106" height="38" fill="#aa8794" stroke="#ffffff" stroke-width="1"/>
+<text x="785.0" y="664.1" text-anchor="middle" class="cell" style="fill:#ffffff">H→A 8.9M</text>
+<rect x="838" y="639" width="106" height="38" fill="#f1f3f4" stroke="#ffffff" stroke-width="1"/>
+<text x="891.0" y="664.1" text-anchor="middle" class="cell" style="fill:#202124">H throughout</text>
+<rect x="944" y="639" width="106" height="38" fill="#f1f3f4" stroke="#ffffff" stroke-width="1"/>
+<text x="997.0" y="664.1" text-anchor="middle" class="cell" style="fill:#202124">H throughout</text>
+<rect x="1050" y="639" width="106" height="38" fill="#f1f3f4" stroke="#ffffff" stroke-width="1"/>
+<text x="1103.0" y="664.1" text-anchor="middle" class="cell" style="fill:#202124">H throughout</text>
+<rect x="1156" y="639" width="106" height="38" fill="#f1f3f4" stroke="#ffffff" stroke-width="1"/>
+<text x="1209.0" y="664.1" text-anchor="middle" class="cell" style="fill:#202124">H throughout</text>
+<rect x="1262" y="639" width="106" height="38" fill="#f1f3f4" stroke="#ffffff" stroke-width="1"/>
+<text x="1315.0" y="664.1" text-anchor="middle" class="cell" style="fill:#202124">H throughout 1/2</text>
+<rect x="1368" y="639" width="106" height="38" fill="#f1f3f4" stroke="#ffffff" stroke-width="1"/>
+<text x="1421.0" y="664.1" text-anchor="middle" class="cell" style="fill:#202124">H throughout 1/2</text>
+<text x="86" y="702.1" text-anchor="end" class="axis">128</text>
+<rect x="96" y="677" width="106" height="38" fill="#d3b596" stroke="#ffffff" stroke-width="1"/>
+<text x="149.0" y="702.1" text-anchor="middle" class="cell" style="fill:#202124">H→A 32k</text>
+<rect x="202" y="677" width="106" height="38" fill="#f1f3f4" stroke="#ffffff" stroke-width="1"/>
+<text x="255.0" y="702.1" text-anchor="middle" class="cell" style="fill:#202124">H throughout</text>
+<rect x="308" y="677" width="106" height="38" fill="#b79695" stroke="#ffffff" stroke-width="1"/>
+<text x="361.0" y="702.1" text-anchor="middle" class="cell" style="fill:#202124">H→A 1.4M</text>
+<rect x="414" y="677" width="106" height="38" fill="#b18f94" stroke="#ffffff" stroke-width="1"/>
+<text x="467.0" y="702.1" text-anchor="middle" class="cell" style="fill:#202124">H→A 3.3M</text>
+<rect x="520" y="677" width="106" height="38" fill="#f1f3f4" stroke="#ffffff" stroke-width="1"/>
+<text x="573.0" y="702.1" text-anchor="middle" class="cell" style="fill:#202124">H throughout</text>
+<rect x="626" y="677" width="106" height="38" fill="#f1f3f4" stroke="#ffffff" stroke-width="1"/>
+<text x="679.0" y="702.1" text-anchor="middle" class="cell" style="fill:#202124">H throughout</text>
+<rect x="732" y="677" width="106" height="38" fill="#f1f3f4" stroke="#ffffff" stroke-width="1"/>
+<text x="785.0" y="702.1" text-anchor="middle" class="cell" style="fill:#202124">H throughout</text>
+<rect x="838" y="677" width="106" height="38" fill="#f1f3f4" stroke="#ffffff" stroke-width="1"/>
+<text x="891.0" y="702.1" text-anchor="middle" class="cell" style="fill:#202124">H throughout</text>
+<rect x="944" y="677" width="106" height="38" fill="#f1f3f4" stroke="#ffffff" stroke-width="1"/>
+<text x="997.0" y="702.1" text-anchor="middle" class="cell" style="fill:#202124">H throughout</text>
+<rect x="1050" y="677" width="106" height="38" fill="#f1f3f4" stroke="#ffffff" stroke-width="1"/>
+<text x="1103.0" y="702.1" text-anchor="middle" class="cell" style="fill:#202124">H throughout</text>
+<rect x="1156" y="677" width="106" height="38" fill="#f1f3f4" stroke="#ffffff" stroke-width="1"/>
+<text x="1209.0" y="702.1" text-anchor="middle" class="cell" style="fill:#202124">H throughout</text>
+<rect x="1262" y="677" width="106" height="38" fill="#f1f3f4" stroke="#ffffff" stroke-width="1"/>
+<text x="1315.0" y="702.1" text-anchor="middle" class="cell" style="fill:#202124">H throughout 1/2</text>
+<rect x="1368" y="677" width="106" height="38" fill="#f1f3f4" stroke="#ffffff" stroke-width="1"/>
+<text x="1421.0" y="702.1" text-anchor="middle" class="cell" style="fill:#202124">H throughout 1/2</text>
+<text transform="translate(149.0 724) rotate(55)" text-anchor="start" class="axis">1</text>
+<text transform="translate(255.0 724) rotate(55)" text-anchor="start" class="axis">2</text>
+<text transform="translate(361.0 724) rotate(55)" text-anchor="start" class="axis">4</text>
+<text transform="translate(467.0 724) rotate(55)" text-anchor="start" class="axis">8</text>
+<text transform="translate(573.0 724) rotate(55)" text-anchor="start" class="axis">16</text>
+<text transform="translate(679.0 724) rotate(55)" text-anchor="start" class="axis">32</text>
+<text transform="translate(785.0 724) rotate(55)" text-anchor="start" class="axis">64</text>
+<text transform="translate(891.0 724) rotate(55)" text-anchor="start" class="axis">128</text>
+<text transform="translate(997.0 724) rotate(55)" text-anchor="start" class="axis">256</text>
+<text transform="translate(1103.0 724) rotate(55)" text-anchor="start" class="axis">1,000</text>
+<text transform="translate(1209.0 724) rotate(55)" text-anchor="start" class="axis">10,000</text>
+<text transform="translate(1315.0 724) rotate(55)" text-anchor="start" class="axis">100,000</text>
+<text transform="translate(1421.0 724) rotate(55)" text-anchor="start" class="axis">1,000,000</text>
+<text transform="translate(24 430.0) rotate(-90)" text-anchor="middle" class="axis">pattern length k</text>
+<text x="785.0" y="791" text-anchor="middle" class="axis">number of patterns</text>
+<text x="28" y="820" class="panel">All overlapping matches</text>
+<text x="86" y="865.1" text-anchor="end" class="axis">4</text>
+<rect x="96" y="840" width="106" height="38" fill="#fee599" stroke="#ffffff" stroke-width="1"/>
+<text x="149.0" y="865.1" text-anchor="middle" class="cell" style="fill:#202124">H→B 3 +1</text>
+<rect x="202" y="840" width="106" height="38" fill="#fce399" stroke="#ffffff" stroke-width="1"/>
+<text x="255.0" y="865.1" text-anchor="middle" class="cell" style="fill:#202124">H→B 131</text>
+<rect x="308" y="840" width="106" height="38" fill="#dec197" stroke="#ffffff" stroke-width="1"/>
+<text x="361.0" y="865.1" text-anchor="middle" class="cell" style="fill:#202124">H→A 7.6k</text>
+<rect x="414" y="840" width="106" height="38" fill="#ddc097" stroke="#ffffff" stroke-width="1"/>
+<text x="467.0" y="865.1" text-anchor="middle" class="cell" style="fill:#202124">H→A 8.7k</text>
+<rect x="520" y="840" width="106" height="38" fill="#dcbe97" stroke="#ffffff" stroke-width="1"/>
+<text x="573.0" y="865.1" text-anchor="middle" class="cell" style="fill:#202124">H→A 11k</text>
+<rect x="626" y="840" width="106" height="38" fill="#dcbf97" stroke="#ffffff" stroke-width="1"/>
+<text x="679.0" y="865.1" text-anchor="middle" class="cell" style="fill:#202124">H→A 9.8k</text>
+<rect x="732" y="840" width="106" height="38" fill="#ddc097" stroke="#ffffff" stroke-width="1"/>
+<text x="785.0" y="865.1" text-anchor="middle" class="cell" style="fill:#202124">H→A 9.1k</text>
+<rect x="838" y="840" width="106" height="38" fill="#d5b797" stroke="#ffffff" stroke-width="1"/>
+<text x="891.0" y="865.1" text-anchor="middle" class="cell" style="fill:#202124">H→A 25k</text>
+<rect x="944" y="840" width="106" height="38" fill="#c7a896" stroke="#ffffff" stroke-width="1"/>
+<text x="997.0" y="865.1" text-anchor="middle" class="cell" style="fill:#202124">H→A 170k</text>
+<rect x="1050" y="840" width="106" height="38" class="missing"/>
+<rect x="1156" y="840" width="106" height="38" class="missing"/>
+<rect x="1262" y="840" width="106" height="38" class="missing"/>
+<rect x="1368" y="840" width="106" height="38" class="missing"/>
+<text x="86" y="903.1" text-anchor="end" class="axis">6</text>
+<rect x="96" y="878" width="106" height="38" fill="#fee599" stroke="#ffffff" stroke-width="1"/>
+<text x="149.0" y="903.1" text-anchor="middle" class="cell" style="fill:#202124">H→B 3</text>
+<rect x="202" y="878" width="106" height="38" fill="#fee599" stroke="#ffffff" stroke-width="1"/>
+<text x="255.0" y="903.1" text-anchor="middle" class="cell" style="fill:#202124">H→B 21</text>
+<rect x="308" y="878" width="106" height="38" fill="#ebd098" stroke="#ffffff" stroke-width="1"/>
+<text x="361.0" y="903.1" text-anchor="middle" class="cell" style="fill:#202124">H→B 1.2k +1</text>
+<rect x="414" y="878" width="106" height="38" fill="#d7ba97" stroke="#ffffff" stroke-width="1"/>
+<text x="467.0" y="903.1" text-anchor="middle" class="cell" style="fill:#202124">H→A 19k</text>
+<rect x="520" y="878" width="106" height="38" fill="#d6b897" stroke="#ffffff" stroke-width="1"/>
+<text x="573.0" y="903.1" text-anchor="middle" class="cell" style="fill:#202124">H→A 23k</text>
+<rect x="626" y="878" width="106" height="38" fill="#d4b697" stroke="#ffffff" stroke-width="1"/>
+<text x="679.0" y="903.1" text-anchor="middle" class="cell" style="fill:#202124">H→A 30k</text>
+<rect x="732" y="878" width="106" height="38" fill="#d1b296" stroke="#ffffff" stroke-width="1"/>
+<text x="785.0" y="903.1" text-anchor="middle" class="cell" style="fill:#202124">H→A 46k</text>
+<rect x="838" y="878" width="106" height="38" fill="#cdae96" stroke="#ffffff" stroke-width="1"/>
+<text x="891.0" y="903.1" text-anchor="middle" class="cell" style="fill:#202124">H→A 76k</text>
+<rect x="944" y="878" width="106" height="38" fill="#ccad96" stroke="#ffffff" stroke-width="1"/>
+<text x="997.0" y="903.1" text-anchor="middle" class="cell" style="fill:#202124">H→A 91k</text>
+<rect x="1050" y="878" width="106" height="38" fill="#c9a996" stroke="#ffffff" stroke-width="1"/>
+<text x="1103.0" y="903.1" text-anchor="middle" class="cell" style="fill:#202124">H→A 140k</text>
+<rect x="1156" y="878" width="106" height="38" class="missing"/>
+<rect x="1262" y="878" width="106" height="38" class="missing"/>
+<rect x="1368" y="878" width="106" height="38" class="missing"/>
+<text x="86" y="941.1" text-anchor="end" class="axis">8</text>
+<rect x="96" y="916" width="106" height="38" fill="#fee599" stroke="#ffffff" stroke-width="1"/>
+<text x="149.0" y="941.1" text-anchor="middle" class="cell" style="fill:#202124">H→B 1</text>
+<rect x="202" y="916" width="106" height="38" fill="#fee599" stroke="#ffffff" stroke-width="1"/>
+<text x="255.0" y="941.1" text-anchor="middle" class="cell" style="fill:#202124">H→B 55</text>
+<rect x="308" y="916" width="106" height="38" fill="#f6dc99" stroke="#ffffff" stroke-width="1"/>
+<text x="361.0" y="941.1" text-anchor="middle" class="cell" style="fill:#202124">H→B 295</text>
+<rect x="414" y="916" width="106" height="38" fill="#d5b897" stroke="#ffffff" stroke-width="1"/>
+<text x="467.0" y="941.1" text-anchor="middle" class="cell" style="fill:#202124">H→A 24k</text>
+<rect x="520" y="916" width="106" height="38" fill="#d3b596" stroke="#ffffff" stroke-width="1"/>
+<text x="573.0" y="941.1" text-anchor="middle" class="cell" style="fill:#202124">H→A 32k</text>
+<rect x="626" y="916" width="106" height="38" fill="#d1b296" stroke="#ffffff" stroke-width="1"/>
+<text x="679.0" y="941.1" text-anchor="middle" class="cell" style="fill:#202124">H→A 47k</text>
+<rect x="732" y="916" width="106" height="38" fill="#cfb096" stroke="#ffffff" stroke-width="1"/>
+<text x="785.0" y="941.1" text-anchor="middle" class="cell" style="fill:#202124">H→A 60k</text>
+<rect x="838" y="916" width="106" height="38" fill="#c7a896" stroke="#ffffff" stroke-width="1"/>
+<text x="891.0" y="941.1" text-anchor="middle" class="cell" style="fill:#202124">H→A 163k</text>
+<rect x="944" y="916" width="106" height="38" fill="#c4a596" stroke="#ffffff" stroke-width="1"/>
+<text x="997.0" y="941.1" text-anchor="middle" class="cell" style="fill:#202124">H→A 245k</text>
+<rect x="1050" y="916" width="106" height="38" fill="#b39195" stroke="#ffffff" stroke-width="1"/>
+<text x="1103.0" y="941.1" text-anchor="middle" class="cell" style="fill:#202124">H→A 2.6M</text>
+<rect x="1156" y="916" width="106" height="38" fill="#ac8994" stroke="#ffffff" stroke-width="1"/>
+<text x="1209.0" y="941.1" text-anchor="middle" class="cell" style="fill:#ffffff">H→A 6.9M</text>
+<rect x="1262" y="916" width="106" height="38" class="missing"/>
+<rect x="1368" y="916" width="106" height="38" class="missing"/>
+<text x="86" y="979.1" text-anchor="end" class="axis">10</text>
+<rect x="96" y="954" width="106" height="38" fill="#fee599" stroke="#ffffff" stroke-width="1"/>
+<text x="149.0" y="979.1" text-anchor="middle" class="cell" style="fill:#202124">H→B 4</text>
+<rect x="202" y="954" width="106" height="38" fill="#fee599" stroke="#ffffff" stroke-width="1"/>
+<text x="255.0" y="979.1" text-anchor="middle" class="cell" style="fill:#202124">H→B 21</text>
+<rect x="308" y="954" width="106" height="38" fill="#f7dd99" stroke="#ffffff" stroke-width="1"/>
+<text x="361.0" y="979.1" text-anchor="middle" class="cell" style="fill:#202124">H→B 266</text>
+<rect x="414" y="954" width="106" height="38" fill="#e5c998" stroke="#ffffff" stroke-width="1"/>
+<text x="467.0" y="979.1" text-anchor="middle" class="cell" style="fill:#202124">H→B 3.1k +1</text>
+<rect x="520" y="954" width="106" height="38" fill="#d1b396" stroke="#ffffff" stroke-width="1"/>
+<text x="573.0" y="979.1" text-anchor="middle" class="cell" style="fill:#202124">H→A 42k</text>
+<rect x="626" y="954" width="106" height="38" fill="#d0b196" stroke="#ffffff" stroke-width="1"/>
+<text x="679.0" y="979.1" text-anchor="middle" class="cell" style="fill:#202124">H→A 54k</text>
+<rect x="732" y="954" width="106" height="38" fill="#c9aa96" stroke="#ffffff" stroke-width="1"/>
+<text x="785.0" y="979.1" text-anchor="middle" class="cell" style="fill:#202124">H→A 127k</text>
+<rect x="838" y="954" width="106" height="38" fill="#c6a796" stroke="#ffffff" stroke-width="1"/>
+<text x="891.0" y="979.1" text-anchor="middle" class="cell" style="fill:#202124">H→A 187k</text>
+<rect x="944" y="954" width="106" height="38" fill="#c1a195" stroke="#ffffff" stroke-width="1"/>
+<text x="997.0" y="979.1" text-anchor="middle" class="cell" style="fill:#202124">H→A 369k</text>
+<rect x="1050" y="954" width="106" height="38" fill="#ac8994" stroke="#ffffff" stroke-width="1"/>
+<text x="1103.0" y="979.1" text-anchor="middle" class="cell" style="fill:#ffffff">H→A 6.8M</text>
+<rect x="1156" y="954" width="106" height="38" fill="#f1f3f4" stroke="#ffffff" stroke-width="1"/>
+<text x="1209.0" y="979.1" text-anchor="middle" class="cell" style="fill:#202124">H throughout</text>
+<rect x="1262" y="954" width="106" height="38" fill="#f1f3f4" stroke="#ffffff" stroke-width="1"/>
+<text x="1315.0" y="979.1" text-anchor="middle" class="cell" style="fill:#202124">H throughout 2/3</text>
+<rect x="1368" y="954" width="106" height="38" fill="#f1f3f4" stroke="#ffffff" stroke-width="1"/>
+<text x="1421.0" y="979.1" text-anchor="middle" class="cell" style="fill:#202124">H throughout 2/3</text>
+<text x="86" y="1017.1" text-anchor="end" class="axis">12</text>
+<rect x="96" y="992" width="106" height="38" fill="#f1f3f4" stroke="#ffffff" stroke-width="1"/>
+<text x="149.0" y="1017.1" text-anchor="middle" class="cell" style="fill:#202124">B throughout</text>
+<rect x="202" y="992" width="106" height="38" fill="#fee599" stroke="#ffffff" stroke-width="1"/>
+<text x="255.0" y="1017.1" text-anchor="middle" class="cell" style="fill:#202124">H→B 57</text>
+<rect x="308" y="992" width="106" height="38" fill="#fae199" stroke="#ffffff" stroke-width="1"/>
+<text x="361.0" y="1017.1" text-anchor="middle" class="cell" style="fill:#202124">H→B 165</text>
+<rect x="414" y="992" width="106" height="38" fill="#edd298" stroke="#ffffff" stroke-width="1"/>
+<text x="467.0" y="1017.1" text-anchor="middle" class="cell" style="fill:#202124">H→B 968 +1</text>
+<rect x="520" y="992" width="106" height="38" fill="#d2b396" stroke="#ffffff" stroke-width="1"/>
+<text x="573.0" y="1017.1" text-anchor="middle" class="cell" style="fill:#202124">H→A 41k</text>
+<rect x="626" y="992" width="106" height="38" fill="#ccad96" stroke="#ffffff" stroke-width="1"/>
+<text x="679.0" y="1017.1" text-anchor="middle" class="cell" style="fill:#202124">H→A 86k</text>
+<rect x="732" y="992" width="106" height="38" fill="#c9aa96" stroke="#ffffff" stroke-width="1"/>
+<text x="785.0" y="1017.1" text-anchor="middle" class="cell" style="fill:#202124">H→A 128k</text>
+<rect x="838" y="992" width="106" height="38" fill="#c5a696" stroke="#ffffff" stroke-width="1"/>
+<text x="891.0" y="1017.1" text-anchor="middle" class="cell" style="fill:#202124">H→A 214k</text>
+<rect x="944" y="992" width="106" height="38" fill="#bf9f95" stroke="#ffffff" stroke-width="1"/>
+<text x="997.0" y="1017.1" text-anchor="middle" class="cell" style="fill:#202124">H→A 488k</text>
+<rect x="1050" y="992" width="106" height="38" fill="#a37f94" stroke="#ffffff" stroke-width="1"/>
+<text x="1103.0" y="1017.1" text-anchor="middle" class="cell" style="fill:#ffffff">H→A 23M</text>
+<rect x="1156" y="992" width="106" height="38" fill="#f1f3f4" stroke="#ffffff" stroke-width="1"/>
+<text x="1209.0" y="1017.1" text-anchor="middle" class="cell" style="fill:#202124">H throughout</text>
+<rect x="1262" y="992" width="106" height="38" fill="#f1f3f4" stroke="#ffffff" stroke-width="1"/>
+<text x="1315.0" y="1017.1" text-anchor="middle" class="cell" style="fill:#202124">H throughout 2/3</text>
+<rect x="1368" y="992" width="106" height="38" fill="#f1f3f4" stroke="#ffffff" stroke-width="1"/>
+<text x="1421.0" y="1017.1" text-anchor="middle" class="cell" style="fill:#202124">H throughout 1/3</text>
+<text x="86" y="1055.1" text-anchor="end" class="axis">16</text>
+<rect x="96" y="1030" width="106" height="38" fill="#f1f3f4" stroke="#ffffff" stroke-width="1"/>
+<text x="149.0" y="1055.1" text-anchor="middle" class="cell" style="fill:#202124">B throughout</text>
+<rect x="202" y="1030" width="106" height="38" fill="#fee599" stroke="#ffffff" stroke-width="1"/>
+<text x="255.0" y="1055.1" text-anchor="middle" class="cell" style="fill:#202124">H→B 36</text>
+<rect x="308" y="1030" width="106" height="38" fill="#fbe299" stroke="#ffffff" stroke-width="1"/>
+<text x="361.0" y="1055.1" text-anchor="middle" class="cell" style="fill:#202124">H→B 152</text>
+<rect x="414" y="1030" width="106" height="38" fill="#eed398" stroke="#ffffff" stroke-width="1"/>
+<text x="467.0" y="1055.1" text-anchor="middle" class="cell" style="fill:#202124">H→B 853</text>
+<rect x="520" y="1030" width="106" height="38" fill="#dec297" stroke="#ffffff" stroke-width="1"/>
+<text x="573.0" y="1055.1" text-anchor="middle" class="cell" style="fill:#202124">H→B 7.3k +1</text>
+<rect x="626" y="1030" width="106" height="38" fill="#cbac96" stroke="#ffffff" stroke-width="1"/>
+<text x="679.0" y="1055.1" text-anchor="middle" class="cell" style="fill:#202124">H→A 103k</text>
+<rect x="732" y="1030" width="106" height="38" fill="#c7a796" stroke="#ffffff" stroke-width="1"/>
+<text x="785.0" y="1055.1" text-anchor="middle" class="cell" style="fill:#202124">H→A 180k</text>
+<rect x="838" y="1030" width="106" height="38" fill="#c09f95" stroke="#ffffff" stroke-width="1"/>
+<text x="891.0" y="1055.1" text-anchor="middle" class="cell" style="fill:#202124">H→A 471k</text>
+<rect x="944" y="1030" width="106" height="38" fill="#ba9995" stroke="#ffffff" stroke-width="1"/>
+<text x="997.0" y="1055.1" text-anchor="middle" class="cell" style="fill:#202124">H→A 960k</text>
+<rect x="1050" y="1030" width="106" height="38" fill="#a38094" stroke="#ffffff" stroke-width="1"/>
+<text x="1103.0" y="1055.1" text-anchor="middle" class="cell" style="fill:#ffffff">H→A 22M</text>
+<rect x="1156" y="1030" width="106" height="38" fill="#f1f3f4" stroke="#ffffff" stroke-width="1"/>
+<text x="1209.0" y="1055.1" text-anchor="middle" class="cell" style="fill:#202124">H throughout</text>
+<rect x="1262" y="1030" width="106" height="38" fill="#f1f3f4" stroke="#ffffff" stroke-width="1"/>
+<text x="1315.0" y="1055.1" text-anchor="middle" class="cell" style="fill:#202124">H throughout 2/3</text>
+<rect x="1368" y="1030" width="106" height="38" fill="#f1f3f4" stroke="#ffffff" stroke-width="1"/>
+<text x="1421.0" y="1055.1" text-anchor="middle" class="cell" style="fill:#202124">H throughout 1/3</text>
+<text x="86" y="1093.1" text-anchor="end" class="axis">20</text>
+<rect x="96" y="1068" width="106" height="38" fill="#f1f3f4" stroke="#ffffff" stroke-width="1"/>
+<text x="149.0" y="1093.1" text-anchor="middle" class="cell" style="fill:#202124">B throughout</text>
+<rect x="202" y="1068" width="106" height="38" fill="#fee599" stroke="#ffffff" stroke-width="1"/>
+<text x="255.0" y="1093.1" text-anchor="middle" class="cell" style="fill:#202124">H→B 51</text>
+<rect x="308" y="1068" width="106" height="38" fill="#fce399" stroke="#ffffff" stroke-width="1"/>
+<text x="361.0" y="1093.1" text-anchor="middle" class="cell" style="fill:#202124">H→B 125</text>
+<rect x="414" y="1068" width="106" height="38" fill="#f1d798" stroke="#ffffff" stroke-width="1"/>
+<text x="467.0" y="1093.1" text-anchor="middle" class="cell" style="fill:#202124">H→B 575</text>
+<rect x="520" y="1068" width="106" height="38" fill="#e5c998" stroke="#ffffff" stroke-width="1"/>
+<text x="573.0" y="1093.1" text-anchor="middle" class="cell" style="fill:#202124">H→B 2.8k +1</text>
+<rect x="626" y="1068" width="106" height="38" fill="#caab96" stroke="#ffffff" stroke-width="1"/>
+<text x="679.0" y="1093.1" text-anchor="middle" class="cell" style="fill:#202124">H→A 111k</text>
+<rect x="732" y="1068" width="106" height="38" fill="#c4a496" stroke="#ffffff" stroke-width="1"/>
+<text x="785.0" y="1093.1" text-anchor="middle" class="cell" style="fill:#202124">H→A 250k</text>
+<rect x="838" y="1068" width="106" height="38" fill="#c1a195" stroke="#ffffff" stroke-width="1"/>
+<text x="891.0" y="1093.1" text-anchor="middle" class="cell" style="fill:#202124">H→A 367k</text>
+<rect x="944" y="1068" width="106" height="38" fill="#b89795" stroke="#ffffff" stroke-width="1"/>
+<text x="997.0" y="1093.1" text-anchor="middle" class="cell" style="fill:#202124">H→A 1.3M</text>
+<rect x="1050" y="1068" width="106" height="38" fill="#9f7b93" stroke="#ffffff" stroke-width="1"/>
+<text x="1103.0" y="1093.1" text-anchor="middle" class="cell" style="fill:#ffffff">H→A 37M</text>
+<rect x="1156" y="1068" width="106" height="38" fill="#f1f3f4" stroke="#ffffff" stroke-width="1"/>
+<text x="1209.0" y="1093.1" text-anchor="middle" class="cell" style="fill:#202124">H throughout</text>
+<rect x="1262" y="1068" width="106" height="38" fill="#f1f3f4" stroke="#ffffff" stroke-width="1"/>
+<text x="1315.0" y="1093.1" text-anchor="middle" class="cell" style="fill:#202124">H throughout 2/3</text>
+<rect x="1368" y="1068" width="106" height="38" fill="#f1f3f4" stroke="#ffffff" stroke-width="1"/>
+<text x="1421.0" y="1093.1" text-anchor="middle" class="cell" style="fill:#202124">H throughout 1/3</text>
+<text x="86" y="1131.1" text-anchor="end" class="axis">24</text>
+<rect x="96" y="1106" width="106" height="38" fill="#f1f3f4" stroke="#ffffff" stroke-width="1"/>
+<text x="149.0" y="1131.1" text-anchor="middle" class="cell" style="fill:#202124">B throughout</text>
+<rect x="202" y="1106" width="106" height="38" fill="#fee599" stroke="#ffffff" stroke-width="1"/>
+<text x="255.0" y="1131.1" text-anchor="middle" class="cell" style="fill:#202124">H→B 31</text>
+<rect x="308" y="1106" width="106" height="38" fill="#fce399" stroke="#ffffff" stroke-width="1"/>
+<text x="361.0" y="1131.1" text-anchor="middle" class="cell" style="fill:#202124">H→B 132</text>
+<rect x="414" y="1106" width="106" height="38" fill="#f2d898" stroke="#ffffff" stroke-width="1"/>
+<text x="467.0" y="1131.1" text-anchor="middle" class="cell" style="fill:#202124">H→B 500</text>
+<rect x="520" y="1106" width="106" height="38" fill="#e9ce98" stroke="#ffffff" stroke-width="1"/>
+<text x="573.0" y="1131.1" text-anchor="middle" class="cell" style="fill:#202124">H→B 1.7k +1</text>
+<rect x="626" y="1106" width="106" height="38" fill="#c6a796" stroke="#ffffff" stroke-width="1"/>
+<text x="679.0" y="1131.1" text-anchor="middle" class="cell" style="fill:#202124">H→A 186k</text>
+<rect x="732" y="1106" width="106" height="38" fill="#c5a596" stroke="#ffffff" stroke-width="1"/>
+<text x="785.0" y="1131.1" text-anchor="middle" class="cell" style="fill:#202124">H→A 223k</text>
+<rect x="838" y="1106" width="106" height="38" fill="#bc9b95" stroke="#ffffff" stroke-width="1"/>
+<text x="891.0" y="1131.1" text-anchor="middle" class="cell" style="fill:#202124">H→A 748k</text>
+<rect x="944" y="1106" width="106" height="38" fill="#b99795" stroke="#ffffff" stroke-width="1"/>
+<text x="997.0" y="1131.1" text-anchor="middle" class="cell" style="fill:#202124">H→A 1.2M</text>
+<rect x="1050" y="1106" width="106" height="38" fill="#f1f3f4" stroke="#ffffff" stroke-width="1"/>
+<text x="1103.0" y="1131.1" text-anchor="middle" class="cell" style="fill:#202124">H throughout</text>
+<rect x="1156" y="1106" width="106" height="38" fill="#f1f3f4" stroke="#ffffff" stroke-width="1"/>
+<text x="1209.0" y="1131.1" text-anchor="middle" class="cell" style="fill:#202124">H throughout</text>
+<rect x="1262" y="1106" width="106" height="38" fill="#f1f3f4" stroke="#ffffff" stroke-width="1"/>
+<text x="1315.0" y="1131.1" text-anchor="middle" class="cell" style="fill:#202124">H throughout 2/3</text>
+<rect x="1368" y="1106" width="106" height="38" fill="#f1f3f4" stroke="#ffffff" stroke-width="1"/>
+<text x="1421.0" y="1131.1" text-anchor="middle" class="cell" style="fill:#202124">H throughout 1/3</text>
+<text x="86" y="1169.1" text-anchor="end" class="axis">31</text>
+<rect x="96" y="1144" width="106" height="38" fill="#f1f3f4" stroke="#ffffff" stroke-width="1"/>
+<text x="149.0" y="1169.1" text-anchor="middle" class="cell" style="fill:#202124">B throughout</text>
+<rect x="202" y="1144" width="106" height="38" fill="#fee599" stroke="#ffffff" stroke-width="1"/>
+<text x="255.0" y="1169.1" text-anchor="middle" class="cell" style="fill:#202124">H→B 51</text>
+<rect x="308" y="1144" width="106" height="38" fill="#fbe299" stroke="#ffffff" stroke-width="1"/>
+<text x="361.0" y="1169.1" text-anchor="middle" class="cell" style="fill:#202124">H→B 141</text>
+<rect x="414" y="1144" width="106" height="38" fill="#f2d898" stroke="#ffffff" stroke-width="1"/>
+<text x="467.0" y="1169.1" text-anchor="middle" class="cell" style="fill:#202124">H→B 476</text>
+<rect x="520" y="1144" width="106" height="38" fill="#eacf98" stroke="#ffffff" stroke-width="1"/>
+<text x="573.0" y="1169.1" text-anchor="middle" class="cell" style="fill:#202124">H→B 1.5k</text>
+<rect x="626" y="1144" width="106" height="38" fill="#d6b897" stroke="#ffffff" stroke-width="1"/>
+<text x="679.0" y="1169.1" text-anchor="middle" class="cell" style="fill:#202124">H→B 22k +1</text>
+<rect x="732" y="1144" width="106" height="38" fill="#c1a195" stroke="#ffffff" stroke-width="1"/>
+<text x="785.0" y="1169.1" text-anchor="middle" class="cell" style="fill:#202124">H→A 386k</text>
+<rect x="838" y="1144" width="106" height="38" fill="#bd9d95" stroke="#ffffff" stroke-width="1"/>
+<text x="891.0" y="1169.1" text-anchor="middle" class="cell" style="fill:#202124">H→A 632k</text>
+<rect x="944" y="1144" width="106" height="38" fill="#b59395" stroke="#ffffff" stroke-width="1"/>
+<text x="997.0" y="1169.1" text-anchor="middle" class="cell" style="fill:#202124">H→A 2.0M</text>
+<rect x="1050" y="1144" width="106" height="38" fill="#f1f3f4" stroke="#ffffff" stroke-width="1"/>
+<text x="1103.0" y="1169.1" text-anchor="middle" class="cell" style="fill:#202124">H throughout</text>
+<rect x="1156" y="1144" width="106" height="38" fill="#f1f3f4" stroke="#ffffff" stroke-width="1"/>
+<text x="1209.0" y="1169.1" text-anchor="middle" class="cell" style="fill:#202124">H throughout</text>
+<rect x="1262" y="1144" width="106" height="38" fill="#f1f3f4" stroke="#ffffff" stroke-width="1"/>
+<text x="1315.0" y="1169.1" text-anchor="middle" class="cell" style="fill:#202124">H throughout 2/3</text>
+<rect x="1368" y="1144" width="106" height="38" fill="#f1f3f4" stroke="#ffffff" stroke-width="1"/>
+<text x="1421.0" y="1169.1" text-anchor="middle" class="cell" style="fill:#202124">H throughout 1/3</text>
+<text x="86" y="1207.1" text-anchor="end" class="axis">40</text>
+<rect x="96" y="1182" width="106" height="38" fill="#f1f3f4" stroke="#ffffff" stroke-width="1"/>
+<text x="149.0" y="1207.1" text-anchor="middle" class="cell" style="fill:#202124">B throughout</text>
+<rect x="202" y="1182" width="106" height="38" fill="#fee599" stroke="#ffffff" stroke-width="1"/>
+<text x="255.0" y="1207.1" text-anchor="middle" class="cell" style="fill:#202124">H→B 35</text>
+<rect x="308" y="1182" width="106" height="38" fill="#fbe299" stroke="#ffffff" stroke-width="1"/>
+<text x="361.0" y="1207.1" text-anchor="middle" class="cell" style="fill:#202124">H→B 142</text>
+<rect x="414" y="1182" width="106" height="38" fill="#f2d898" stroke="#ffffff" stroke-width="1"/>
+<text x="467.0" y="1207.1" text-anchor="middle" class="cell" style="fill:#202124">H→B 475</text>
+<rect x="520" y="1182" width="106" height="38" fill="#ebcf98" stroke="#ffffff" stroke-width="1"/>
+<text x="573.0" y="1207.1" text-anchor="middle" class="cell" style="fill:#202124">H→B 1.4k</text>
+<rect x="626" y="1182" width="106" height="38" fill="#e0c497" stroke="#ffffff" stroke-width="1"/>
+<text x="679.0" y="1207.1" text-anchor="middle" class="cell" style="fill:#202124">H→B 5.6k +1</text>
+<rect x="732" y="1182" width="106" height="38" fill="#bf9e95" stroke="#ffffff" stroke-width="1"/>
+<text x="785.0" y="1207.1" text-anchor="middle" class="cell" style="fill:#202124">H→A 523k</text>
+<rect x="838" y="1182" width="106" height="38" fill="#bb9a95" stroke="#ffffff" stroke-width="1"/>
+<text x="891.0" y="1207.1" text-anchor="middle" class="cell" style="fill:#202124">H→A 851k</text>
+<rect x="944" y="1182" width="106" height="38" fill="#af8c94" stroke="#ffffff" stroke-width="1"/>
+<text x="997.0" y="1207.1" text-anchor="middle" class="cell" style="fill:#202124">H→A 4.7M</text>
+<rect x="1050" y="1182" width="106" height="38" fill="#f1f3f4" stroke="#ffffff" stroke-width="1"/>
+<text x="1103.0" y="1207.1" text-anchor="middle" class="cell" style="fill:#202124">H throughout</text>
+<rect x="1156" y="1182" width="106" height="38" fill="#f1f3f4" stroke="#ffffff" stroke-width="1"/>
+<text x="1209.0" y="1207.1" text-anchor="middle" class="cell" style="fill:#202124">H throughout</text>
+<rect x="1262" y="1182" width="106" height="38" fill="#f1f3f4" stroke="#ffffff" stroke-width="1"/>
+<text x="1315.0" y="1207.1" text-anchor="middle" class="cell" style="fill:#202124">H throughout 2/3</text>
+<rect x="1368" y="1182" width="106" height="38" fill="#f1f3f4" stroke="#ffffff" stroke-width="1"/>
+<text x="1421.0" y="1207.1" text-anchor="middle" class="cell" style="fill:#202124">H throughout 1/3</text>
+<text x="86" y="1245.1" text-anchor="end" class="axis">48</text>
+<rect x="96" y="1220" width="106" height="38" fill="#f1f3f4" stroke="#ffffff" stroke-width="1"/>
+<text x="149.0" y="1245.1" text-anchor="middle" class="cell" style="fill:#202124">B throughout</text>
+<rect x="202" y="1220" width="106" height="38" fill="#fee599" stroke="#ffffff" stroke-width="1"/>
+<text x="255.0" y="1245.1" text-anchor="middle" class="cell" style="fill:#202124">H→B 45</text>
+<rect x="308" y="1220" width="106" height="38" fill="#fce399" stroke="#ffffff" stroke-width="1"/>
+<text x="361.0" y="1245.1" text-anchor="middle" class="cell" style="fill:#202124">H→B 126</text>
+<rect x="414" y="1220" width="106" height="38" fill="#f3d898" stroke="#ffffff" stroke-width="1"/>
+<text x="467.0" y="1245.1" text-anchor="middle" class="cell" style="fill:#202124">H→B 474</text>
+<rect x="520" y="1220" width="106" height="38" fill="#ecd198" stroke="#ffffff" stroke-width="1"/>
+<text x="573.0" y="1245.1" text-anchor="middle" class="cell" style="fill:#202124">H→B 1.2k</text>
+<rect x="626" y="1220" width="106" height="38" fill="#e1c597" stroke="#ffffff" stroke-width="1"/>
+<text x="679.0" y="1245.1" text-anchor="middle" class="cell" style="fill:#202124">H→B 4.8k +1</text>
+<rect x="732" y="1220" width="106" height="38" fill="#bc9c95" stroke="#ffffff" stroke-width="1"/>
+<text x="785.0" y="1245.1" text-anchor="middle" class="cell" style="fill:#202124">H→A 723k</text>
+<rect x="838" y="1220" width="106" height="38" fill="#b79595" stroke="#ffffff" stroke-width="1"/>
+<text x="891.0" y="1245.1" text-anchor="middle" class="cell" style="fill:#202124">H→A 1.6M</text>
+<rect x="944" y="1220" width="106" height="38" fill="#ad8b94" stroke="#ffffff" stroke-width="1"/>
+<text x="997.0" y="1245.1" text-anchor="middle" class="cell" style="fill:#202124">H→A 5.5M</text>
+<rect x="1050" y="1220" width="106" height="38" fill="#f1f3f4" stroke="#ffffff" stroke-width="1"/>
+<text x="1103.0" y="1245.1" text-anchor="middle" class="cell" style="fill:#202124">H throughout</text>
+<rect x="1156" y="1220" width="106" height="38" fill="#f1f3f4" stroke="#ffffff" stroke-width="1"/>
+<text x="1209.0" y="1245.1" text-anchor="middle" class="cell" style="fill:#202124">H throughout</text>
+<rect x="1262" y="1220" width="106" height="38" fill="#f1f3f4" stroke="#ffffff" stroke-width="1"/>
+<text x="1315.0" y="1245.1" text-anchor="middle" class="cell" style="fill:#202124">H throughout 2/3</text>
+<rect x="1368" y="1220" width="106" height="38" fill="#f1f3f4" stroke="#ffffff" stroke-width="1"/>
+<text x="1421.0" y="1245.1" text-anchor="middle" class="cell" style="fill:#202124">H throughout 1/3</text>
+<text x="86" y="1283.1" text-anchor="end" class="axis">64</text>
+<rect x="96" y="1258" width="106" height="38" fill="#fee599" stroke="#ffffff" stroke-width="1"/>
+<text x="149.0" y="1283.1" text-anchor="middle" class="cell" style="fill:#202124">H→B 5</text>
+<rect x="202" y="1258" width="106" height="38" fill="#fee599" stroke="#ffffff" stroke-width="1"/>
+<text x="255.0" y="1283.1" text-anchor="middle" class="cell" style="fill:#202124">H→B 59</text>
+<rect x="308" y="1258" width="106" height="38" fill="#fbe199" stroke="#ffffff" stroke-width="1"/>
+<text x="361.0" y="1283.1" text-anchor="middle" class="cell" style="fill:#202124">H→B 160</text>
+<rect x="414" y="1258" width="106" height="38" fill="#f4da98" stroke="#ffffff" stroke-width="1"/>
+<text x="467.0" y="1283.1" text-anchor="middle" class="cell" style="fill:#202124">H→B 376</text>
+<rect x="520" y="1258" width="106" height="38" fill="#ecd198" stroke="#ffffff" stroke-width="1"/>
+<text x="573.0" y="1283.1" text-anchor="middle" class="cell" style="fill:#202124">H→B 1.1k</text>
+<rect x="626" y="1258" width="106" height="38" fill="#e3c797" stroke="#ffffff" stroke-width="1"/>
+<text x="679.0" y="1283.1" text-anchor="middle" class="cell" style="fill:#202124">H→B 3.7k</text>
+<rect x="732" y="1258" width="106" height="38" fill="#d9bc97" stroke="#ffffff" stroke-width="1"/>
+<text x="785.0" y="1283.1" text-anchor="middle" class="cell" style="fill:#202124">H→B 14k +1</text>
+<rect x="838" y="1258" width="106" height="38" fill="#af8d94" stroke="#ffffff" stroke-width="1"/>
+<text x="891.0" y="1283.1" text-anchor="middle" class="cell" style="fill:#202124">H→A 4.2M</text>
+<rect x="944" y="1258" width="106" height="38" fill="#a07c93" stroke="#ffffff" stroke-width="1"/>
+<text x="997.0" y="1283.1" text-anchor="middle" class="cell" style="fill:#ffffff">H→A 35M</text>
+<rect x="1050" y="1258" width="106" height="38" fill="#f1f3f4" stroke="#ffffff" stroke-width="1"/>
+<text x="1103.0" y="1283.1" text-anchor="middle" class="cell" style="fill:#202124">H throughout</text>
+<rect x="1156" y="1258" width="106" height="38" fill="#f1f3f4" stroke="#ffffff" stroke-width="1"/>
+<text x="1209.0" y="1283.1" text-anchor="middle" class="cell" style="fill:#202124">H throughout</text>
+<rect x="1262" y="1258" width="106" height="38" fill="#f1f3f4" stroke="#ffffff" stroke-width="1"/>
+<text x="1315.0" y="1283.1" text-anchor="middle" class="cell" style="fill:#202124">H throughout 1/3</text>
+<rect x="1368" y="1258" width="106" height="38" fill="#f1f3f4" stroke="#ffffff" stroke-width="1"/>
+<text x="1421.0" y="1283.1" text-anchor="middle" class="cell" style="fill:#202124">H throughout 1/3</text>
+<text x="86" y="1321.1" text-anchor="end" class="axis">80</text>
+<rect x="96" y="1296" width="106" height="38" fill="#d2b496" stroke="#ffffff" stroke-width="1"/>
+<text x="149.0" y="1321.1" text-anchor="middle" class="cell" style="fill:#202124">H→A 38k</text>
+<rect x="202" y="1296" width="106" height="38" fill="#f1f3f4" stroke="#ffffff" stroke-width="1"/>
+<text x="255.0" y="1321.1" text-anchor="middle" class="cell" style="fill:#202124">H throughout</text>
+<rect x="308" y="1296" width="106" height="38" fill="#c8a996" stroke="#ffffff" stroke-width="1"/>
+<text x="361.0" y="1321.1" text-anchor="middle" class="cell" style="fill:#202124">H→A 151k</text>
+<rect x="414" y="1296" width="106" height="38" fill="#c3a396" stroke="#ffffff" stroke-width="1"/>
+<text x="467.0" y="1321.1" text-anchor="middle" class="cell" style="fill:#202124">H→A 302k</text>
+<rect x="520" y="1296" width="106" height="38" fill="#c09f95" stroke="#ffffff" stroke-width="1"/>
+<text x="573.0" y="1321.1" text-anchor="middle" class="cell" style="fill:#202124">H→A 470k</text>
+<rect x="626" y="1296" width="106" height="38" fill="#b89795" stroke="#ffffff" stroke-width="1"/>
+<text x="679.0" y="1321.1" text-anchor="middle" class="cell" style="fill:#202124">H→A 1.3M</text>
+<rect x="732" y="1296" width="106" height="38" fill="#b18f94" stroke="#ffffff" stroke-width="1"/>
+<text x="785.0" y="1321.1" text-anchor="middle" class="cell" style="fill:#202124">H→A 3.3M</text>
+<rect x="838" y="1296" width="106" height="38" fill="#a37f94" stroke="#ffffff" stroke-width="1"/>
+<text x="891.0" y="1321.1" text-anchor="middle" class="cell" style="fill:#ffffff">H→A 23M</text>
+<rect x="944" y="1296" width="106" height="38" fill="#9d7993" stroke="#ffffff" stroke-width="1"/>
+<text x="997.0" y="1321.1" text-anchor="middle" class="cell" style="fill:#ffffff">H→A 51M</text>
+<rect x="1050" y="1296" width="106" height="38" fill="#f1f3f4" stroke="#ffffff" stroke-width="1"/>
+<text x="1103.0" y="1321.1" text-anchor="middle" class="cell" style="fill:#202124">H throughout</text>
+<rect x="1156" y="1296" width="106" height="38" fill="#f1f3f4" stroke="#ffffff" stroke-width="1"/>
+<text x="1209.0" y="1321.1" text-anchor="middle" class="cell" style="fill:#202124">H throughout</text>
+<rect x="1262" y="1296" width="106" height="38" fill="#f1f3f4" stroke="#ffffff" stroke-width="1"/>
+<text x="1315.0" y="1321.1" text-anchor="middle" class="cell" style="fill:#202124">H throughout 1/2</text>
+<rect x="1368" y="1296" width="106" height="38" fill="#f1f3f4" stroke="#ffffff" stroke-width="1"/>
+<text x="1421.0" y="1321.1" text-anchor="middle" class="cell" style="fill:#202124">H throughout 1/2</text>
+<text x="86" y="1359.1" text-anchor="end" class="axis">96</text>
+<rect x="96" y="1334" width="106" height="38" fill="#d1b296" stroke="#ffffff" stroke-width="1"/>
+<text x="149.0" y="1359.1" text-anchor="middle" class="cell" style="fill:#202124">H→A 46k</text>
+<rect x="202" y="1334" width="106" height="38" fill="#f1f3f4" stroke="#ffffff" stroke-width="1"/>
+<text x="255.0" y="1359.1" text-anchor="middle" class="cell" style="fill:#202124">H throughout</text>
+<rect x="308" y="1334" width="106" height="38" fill="#c5a596" stroke="#ffffff" stroke-width="1"/>
+<text x="361.0" y="1359.1" text-anchor="middle" class="cell" style="fill:#202124">H→A 234k</text>
+<rect x="414" y="1334" width="106" height="38" fill="#c0a095" stroke="#ffffff" stroke-width="1"/>
+<text x="467.0" y="1359.1" text-anchor="middle" class="cell" style="fill:#202124">H→A 443k</text>
+<rect x="520" y="1334" width="106" height="38" fill="#bd9d95" stroke="#ffffff" stroke-width="1"/>
+<text x="573.0" y="1359.1" text-anchor="middle" class="cell" style="fill:#202124">H→A 654k</text>
+<rect x="626" y="1334" width="106" height="38" fill="#b59395" stroke="#ffffff" stroke-width="1"/>
+<text x="679.0" y="1359.1" text-anchor="middle" class="cell" style="fill:#202124">H→A 2.0M</text>
+<rect x="732" y="1334" width="106" height="38" fill="#b18f94" stroke="#ffffff" stroke-width="1"/>
+<text x="785.0" y="1359.1" text-anchor="middle" class="cell" style="fill:#202124">H→A 3.2M</text>
+<rect x="838" y="1334" width="106" height="38" fill="#f1f3f4" stroke="#ffffff" stroke-width="1"/>
+<text x="891.0" y="1359.1" text-anchor="middle" class="cell" style="fill:#202124">H throughout</text>
+<rect x="944" y="1334" width="106" height="38" fill="#f1f3f4" stroke="#ffffff" stroke-width="1"/>
+<text x="997.0" y="1359.1" text-anchor="middle" class="cell" style="fill:#202124">H throughout</text>
+<rect x="1050" y="1334" width="106" height="38" fill="#f1f3f4" stroke="#ffffff" stroke-width="1"/>
+<text x="1103.0" y="1359.1" text-anchor="middle" class="cell" style="fill:#202124">H throughout</text>
+<rect x="1156" y="1334" width="106" height="38" fill="#f1f3f4" stroke="#ffffff" stroke-width="1"/>
+<text x="1209.0" y="1359.1" text-anchor="middle" class="cell" style="fill:#202124">H throughout</text>
+<rect x="1262" y="1334" width="106" height="38" fill="#f1f3f4" stroke="#ffffff" stroke-width="1"/>
+<text x="1315.0" y="1359.1" text-anchor="middle" class="cell" style="fill:#202124">H throughout 1/2</text>
+<rect x="1368" y="1334" width="106" height="38" fill="#f1f3f4" stroke="#ffffff" stroke-width="1"/>
+<text x="1421.0" y="1359.1" text-anchor="middle" class="cell" style="fill:#202124">H throughout 1/2</text>
+<text x="86" y="1397.1" text-anchor="end" class="axis">128</text>
+<rect x="96" y="1372" width="106" height="38" fill="#cdae96" stroke="#ffffff" stroke-width="1"/>
+<text x="149.0" y="1397.1" text-anchor="middle" class="cell" style="fill:#202124">H→A 76k</text>
+<rect x="202" y="1372" width="106" height="38" fill="#f1f3f4" stroke="#ffffff" stroke-width="1"/>
+<text x="255.0" y="1397.1" text-anchor="middle" class="cell" style="fill:#202124">H throughout</text>
+<rect x="308" y="1372" width="106" height="38" fill="#c09f95" stroke="#ffffff" stroke-width="1"/>
+<text x="361.0" y="1397.1" text-anchor="middle" class="cell" style="fill:#202124">H→A 462k</text>
+<rect x="414" y="1372" width="106" height="38" fill="#bd9c95" stroke="#ffffff" stroke-width="1"/>
+<text x="467.0" y="1397.1" text-anchor="middle" class="cell" style="fill:#202124">H→A 683k</text>
+<rect x="520" y="1372" width="106" height="38" fill="#b18f94" stroke="#ffffff" stroke-width="1"/>
+<text x="573.0" y="1397.1" text-anchor="middle" class="cell" style="fill:#202124">H→A 3.3M</text>
+<rect x="626" y="1372" width="106" height="38" fill="#f1f3f4" stroke="#ffffff" stroke-width="1"/>
+<text x="679.0" y="1397.1" text-anchor="middle" class="cell" style="fill:#202124">H throughout</text>
+<rect x="732" y="1372" width="106" height="38" fill="#f1f3f4" stroke="#ffffff" stroke-width="1"/>
+<text x="785.0" y="1397.1" text-anchor="middle" class="cell" style="fill:#202124">H throughout</text>
+<rect x="838" y="1372" width="106" height="38" fill="#f1f3f4" stroke="#ffffff" stroke-width="1"/>
+<text x="891.0" y="1397.1" text-anchor="middle" class="cell" style="fill:#202124">H throughout</text>
+<rect x="944" y="1372" width="106" height="38" fill="#f1f3f4" stroke="#ffffff" stroke-width="1"/>
+<text x="997.0" y="1397.1" text-anchor="middle" class="cell" style="fill:#202124">H throughout</text>
+<rect x="1050" y="1372" width="106" height="38" fill="#f1f3f4" stroke="#ffffff" stroke-width="1"/>
+<text x="1103.0" y="1397.1" text-anchor="middle" class="cell" style="fill:#202124">H throughout</text>
+<rect x="1156" y="1372" width="106" height="38" fill="#f1f3f4" stroke="#ffffff" stroke-width="1"/>
+<text x="1209.0" y="1397.1" text-anchor="middle" class="cell" style="fill:#202124">H throughout</text>
+<rect x="1262" y="1372" width="106" height="38" fill="#f1f3f4" stroke="#ffffff" stroke-width="1"/>
+<text x="1315.0" y="1397.1" text-anchor="middle" class="cell" style="fill:#202124">H throughout 1/2</text>
+<rect x="1368" y="1372" width="106" height="38" fill="#f1f3f4" stroke="#ffffff" stroke-width="1"/>
+<text x="1421.0" y="1397.1" text-anchor="middle" class="cell" style="fill:#202124">H throughout 1/2</text>
+<text transform="translate(149.0 1419) rotate(55)" text-anchor="start" class="axis">1</text>
+<text transform="translate(255.0 1419) rotate(55)" text-anchor="start" class="axis">2</text>
+<text transform="translate(361.0 1419) rotate(55)" text-anchor="start" class="axis">4</text>
+<text transform="translate(467.0 1419) rotate(55)" text-anchor="start" class="axis">8</text>
+<text transform="translate(573.0 1419) rotate(55)" text-anchor="start" class="axis">16</text>
+<text transform="translate(679.0 1419) rotate(55)" text-anchor="start" class="axis">32</text>
+<text transform="translate(785.0 1419) rotate(55)" text-anchor="start" class="axis">64</text>
+<text transform="translate(891.0 1419) rotate(55)" text-anchor="start" class="axis">128</text>
+<text transform="translate(997.0 1419) rotate(55)" text-anchor="start" class="axis">256</text>
+<text transform="translate(1103.0 1419) rotate(55)" text-anchor="start" class="axis">1,000</text>
+<text transform="translate(1209.0 1419) rotate(55)" text-anchor="start" class="axis">10,000</text>
+<text transform="translate(1315.0 1419) rotate(55)" text-anchor="start" class="axis">100,000</text>
+<text transform="translate(1421.0 1419) rotate(55)" text-anchor="start" class="axis">1,000,000</text>
+<text transform="translate(24 1125.0) rotate(-90)" text-anchor="middle" class="axis">pattern length k</text>
+<text x="785.0" y="1486" text-anchor="middle" class="axis">number of patterns</text>
+</svg>

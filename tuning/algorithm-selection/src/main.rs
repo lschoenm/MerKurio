@@ -84,11 +84,10 @@ struct Config {
     algorithms: Vec<Algorithm>,
     modes: Vec<SearchMode>,
     sequence_length: usize,
-    sequences_per_bank: usize,
+    total_bases_per_cell: usize,
     target_patterns_per_cell: usize,
     max_banks: usize,
     runs: usize,
-    target_run_ms: u64,
     max_sample_ms: u64,
     cell_timeout_seconds: u64,
     seed: u64,
@@ -116,13 +115,12 @@ impl Default for Config {
             algorithms: Algorithm::ALL.to_vec(),
             modes: SearchMode::ALL.to_vec(),
             sequence_length: 150,
-            sequences_per_bank: 256,
+            total_bases_per_cell: 100_000_000,
             target_patterns_per_cell: 256,
             max_banks: 64,
-            runs: 12,
-            target_run_ms: 20,
-            max_sample_ms: 1_000,
-            cell_timeout_seconds: 30,
+            runs: 5,
+            max_sample_ms: 2_000,
+            cell_timeout_seconds: 60,
             seed: DEFAULT_SEED,
             output: results.join("algorithm_sweep.csv"),
             status_output: results.join("cell_status.csv"),
@@ -172,8 +170,8 @@ impl Config {
                 "--sequence-length" => {
                     config.sequence_length = parse_usize(&value(&mut args, &flag)?, &flag)?
                 }
-                "--sequences" => {
-                    config.sequences_per_bank = parse_usize(&value(&mut args, &flag)?, &flag)?
+                "--total-bases" => {
+                    config.total_bases_per_cell = parse_usize(&value(&mut args, &flag)?, &flag)?
                 }
                 "--target-patterns-per-cell" => {
                     config.target_patterns_per_cell = parse_usize(&value(&mut args, &flag)?, &flag)?
@@ -181,9 +179,6 @@ impl Config {
                 "--max-banks" => config.max_banks = parse_usize(&value(&mut args, &flag)?, &flag)?,
                 "--runs" | "--samples" => {
                     config.runs = parse_usize(&value(&mut args, &flag)?, &flag)?
-                }
-                "--target-ms" => {
-                    config.target_run_ms = parse_u64(&value(&mut args, &flag)?, &flag)?
                 }
                 "--max-sample-ms" => {
                     config.max_sample_ms = parse_u64(&value(&mut args, &flag)?, &flag)?
@@ -256,18 +251,14 @@ impl Config {
         }
         if self.pattern_counts[0] == 0
             || self.sequence_length == 0
-            || self.sequences_per_bank == 0
+            || self.total_bases_per_cell == 0
             || self.target_patterns_per_cell == 0
             || self.max_banks == 0
             || self.runs == 0
-            || self.target_run_ms == 0
             || self.max_sample_ms == 0
             || self.cell_timeout_seconds == 0
         {
             return Err("All counts and timing limits must be positive.".to_string());
-        }
-        if !self.sequences_per_bank.is_multiple_of(2) {
-            return Err("sequences must be even for balanced insertion.".to_string());
         }
         Ok(())
     }
@@ -276,6 +267,16 @@ impl Config {
         self.target_patterns_per_cell
             .div_ceil(pattern_count)
             .clamp(1, self.max_banks)
+    }
+
+    fn sequences_per_bank(&self, pattern_count: usize) -> usize {
+        let bank_count = self.bank_count(pattern_count);
+        let total_sequences = self.total_bases_per_cell.div_ceil(self.sequence_length);
+        let mut sequences = total_sequences.div_ceil(bank_count);
+        if !sequences.is_multiple_of(2) {
+            sequences += 1;
+        }
+        sequences
     }
 }
 
@@ -314,13 +315,12 @@ Options:
   --algorithms LIST            bndmq,hash,aho_corasick [default: all]
   --modes LIST                 first,all [default: both]
   --sequence-length N          Bases per sequence [default: 150]
-  --sequences N                Sequences per independent bank [default: 256]
+  --total-bases N              Approximate bases across all banks [default: 100000000]
   --target-patterns-per-cell N Target aggregate pattern count at small p [default: 256]
   --max-banks N                Maximum independent pattern banks [default: 64]
-  --runs N                     Measurement rounds [default: 12]
-  --target-ms N                Approximate minimum duration per timed run [default: 20]
-  --max-sample-ms N            Reject a cell if one search iteration exceeds this [default: 1000]
-  --cell-timeout-seconds N     Hard timeout for a worker cell [default: 30]
+  --runs N                     Single-pass measurement rounds [default: 5]
+  --max-sample-ms N            Reject a cell if one end-to-end iteration exceeds this [default: 2000]
+  --cell-timeout-seconds N     Hard timeout for a worker cell [default: 60]
   --seed N                     Deterministic unsigned integer seed
   --output PATH                Raw successful timing CSV
   --status-output PATH         Cell status CSV
@@ -411,13 +411,14 @@ fn build_matcher(patterns: &[String], algorithm: Algorithm) -> Result<PatternMat
     result.map_err(|error| error.to_string())
 }
 
-struct MatcherBank {
-    matcher: PatternMatcher,
+struct PreparedBank {
+    patterns: Vec<String>,
     sequences: Vec<Vec<u8>>,
 }
 
-fn build_banks(config: &Config, worker: &WorkerConfig) -> Result<Vec<MatcherBank>, String> {
+fn prepare_banks(config: &Config, worker: &WorkerConfig) -> Vec<PreparedBank> {
     let bank_count = config.bank_count(worker.pattern_count);
+    let sequences_per_bank = config.sequences_per_bank(worker.pattern_count);
     let mut banks = Vec::with_capacity(bank_count);
 
     for bank_index in 0..bank_count {
@@ -426,10 +427,9 @@ fn build_banks(config: &Config, worker: &WorkerConfig) -> Result<Vec<MatcherBank
             ^ (worker.pattern_count as u64).wrapping_mul(0xe703_7ed1_a0b4_28db)
             ^ (bank_index as u64).wrapping_mul(0x8ebc_6af0_9c88_c6e3);
         let patterns = build_patterns(bank_seed, worker.k, worker.pattern_count);
-        let matcher = build_matcher(&patterns, worker.algorithm)?;
         let mut rng = SplitMix64::new(bank_seed ^ 0x5899_65cc_7537_4cc3);
-        let mut sequences = Vec::with_capacity(config.sequences_per_bank);
-        for sequence_index in 0..config.sequences_per_bank {
+        let mut sequences = Vec::with_capacity(sequences_per_bank);
+        for sequence_index in 0..sequences_per_bank {
             let mut sequence = random_dna(&mut rng, config.sequence_length);
             if sequence_index.is_multiple_of(2) {
                 let pattern = patterns[rng.range(patterns.len())].as_bytes();
@@ -438,9 +438,22 @@ fn build_banks(config: &Config, worker: &WorkerConfig) -> Result<Vec<MatcherBank
             }
             sequences.push(sequence);
         }
-        banks.push(MatcherBank { matcher, sequences });
+        banks.push(PreparedBank {
+            patterns,
+            sequences,
+        });
     }
-    Ok(banks)
+    banks
+}
+
+fn build_matchers(
+    banks: &[PreparedBank],
+    algorithm: Algorithm,
+) -> Result<Vec<PatternMatcher>, String> {
+    banks
+        .iter()
+        .map(|bank| build_matcher(&bank.patterns, algorithm))
+        .collect()
 }
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
@@ -460,7 +473,8 @@ fn mix_event(mut value: u64) -> u64 {
 }
 
 fn search_banks(
-    banks: &[MatcherBank],
+    matchers: &[PatternMatcher],
+    banks: &[PreparedBank],
     bank_order: &[usize],
     mode: SearchMode,
     iterations: usize,
@@ -473,11 +487,12 @@ fn search_banks(
     for _ in 0..iterations {
         for &bank_index in bank_order {
             let bank = &banks[bank_index];
+            let matcher = &matchers[bank_index];
             for (sequence_index, sequence) in bank.sequences.iter().enumerate() {
                 let sequence = black_box(sequence.as_slice());
                 match mode {
                     SearchMode::First => {
-                        if bank.matcher.find_any(sequence) {
+                        if matcher.find_any(sequence) {
                             result.matching_records += 1;
                             result.matches += 1;
                             result.checksum = result.checksum.wrapping_add(mix_event(
@@ -487,7 +502,7 @@ fn search_banks(
                     }
                     SearchMode::All => {
                         let mut matched = false;
-                        bank.matcher.for_each_match(sequence, |hit| {
+                        matcher.for_each_match(sequence, |hit| {
                             matched = true;
                             result.matches += 1;
                             result.checksum = result.checksum.wrapping_add(mix_event(
@@ -508,15 +523,48 @@ fn search_banks(
     black_box(result)
 }
 
-fn timed_search(
-    banks: &[MatcherBank],
+struct EndToEndTiming {
+    total_ns: u128,
+    build_ns: u128,
+    search_ns: u128,
+    result: SearchResult,
+}
+
+fn timed_end_to_end(
+    banks: &[PreparedBank],
+    algorithm: Algorithm,
     bank_order: &[usize],
     mode: SearchMode,
     iterations: usize,
-) -> (u128, SearchResult) {
-    let start = Instant::now();
-    let result = search_banks(banks, bank_order, mode, iterations);
-    (start.elapsed().as_nanos(), result)
+) -> Result<EndToEndTiming, String> {
+    let total_start = Instant::now();
+    let mut build_ns = 0;
+    let mut search_ns = 0;
+    let mut result = SearchResult {
+        checksum: 0,
+        matching_records: 0,
+        matches: 0,
+    };
+
+    for _ in 0..iterations {
+        let build_start = Instant::now();
+        let matchers = build_matchers(banks, algorithm)?;
+        build_ns += build_start.elapsed().as_nanos();
+
+        let search_start = Instant::now();
+        let iteration_result = search_banks(&matchers, banks, bank_order, mode, 1);
+        search_ns += search_start.elapsed().as_nanos();
+        result.checksum = result.checksum.wrapping_add(iteration_result.checksum);
+        result.matching_records += iteration_result.matching_records;
+        result.matches += iteration_result.matches;
+    }
+
+    Ok(EndToEndTiming {
+        total_ns: total_start.elapsed().as_nanos(),
+        build_ns,
+        search_ns,
+        result: black_box(result),
+    })
 }
 
 enum WorkerOutcome {
@@ -525,34 +573,24 @@ enum WorkerOutcome {
 }
 
 fn run_worker(config: &Config, worker: &WorkerConfig) -> Result<WorkerOutcome, String> {
-    let build_start = Instant::now();
-    let banks = build_banks(config, worker)?;
-    let build_ns = build_start.elapsed().as_nanos();
+    let banks = prepare_banks(config, worker);
     let natural_order: Vec<usize> = (0..banks.len()).collect();
-    let validation = search_banks(&banks, &natural_order, worker.mode, 1);
-    let (calibration_ns, _) = timed_search(&banks, &natural_order, worker.mode, 1);
-    let calibration_ms = calibration_ns as f64 / 1_000_000.0;
-    if calibration_ns > u128::from(config.max_sample_ms) * 1_000_000 {
+    let calibration = timed_end_to_end(&banks, worker.algorithm, &natural_order, worker.mode, 1)?;
+    let calibration_ms = calibration.total_ns as f64 / 1_000_000.0;
+    if calibration.total_ns > u128::from(config.max_sample_ms) * 1_000_000 {
         return Ok(WorkerOutcome::SoftTimeout(format!(
-            "single iteration took {calibration_ms:.3} ms"
+            "one matcher-build plus corpus-search iteration took {calibration_ms:.3} ms"
         )));
     }
-
-    let target_ns = u128::from(config.target_run_ms) * 1_000_000;
-    let iterations = target_ns.div_ceil(calibration_ns.max(1)).clamp(1, 100_000) as usize;
-    black_box(search_banks(
-        &banks,
-        &natural_order,
-        worker.mode,
-        iterations,
-    ));
+    let validation = calibration.result;
+    let mut first_timing = Some(calibration);
 
     if let Some(parent) = worker.output.parent() {
         fs::create_dir_all(parent).map_err(|error| error.to_string())?;
     }
     let mut output =
         BufWriter::new(File::create(&worker.output).map_err(|error| error.to_string())?);
-    let bases_per_iteration = banks
+    let bases = banks
         .iter()
         .map(|bank| bank.sequences.iter().map(Vec::len).sum::<usize>())
         .sum::<usize>();
@@ -567,25 +605,36 @@ fn run_worker(config: &Config, worker: &WorkerConfig) -> Result<WorkerOutcome, S
     );
 
     for run_index in 0..config.runs {
-        let mut bank_order = natural_order.clone();
-        round_rng.shuffle(&mut bank_order);
-        let (elapsed_ns, timed_result) = timed_search(&banks, &bank_order, worker.mode, iterations);
-        let bases = bases_per_iteration.saturating_mul(iterations);
-        let ns_per_base = elapsed_ns as f64 / bases as f64;
+        let timing = if let Some(timing) = first_timing.take() {
+            timing
+        } else {
+            let mut bank_order = natural_order.clone();
+            round_rng.shuffle(&mut bank_order);
+            timed_end_to_end(&banks, worker.algorithm, &bank_order, worker.mode, 1)?
+        };
+        let fixed_ns_per_matcher = (timing.total_ns - timing.search_ns) as f64 / banks.len() as f64;
+        let build_ns_per_matcher = timing.build_ns as f64 / banks.len() as f64;
+        let search_ns_per_base = timing.search_ns as f64 / bases as f64;
+        let reference_total_ns = fixed_ns_per_matcher + timing.search_ns as f64;
+        let reference_ns_per_base = reference_total_ns / bases as f64;
         writeln!(
             output,
-            "{},{},{},{},{run_index},{iterations},{},{},{},{build_ns},{bases},{elapsed_ns},{ns_per_base:.9},{},{},{},{}",
+            "{},{},{},{},{run_index},1,{},{},{},{},{bases},{},{},{},{fixed_ns_per_matcher:.3},{build_ns_per_matcher:.3},{search_ns_per_base:.9},{reference_total_ns:.3},{reference_ns_per_base:.9},{},{},{},{}",
             worker.k,
             worker.pattern_count,
             worker.algorithm.name(),
             worker.mode.name(),
             banks.len(),
-            config.sequences_per_bank,
+            banks[0].sequences.len(),
             config.sequence_length,
+            config.total_bases_per_cell,
+            timing.build_ns,
+            timing.search_ns,
+            timing.total_ns,
             validation.checksum,
             validation.matching_records,
             validation.matches,
-            timed_result.checksum,
+            timing.result.checksum,
         )
         .map_err(|error| error.to_string())?;
     }
@@ -638,6 +687,14 @@ fn write_metadata(config: &Config) -> std::io::Result<()> {
     )?;
     writeln!(output, "system={}", command_output("uname", &["-a"]))?;
     writeln!(output, "corpus=mixed_inserted_50_percent")?;
+    writeln!(
+        output,
+        "primary_metric=one_matcher_fixed_cost_plus_direct_cell_search_ns_per_base"
+    )?;
+    writeln!(
+        output,
+        "workload_preparation=pattern_and_sequence_generation_excluded"
+    )?;
     writeln!(output, "k_values={}", join_usize(&config.k_values))?;
     writeln!(
         output,
@@ -665,7 +722,11 @@ fn write_metadata(config: &Config) -> std::io::Result<()> {
             .join(",")
     )?;
     writeln!(output, "sequence_length={}", config.sequence_length)?;
-    writeln!(output, "sequences_per_bank={}", config.sequences_per_bank)?;
+    writeln!(
+        output,
+        "total_bases_per_cell={}",
+        config.total_bases_per_cell
+    )?;
     writeln!(
         output,
         "target_patterns_per_cell={}",
@@ -673,7 +734,6 @@ fn write_metadata(config: &Config) -> std::io::Result<()> {
     )?;
     writeln!(output, "max_banks={}", config.max_banks)?;
     writeln!(output, "runs={}", config.runs)?;
-    writeln!(output, "target_run_ms={}", config.target_run_ms)?;
     writeln!(output, "max_sample_ms={}", config.max_sample_ms)?;
     writeln!(
         output,
@@ -716,14 +776,13 @@ fn run_worker_process(
         .args(["--worker-mode", worker.mode.name()])
         .args(["--worker-output", &temporary_output.display().to_string()])
         .args(["--sequence-length", &config.sequence_length.to_string()])
-        .args(["--sequences", &config.sequences_per_bank.to_string()])
+        .args(["--total-bases", &config.total_bases_per_cell.to_string()])
         .args([
             "--target-patterns-per-cell",
             &config.target_patterns_per_cell.to_string(),
         ])
         .args(["--max-banks", &config.max_banks.to_string()])
         .args(["--runs", &config.runs.to_string()])
-        .args(["--target-ms", &config.target_run_ms.to_string()])
         .args(["--max-sample-ms", &config.max_sample_ms.to_string()])
         .args([
             "--cell-timeout-seconds",
@@ -802,7 +861,7 @@ fn run_parent(config: &Config) -> Result<(), Box<dyn std::error::Error>> {
     let mut raw = BufWriter::new(File::create(&config.output)?);
     writeln!(
         raw,
-        "k,patterns,algorithm,mode,run,iterations,banks,sequences_per_bank,sequence_length,build_ns,bases,elapsed_ns,ns_per_base,validation_checksum,matching_records,matches,timed_checksum"
+        "k,patterns,algorithm,mode,run,iterations,banks,sequences_per_bank,sequence_length,target_bases_per_cell,bases,build_ns,search_ns,total_ns,fixed_ns_per_matcher,build_ns_per_matcher,search_ns_per_base,reference_total_ns,reference_ns_per_base,validation_checksum,matching_records,matches,timed_checksum"
     )?;
     raw.flush()?;
     let mut statuses = BufWriter::new(File::create(&config.status_output)?);
@@ -927,11 +986,10 @@ mod tuning_tests {
     fn small_config() -> Config {
         Config {
             sequence_length: 40,
-            sequences_per_bank: 8,
+            total_bases_per_cell: 640,
             target_patterns_per_cell: 8,
             max_banks: 2,
             runs: 1,
-            target_run_ms: 1,
             max_sample_ms: 100,
             ..Config::default()
         }
@@ -948,6 +1006,29 @@ mod tuning_tests {
     }
 
     #[test]
+    fn total_corpus_budget_is_distributed_evenly_across_banks() {
+        let config = Config {
+            sequence_length: 150,
+            total_bases_per_cell: 100_000,
+            target_patterns_per_cell: 256,
+            max_banks: 64,
+            ..Config::default()
+        };
+
+        for pattern_count in [1, 16, 256] {
+            let banks = config.bank_count(pattern_count);
+            let sequences = config.sequences_per_bank(pattern_count);
+            let actual_bases = banks * sequences * config.sequence_length;
+
+            assert!(sequences.is_multiple_of(2));
+            assert!(actual_bases >= config.total_bases_per_cell);
+            assert!(
+                actual_bases - config.total_bases_per_cell < 2 * banks * config.sequence_length
+            );
+        }
+    }
+
+    #[test]
     fn production_algorithms_agree_on_small_corpus() {
         let config = small_config();
         let mut results = Vec::new();
@@ -959,9 +1040,10 @@ mod tuning_tests {
                 mode: SearchMode::All,
                 output: PathBuf::new(),
             };
-            let banks = build_banks(&config, &worker).unwrap();
+            let banks = prepare_banks(&config, &worker);
+            let matchers = build_matchers(&banks, algorithm).unwrap();
             let order: Vec<usize> = (0..banks.len()).collect();
-            results.push(search_banks(&banks, &order, SearchMode::All, 1));
+            results.push(search_banks(&matchers, &banks, &order, SearchMode::All, 1));
         }
 
         assert!(results.windows(2).all(|pair| pair[0] == pair[1]));

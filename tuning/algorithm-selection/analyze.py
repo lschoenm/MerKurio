@@ -2,6 +2,7 @@
 
 import csv
 import math
+import random
 import statistics
 from collections import defaultdict
 from pathlib import Path
@@ -15,9 +16,10 @@ SUMMARY = RESULTS / "algorithm_summary.csv"
 WINNERS = RESULTS / "algorithm_winners.csv"
 SELECTION_MAP = RESULTS / "selection_map.svg"
 CROSSOVER_PLOT = RESULTS / "crossover_curves.svg"
-REGRET_TABLE = RESULTS / "selector_regret.csv"
-REGRET_PLOT = RESULTS / "selector_regret.svg"
-SELECTOR_RULES = RESULTS / "selector_rules.txt"
+CORPUS_REGIONS = RESULTS / "corpus_size_regions.csv"
+CORPUS_CROSSOVERS = RESULTS / "corpus_size_crossovers.csv"
+CORPUS_CROSSOVER_PLOT = RESULTS / "corpus_size_crossovers.svg"
+CORPUS_MODELS = RESULTS / "corpus_size_models.csv"
 MODES = ("first", "all")
 ALGORITHMS = ("bndmq", "hash", "aho_corasick")
 COLORS = {
@@ -34,8 +36,11 @@ LABELS = {
 
 def load_raw():
     timings = defaultdict(list)
-    build_times = {}
+    search_timings = defaultdict(list)
+    build_times = defaultdict(list)
+    corpus_model_samples = defaultdict(list)
     validation = defaultdict(dict)
+    reference_bases = set()
     with RAW.open(newline="") as handle:
         for row in csv.DictReader(handle):
             key = (
@@ -44,8 +49,16 @@ def load_raw():
                 row["mode"],
                 row["algorithm"],
             )
-            timings[key].append(float(row["ns_per_base"]))
-            build_times[key] = int(row["build_ns"])
+            timings[key].append(float(row["reference_ns_per_base"]))
+            search_timings[key].append(float(row["search_ns_per_base"]))
+            build_times[key].append(float(row["build_ns_per_matcher"]) / 1_000_000.0)
+            corpus_model_samples[key].append(
+                (
+                    float(row["fixed_ns_per_matcher"]),
+                    float(row["search_ns_per_base"]),
+                )
+            )
+            reference_bases.add(int(row["target_bases_per_cell"]))
             cell = key[:3]
             observed = (
                 int(row["validation_checksum"]),
@@ -55,7 +68,16 @@ def load_raw():
             previous = validation[cell].setdefault(key[3], observed)
             if previous != observed:
                 raise SystemExit(f"Inconsistent validation result within {key}")
-    return timings, build_times, validation
+    if len(reference_bases) != 1:
+        raise SystemExit("Raw results contain inconsistent target corpus sizes.")
+    return (
+        timings,
+        search_timings,
+        build_times,
+        corpus_model_samples,
+        validation,
+        reference_bases.pop(),
+    )
 
 
 def load_statuses():
@@ -83,7 +105,7 @@ def validate_algorithms(validation):
             raise SystemExit(f"Algorithm result mismatch at {cell}: {details}")
 
 
-def summarize(timings, build_times):
+def summarize(timings, search_timings, build_times):
     summary = {}
     for key, values in timings.items():
         summary[key] = {
@@ -93,7 +115,8 @@ def summarize(timings, build_times):
             "stddev": statistics.stdev(values) if len(values) > 1 else 0.0,
             "minimum": min(values),
             "maximum": max(values),
-            "build_ns": build_times[key],
+            "search_median": statistics.median(search_timings[key]),
+            "build_ms": statistics.median(build_times[key]),
         }
     return summary
 
@@ -107,7 +130,7 @@ def write_tables(summary):
         )
 
     with SUMMARY.open("w", newline="") as handle:
-        writer = csv.writer(handle)
+        writer = csv.writer(handle, lineterminator="\n")
         writer.writerow(
             [
                 "k",
@@ -115,12 +138,13 @@ def write_tables(summary):
                 "mode",
                 "algorithm",
                 "runs",
-                "build_ms",
-                "median_ns_per_base",
-                "mean_ns_per_base",
-                "stddev_ns_per_base",
-                "min_ns_per_base",
-                "max_ns_per_base",
+                "median_build_ms_per_matcher",
+                "median_search_ns_per_base",
+                "median_reference_ns_per_base",
+                "mean_reference_ns_per_base",
+                "stddev_reference_ns_per_base",
+                "min_reference_ns_per_base",
+                "max_reference_ns_per_base",
                 "slower_than_best_pct",
             ]
         )
@@ -136,7 +160,8 @@ def write_tables(summary):
                     mode,
                     algorithm,
                     values["runs"],
-                    f"{values['build_ns'] / 1_000_000.0:.3f}",
+                    f"{values['build_ms']:.6f}",
+                    f"{values['search_median']:.9f}",
                     f"{values['median']:.9f}",
                     f"{values['mean']:.9f}",
                     f"{values['stddev']:.9f}",
@@ -148,14 +173,14 @@ def write_tables(summary):
 
     winners = {}
     with WINNERS.open("w", newline="") as handle:
-        writer = csv.writer(handle)
+        writer = csv.writer(handle, lineterminator="\n")
         writer.writerow(
             [
                 "k",
                 "patterns",
                 "mode",
                 "best_algorithm",
-                "median_ns_per_base",
+                "median_reference_ns_per_base",
                 "second_algorithm",
                 "margin_pct",
             ]
@@ -201,7 +226,7 @@ def write_tables(summary):
     return winners
 
 
-def write_selection_map(winners, statuses):
+def write_selection_map(winners, statuses, reference_bases):
     k_values = sorted({key[0] for key in statuses})
     pattern_counts = sorted({key[1] for key in statuses})
     modes = [mode for mode in MODES if any(key[2] == mode for key in statuses)]
@@ -210,7 +235,7 @@ def write_selection_map(winners, statuses):
     left = 96
     right = 28
     top = 130
-    panel_gap = 100
+    panel_gap = 130
     panel_height = len(k_values) * cell_height
     width = max(720, left + len(pattern_counts) * cell_width + right)
     height = top + len(modes) * panel_height + max(0, len(modes) - 1) * panel_gap + 100
@@ -225,7 +250,9 @@ def write_selection_map(winners, statuses):
         '.cell{font-size:12px;font-weight:650;fill:#ffffff}.tie{stroke:#202124;'
         'stroke-width:2}.missing{fill:#e8eaed;stroke:#ffffff;stroke-width:1}</style>',
         '<text x="28" y="31" class="title">Pattern-matching algorithm selection</text>',
-        '<text x="28" y="53" class="subtitle">Cell color is the lowest median time; dark outline means &lt;3% over runner-up</text>',
+        '<text x="28" y="53" class="subtitle">Cell color is the lowest median '
+        f'{compact_bases(reference_bases)}-base reference time; dark outline '
+        'means &lt;3% over runner-up</text>',
     ]
 
     legend_x = 28
@@ -310,7 +337,7 @@ def polyline(points, color, width=2.0):
     )
 
 
-def write_crossover_plot(summary, statuses):
+def write_crossover_plot(summary, statuses, reference_bases):
     k_values = sorted({key[0] for key in statuses})
     pattern_counts = sorted({key[1] for key in statuses})
     modes = [mode for mode in MODES if any(key[2] == mode for key in statuses)]
@@ -362,7 +389,8 @@ def write_crossover_plot(summary, statuses):
         'font-weight:600}.axis{font-size:11px}.grid{stroke:#dadce0;stroke-width:1}'
         '.frame{stroke:#5f6368;stroke-width:1;fill:none}</style>',
         '<text x="28" y="31" class="title">Algorithm crossover curves</text>',
-        '<text x="28" y="53" class="subtitle">Runtime relative to the fastest available algorithm in each cell'
+        '<text x="28" y="53" class="subtitle">Reference runtime at '
+        f'{compact_bases(reference_bases)} bases relative to the fastest available algorithm'
         f"{clipping_note}</text>",
     ]
     legend_x = 28
@@ -470,97 +498,6 @@ def write_crossover_plot(summary, statuses):
     CROSSOVER_PLOT.write_text("\n".join(svg) + "\n")
 
 
-def split_timing_rounds(timings):
-    training = {}
-    evaluation = {}
-    for key, values in timings.items():
-        split = max(1, len(values) // 2)
-        training[key] = statistics.median(values[:split])
-        held_out = values[split:]
-        evaluation[key] = statistics.median(held_out if held_out else values[-1:])
-    return training, evaluation
-
-
-def cell_times_by_mode(timings, mode):
-    cells = defaultdict(dict)
-    for (k, patterns, candidate_mode, algorithm), value in timings.items():
-        if candidate_mode == mode:
-            cells[(k, patterns)][algorithm] = value
-    return cells
-
-
-def leaf_choice(samples):
-    best_algorithm = None
-    best_loss = float("inf")
-    for algorithm in ALGORITHMS:
-        loss = 0.0
-        for _k, _patterns, times in samples:
-            oracle = min(times.values())
-            selected = times.get(algorithm, oracle * 10.0)
-            loss += math.log(max(1.0, selected / oracle))
-        if loss < best_loss:
-            best_algorithm = algorithm
-            best_loss = loss
-    return best_algorithm, best_loss
-
-
-def fit_selector(samples, depth=0, max_depth=4):
-    algorithm, base_loss = leaf_choice(samples)
-    if depth >= max_depth or len(samples) < 4:
-        return {"algorithm": algorithm}
-
-    best_split = None
-    for feature_index, feature in ((0, "k"), (1, "patterns")):
-        values = sorted({sample[feature_index] for sample in samples})
-        for lower, upper in zip(values, values[1:]):
-            threshold = (lower + upper) / 2.0
-            left = [sample for sample in samples if sample[feature_index] <= threshold]
-            right = [sample for sample in samples if sample[feature_index] > threshold]
-            if not left or not right:
-                continue
-            _left_algorithm, left_loss = leaf_choice(left)
-            _right_algorithm, right_loss = leaf_choice(right)
-            split_loss = left_loss + right_loss
-            if best_split is None or split_loss < best_split["loss"]:
-                best_split = {
-                    "feature": feature,
-                    "threshold": threshold,
-                    "left": left,
-                    "right": right,
-                    "loss": split_loss,
-                }
-
-    if best_split is None or best_split["loss"] >= base_loss - 1e-9:
-        return {"algorithm": algorithm}
-    return {
-        "feature": best_split["feature"],
-        "threshold": best_split["threshold"],
-        "left": fit_selector(best_split["left"], depth + 1, max_depth),
-        "right": fit_selector(best_split["right"], depth + 1, max_depth),
-    }
-
-
-def predict_selector(tree, k, patterns):
-    while "algorithm" not in tree:
-        value = k if tree["feature"] == "k" else patterns
-        tree = tree["left"] if value <= tree["threshold"] else tree["right"]
-    return tree["algorithm"]
-
-
-def format_selector(tree, indent=""):
-    if "algorithm" in tree:
-        return [f"{indent}use {tree['algorithm']}"]
-    threshold = tree["threshold"]
-    threshold_text = (
-        str(int(threshold)) if threshold.is_integer() else f"{threshold:.1f}"
-    )
-    lines = [f"{indent}if {tree['feature']} <= {threshold_text}:"]
-    lines.extend(format_selector(tree["left"], indent + "  "))
-    lines.append(f"{indent}else:")
-    lines.extend(format_selector(tree["right"], indent + "  "))
-    return lines
-
-
 def percentile(values, percentile_value):
     if not values:
         return None
@@ -574,126 +511,121 @@ def percentile(values, percentile_value):
     return ordered[lower] * (1.0 - fraction) + ordered[upper] * fraction
 
 
-def evaluate_selectors(timings, statuses):
-    training, evaluation = split_timing_rounds(timings)
-    modes = sorted(
-        {key[2] for key in statuses},
-        key=lambda mode: MODES.index(mode) if mode in MODES else len(MODES),
-    )
-    trees = {}
-    regrets = {}
-    rule_lines = [
-        "Shallow selector fitted on the first half of timing rounds.",
-        "Regret is evaluated on the held-out second half.",
-        "Missing/timed-out algorithms receive a 10x training penalty.",
-        "",
-    ]
+def lower_envelope(lines):
+    if not lines:
+        return []
+    boundaries = {0.0}
+    choices = list(lines.items())
+    for index, (_left_algorithm, (left_fixed, left_rate)) in enumerate(choices):
+        for _right_algorithm, (right_fixed, right_rate) in choices[index + 1 :]:
+            rate_difference = left_rate - right_rate
+            if abs(rate_difference) < 1e-15:
+                continue
+            crossing = (right_fixed - left_fixed) / rate_difference
+            if crossing > 0 and math.isfinite(crossing):
+                boundaries.add(crossing)
 
-    for mode in modes:
-        training_cells = cell_times_by_mode(training, mode)
-        samples = [
-            (k, patterns, times)
-            for (k, patterns), times in sorted(training_cells.items())
-        ]
-        if not samples:
-            continue
-        tree = fit_selector(samples)
-        trees[mode] = tree
-        rule_lines.append(f"[{mode}]")
-        rule_lines.extend(format_selector(tree))
-        rule_lines.append("")
-
-        evaluation_cells = cell_times_by_mode(evaluation, mode)
-        for (k, patterns), times in evaluation_cells.items():
-            selected = predict_selector(tree, k, patterns)
-            oracle_algorithm, oracle_time = min(
-                times.items(), key=lambda item: item[1]
-            )
-            selected_time = times.get(selected)
-            regrets[(k, patterns, mode)] = {
-                "selected": selected,
-                "oracle": oracle_algorithm,
-                "regret": (
-                    None
-                    if selected_time is None
-                    else (selected_time / oracle_time - 1.0) * 100.0
-                ),
-                "selected_time": selected_time,
-                "oracle_time": oracle_time,
-            }
-    SELECTOR_RULES.write_text("\n".join(rule_lines))
-    return regrets, trees
-
-
-def regret_color(value):
-    if value is None:
-        return "#e8eaed"
-    stops = [
-        (0.0, (24, 128, 56)),
-        (3.0, (251, 188, 4)),
-        (10.0, (242, 153, 0)),
-        (25.0, (217, 48, 37)),
-    ]
-    clipped = max(0.0, min(25.0, value))
-    for (left_value, left_color), (right_value, right_color) in zip(
-        stops, stops[1:]
-    ):
-        if clipped <= right_value:
-            fraction = (clipped - left_value) / (right_value - left_value)
-            color = tuple(
-                round(left + (right - left) * fraction)
-                for left, right in zip(left_color, right_color)
-            )
-            return f"#{color[0]:02x}{color[1]:02x}{color[2]:02x}"
-    return "#d93025"
-
-
-def write_regret_outputs(regrets, statuses):
-    with REGRET_TABLE.open("w", newline="") as handle:
-        writer = csv.writer(handle)
-        writer.writerow(
-            [
-                "k",
-                "patterns",
-                "mode",
-                "selected_algorithm",
-                "oracle_algorithm",
-                "held_out_regret_pct",
-                "selected_ns_per_base",
-                "oracle_ns_per_base",
-            ]
+    ordered = sorted(boundaries)
+    interval_winners = []
+    for index, lower in enumerate(ordered):
+        if index + 1 < len(ordered):
+            probe = (lower + ordered[index + 1]) / 2.0
+        else:
+            probe = max(1.0, lower * 2.0 + 1.0)
+        winner = min(
+            lines,
+            key=lambda algorithm: lines[algorithm][0]
+            + lines[algorithm][1] * probe,
         )
-        for (k, patterns, mode), values in sorted(regrets.items()):
-            writer.writerow(
-                [
-                    k,
-                    patterns,
-                    mode,
-                    values["selected"],
-                    values["oracle"],
-                    (
-                        ""
-                        if values["regret"] is None
-                        else f"{values['regret']:.4f}"
-                    ),
-                    (
-                        ""
-                        if values["selected_time"] is None
-                        else f"{values['selected_time']:.9f}"
-                    ),
-                    f"{values['oracle_time']:.9f}",
-                ]
-            )
+        if not interval_winners or interval_winners[-1] != winner:
+            interval_winners.append(winner)
 
+    regions = []
+    start = 0.0
+    for index, algorithm in enumerate(interval_winners):
+        if index + 1 < len(interval_winners):
+            next_algorithm = interval_winners[index + 1]
+            fixed, rate = lines[algorithm]
+            next_fixed, next_rate = lines[next_algorithm]
+            end = (next_fixed - fixed) / (rate - next_rate)
+        else:
+            end = None
+        regions.append(
+            {
+                "algorithm": algorithm,
+                "start": start,
+                "end": end,
+            }
+        )
+        if end is not None:
+            start = end
+    return regions
+
+
+def bootstrap_transition_intervals(samples, point_regions, seed, rounds=1000):
+    transitions = [
+        (region["algorithm"], point_regions[index + 1]["algorithm"])
+        for index, region in enumerate(point_regions[:-1])
+    ]
+    observed = {transition: [] for transition in transitions}
+    rng = random.Random(seed)
+
+    for _ in range(rounds):
+        lines = {}
+        for algorithm, values in samples.items():
+            resampled = [values[rng.randrange(len(values))] for _ in values]
+            lines[algorithm] = (
+                statistics.median(value[0] for value in resampled),
+                statistics.median(value[1] for value in resampled),
+            )
+        regions = lower_envelope(lines)
+        for index, region in enumerate(regions[:-1]):
+            transition = (region["algorithm"], regions[index + 1]["algorithm"])
+            if transition in observed:
+                observed[transition].append(region["end"])
+
+    intervals = {}
+    for transition, values in observed.items():
+        intervals[transition] = {
+            "low": percentile(values, 0.025),
+            "high": percentile(values, 0.975),
+            "support": len(values) / rounds * 100.0,
+        }
+    return intervals
+
+
+def compact_bases(value):
+    suffixes = ((1e12, "T"), (1e9, "G"), (1e6, "M"), (1e3, "k"))
+    for scale, suffix in suffixes:
+        if value >= scale:
+            scaled = value / scale
+            precision = 0 if scaled >= 10 else 1
+            return f"{scaled:.{precision}f}{suffix}"
+    return f"{value:.0f}"
+
+
+def corpus_crossover_color(value):
+    logarithm = max(2.0, min(12.0, math.log10(max(1.0, value))))
+    fraction = (logarithm - 2.0) / 10.0
+    start = (254, 229, 153)
+    end = (84, 39, 143)
+    color = tuple(
+        round(left + (right - left) * fraction)
+        for left, right in zip(start, end)
+    )
+    return f"#{color[0]:02x}{color[1]:02x}{color[2]:02x}", fraction
+
+
+def write_corpus_crossover_plot(regions_by_cell, availability, statuses):
     k_values = sorted({key[0] for key in statuses})
     pattern_counts = sorted({key[1] for key in statuses})
     modes = [mode for mode in MODES if any(key[2] == mode for key in statuses)]
-    cell_width = max(64, min(94, 1160 // max(1, len(pattern_counts))))
-    cell_height = max(27, min(42, 540 // max(1, len(k_values))))
+    cell_width = max(82, min(106, 1400 // max(1, len(pattern_counts))))
+    cell_height = max(28, min(38, 600 // max(1, len(k_values))))
     left, right, top = 96, 28, 145
-    panel_gap = 130
+    panel_gap = 125
     panel_height = len(k_values) * cell_height
-    width = max(760, left + len(pattern_counts) * cell_width + right)
+    width = max(880, left + len(pattern_counts) * cell_width + right)
     height = (
         top
         + len(modes) * panel_height
@@ -701,65 +633,36 @@ def write_regret_outputs(regrets, statuses):
         + 105
     )
 
-    summaries = {}
-    for mode in modes:
-        values = [
-            result["regret"]
-            for key, result in regrets.items()
-            if key[2] == mode and result["regret"] is not None
-        ]
-        summaries[mode] = {
-            "median": statistics.median(values) if values else None,
-            "p95": percentile(values, 0.95),
-            "maximum": max(values) if values else None,
-        }
-
     svg = [
         f'<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" '
         f'viewBox="0 0 {width} {height}">',
         '<rect width="100%" height="100%" fill="#ffffff"/>',
         '<style>text{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;'
         'fill:#202124}.title{font-size:21px;font-weight:650}.subtitle{font-size:14px;'
-        'fill:#5f6368}.panel{font-size:17px;font-weight:600}.axis{font-size:12px}'
-        '.cell{font-size:11px;font-weight:650}.missing{fill:#e8eaed;stroke:#ffffff;'
+        'fill:#5f6368}.panel{font-size:17px;font-weight:600}.axis{font-size:11px}'
+        '.cell{font-size:10px;font-weight:650}.missing{fill:#e8eaed;stroke:#ffffff;'
         'stroke-width:1}</style>',
-        '<text x="28" y="31" class="title">Held-out selector regret</text>',
-        '<text x="28" y="53" class="subtitle">Shallow decision tree trained on the first half of rounds; slowdown versus held-out cell oracle</text>',
+        '<text x="28" y="31" class="title">Corpus-size algorithm crossovers (in searched bases)</text>',
+        '<text x="28" y="53" class="subtitle">First lower-envelope transition among successful algorithms; +N marks additional transitions</text>',
+        '<text x="28" y="82" class="axis">earlier crossover</text>',
     ]
-    legend = [(0, "#188038"), (3, "#fbbc04"), (10, "#f29900"), (25, "#d93025")]
-    legend_x = 28
-    for value, color in legend:
-        svg.append(
-            f'<rect x="{legend_x}" y="72" width="28" height="14" fill="{color}"/>'
-        )
-        svg.append(
-            f'<text x="{legend_x+35}" y="84" class="axis">{value}%</text>'
-        )
-        legend_x += 90
+    legend_x = 125
+    for index, (value, label) in enumerate(
+        ((1e2, "100"), (1e4, "10k"), (1e6, "1M"), (1e8, "100M"), (1e10, "10G"))
+    ):
+        color, _fraction = corpus_crossover_color(value)
+        x = legend_x + index * 75
+        svg.append(f'<rect x="{x}" y="69" width="42" height="14" fill="{color}"/>')
+        svg.append(f'<text x="{x+21}" y="96" text-anchor="middle" class="axis">{label}</text>')
     svg.append(
-        f'<rect x="{legend_x}" y="72" width="28" height="14" class="missing"/>'
-    )
-    svg.append(
-        f'<text x="{legend_x+35}" y="84" class="axis">selected algorithm unavailable</text>'
+        f'<text x="{legend_x+5*75+4}" y="82" class="axis">later crossover · gray = no observed transition</text>'
     )
 
     for mode_index, mode in enumerate(modes):
         panel_top = top + mode_index * (panel_height + panel_gap)
-        summary = summaries[mode]
-        summary_text = (
-            "no evaluable cells"
-            if summary["median"] is None
-            else (
-                f"median {summary['median']:.2f}% · "
-                f"p95 {summary['p95']:.2f}% · max {summary['maximum']:.2f}%"
-            )
-        )
         svg.append(
-            f'<text x="28" y="{panel_top-27}" class="panel">'
+            f'<text x="28" y="{panel_top-20}" class="panel">'
             f'{"First match" if mode == "first" else "All overlapping matches"}</text>'
-        )
-        svg.append(
-            f'<text x="242" y="{panel_top-27}" class="subtitle">{summary_text}</text>'
         )
         for row, k in enumerate(k_values):
             y = panel_top + row * cell_height
@@ -769,26 +672,39 @@ def write_regret_outputs(regrets, statuses):
             )
             for column, patterns in enumerate(pattern_counts):
                 x = left + column * cell_width
-                result = regrets.get((k, patterns, mode))
-                if result is None:
+                regions = regions_by_cell.get((k, patterns, mode))
+                if not regions:
                     svg.append(
                         f'<rect x="{x}" y="{y}" width="{cell_width}" '
                         f'height="{cell_height}" class="missing"/>'
                     )
                     continue
-                value = result["regret"]
-                color = regret_color(value)
+                if len(regions) == 1:
+                    color = "#f1f3f4"
+                    successful, eligible = availability[(k, patterns, mode)]
+                    if successful == eligible:
+                        label = f"{LABELS[regions[0]['algorithm']]} throughout"
+                    else:
+                        label = (
+                            f"{LABELS[regions[0]['algorithm']]} throughout "
+                            f"{successful}/{eligible}"
+                        )
+                    text_color = "#202124"
+                else:
+                    first = regions[0]
+                    second = regions[1]
+                    color, fraction = corpus_crossover_color(first["end"])
+                    extra = f" +{len(regions)-2}" if len(regions) > 2 else ""
+                    label = (
+                        f"{LABELS[first['algorithm']]}→"
+                        f"{LABELS[second['algorithm']]} {compact_bases(first['end'])}{extra}"
+                    )
+                    text_color = "#ffffff" if fraction > 0.48 else "#202124"
                 svg.append(
                     f'<rect x="{x}" y="{y}" width="{cell_width}" '
                     f'height="{cell_height}" fill="{color}" '
                     'stroke="#ffffff" stroke-width="1"/>'
                 )
-                label = (
-                    f"{LABELS[result['selected']]} ×"
-                    if value is None
-                    else f"{LABELS[result['selected']]} {value:.1f}"
-                )
-                text_color = "#ffffff" if value is not None and value >= 10 else "#202124"
                 svg.append(
                     f'<text x="{x+cell_width/2:.1f}" y="{y+cell_height*0.66:.1f}" '
                     f'text-anchor="middle" class="cell" style="fill:{text_color}">{label}</text>'
@@ -798,7 +714,7 @@ def write_regret_outputs(regrets, statuses):
         for column, patterns in enumerate(pattern_counts):
             x = left + (column + 0.5) * cell_width
             svg.append(
-                f'<text transform="translate({x:.1f} {bottom+10}) rotate(55)" '
+                f'<text transform="translate({x:.1f} {bottom+9}) rotate(55)" '
                 f'text-anchor="start" class="axis">{patterns:,}</text>'
             )
         svg.append(
@@ -811,23 +727,170 @@ def write_regret_outputs(regrets, statuses):
         )
 
     svg.append("</svg>")
-    REGRET_PLOT.write_text("\n".join(svg) + "\n")
+    CORPUS_CROSSOVER_PLOT.write_text("\n".join(svg) + "\n")
+
+
+def write_corpus_crossover_outputs(corpus_model_samples, statuses):
+    cells = sorted({key[:3] for key in corpus_model_samples})
+    regions_by_cell = {}
+    crossover_rows = []
+    availability = {}
+
+    with CORPUS_MODELS.open("w", newline="") as handle:
+        writer = csv.writer(handle, lineterminator="\n")
+        writer.writerow(
+            [
+                "k",
+                "patterns",
+                "mode",
+                "algorithm",
+                "runs",
+                "median_fixed_ns_per_matcher",
+                "fixed_p2_5_ns_per_matcher",
+                "fixed_p97_5_ns_per_matcher",
+                "median_search_ns_per_base",
+                "search_p2_5_ns_per_base",
+                "search_p97_5_ns_per_base",
+            ]
+        )
+        for key, values in sorted(corpus_model_samples.items()):
+            fixed = [value[0] for value in values]
+            rates = [value[1] for value in values]
+            writer.writerow(
+                [
+                    *key,
+                    len(values),
+                    f"{statistics.median(fixed):.9f}",
+                    f"{percentile(fixed, 0.025):.9f}",
+                    f"{percentile(fixed, 0.975):.9f}",
+                    f"{statistics.median(rates):.9f}",
+                    f"{percentile(rates, 0.025):.9f}",
+                    f"{percentile(rates, 0.975):.9f}",
+                ]
+            )
+
+    with CORPUS_REGIONS.open("w", newline="") as handle:
+        writer = csv.writer(handle, lineterminator="\n")
+        writer.writerow(
+            [
+                "k",
+                "patterns",
+                "mode",
+                "region",
+                "algorithm",
+                "min_bases_inclusive",
+                "max_bases_exclusive",
+            ]
+        )
+        for k, patterns, mode in cells:
+            samples = {
+                algorithm: corpus_model_samples[(k, patterns, mode, algorithm)]
+                for algorithm in ALGORITHMS
+                if (k, patterns, mode, algorithm) in corpus_model_samples
+            }
+            lines = {
+                algorithm: (
+                    statistics.median(value[0] for value in values),
+                    statistics.median(value[1] for value in values),
+                )
+                for algorithm, values in samples.items()
+            }
+            regions = lower_envelope(lines)
+            regions_by_cell[(k, patterns, mode)] = regions
+            eligible = sum(
+                statuses.get((k, patterns, mode, algorithm), {}).get("status")
+                != "invalid"
+                for algorithm in ALGORITHMS
+            )
+            availability[(k, patterns, mode)] = (len(samples), eligible)
+            seed = (
+                0x6A09_E667
+                ^ k * 0x9E37
+                ^ patterns * 0x85EB
+                ^ (0 if mode == "first" else 0xC2B2_AE35)
+            )
+            intervals = bootstrap_transition_intervals(samples, regions, seed)
+            for region_index, region in enumerate(regions):
+                writer.writerow(
+                    [
+                        k,
+                        patterns,
+                        mode,
+                        region_index,
+                        region["algorithm"],
+                        f"{region['start']:.6f}",
+                        "" if region["end"] is None else f"{region['end']:.6f}",
+                    ]
+                )
+                if region["end"] is not None:
+                    next_algorithm = regions[region_index + 1]["algorithm"]
+                    interval = intervals[(region["algorithm"], next_algorithm)]
+                    crossover_rows.append(
+                        [
+                            k,
+                            patterns,
+                            mode,
+                            region_index,
+                            region["algorithm"],
+                            next_algorithm,
+                            region["end"],
+                            interval["low"],
+                            interval["high"],
+                            interval["support"],
+                        ]
+                    )
+
+    with CORPUS_CROSSOVERS.open("w", newline="") as handle:
+        writer = csv.writer(handle, lineterminator="\n")
+        writer.writerow(
+            [
+                "k",
+                "patterns",
+                "mode",
+                "transition",
+                "from_algorithm",
+                "to_algorithm",
+                "crossover_bases",
+                "bootstrap_ci_low_bases",
+                "bootstrap_ci_high_bases",
+                "bootstrap_transition_support_pct",
+            ]
+        )
+        for row in crossover_rows:
+            writer.writerow(
+                [
+                    *row[:6],
+                    f"{row[6]:.6f}",
+                    "" if row[7] is None else f"{row[7]:.6f}",
+                    "" if row[8] is None else f"{row[8]:.6f}",
+                    f"{row[9]:.2f}",
+                ]
+            )
+
+    write_corpus_crossover_plot(regions_by_cell, availability, statuses)
+    return regions_by_cell, crossover_rows
 
 
 def main():
     if not RAW.exists() or not STATUS.exists():
         raise SystemExit("Missing algorithm_sweep.csv or cell_status.csv.")
-    timings, build_times, validation = load_raw()
+    (
+        timings,
+        search_timings,
+        build_times,
+        corpus_model_samples,
+        validation,
+        reference_bases,
+    ) = load_raw()
     if not timings:
         raise SystemExit("The raw result file contains no successful measurements.")
     statuses = load_statuses()
     validate_algorithms(validation)
-    summary = summarize(timings, build_times)
+    summary = summarize(timings, search_timings, build_times)
     winners = write_tables(summary)
-    write_selection_map(winners, statuses)
-    write_crossover_plot(summary, statuses)
-    regrets, _trees = evaluate_selectors(timings, statuses)
-    write_regret_outputs(regrets, statuses)
+    write_selection_map(winners, statuses, reference_bases)
+    write_crossover_plot(summary, statuses, reference_bases)
+    write_corpus_crossover_outputs(corpus_model_samples, statuses)
 
 
 if __name__ == "__main__":
