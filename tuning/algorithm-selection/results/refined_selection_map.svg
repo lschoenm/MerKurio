@@ -32,7 +32,7 @@
 <polygon points="439.15,150.00 467.25,150.00 467.25,155.00 439.15,155.00" fill="#d93025" class="region"/>
 <polygon points="467.25,150.00 495.35,150.00 495.35,155.00 467.25,155.00" fill="#d93025" class="region"/>
 <polygon points="495.35,145.00 523.44,145.00 523.44,150.00 495.35,150.00" fill="#188038" class="region"/>
-<polygon points="523.44,145.00 551.54,145.00 551.54,150.00 523.44,150.00" fill="#d93025" class="region"/>
+<polygon points="523.44,145.00 551.54,145.00 551.54,150.00 523.44,150.00" fill="#188038" class="region"/>
 <polygon points="495.35,150.00 523.44,150.00 523.44,155.00 495.35,155.00" fill="#d93025" class="region"/>
 <polygon points="523.44,150.00 551.54,150.00 551.54,155.00 523.44,155.00" fill="#d93025" class="region"/>
 <polygon points="102.00,155.00 130.10,155.00 130.10,160.00 102.00,160.00" fill="#d93025" class="region"/>
@@ -42,26 +42,26 @@
 <polygon points="158.19,155.00 186.29,155.00 186.29,160.00 158.19,160.00" fill="#1a73e8" class="region"/>
 <polygon points="186.29,155.00 214.38,155.00 214.38,160.00 186.29,160.00" fill="#d93025" class="region"/>
 <polygon points="158.19,160.00 186.29,160.00 186.29,165.00 158.19,165.00" fill="#1a73e8" class="region"/>
-<polygon points="186.29,160.00 214.38,160.00 214.38,165.00 186.29,165.00" fill="#d93025" class="region"/>
-<rect x="214.38" y="155.00" width="56.19" height="10.00" fill="#d93025" class="region"/>
+<polygon points="186.29,160.00 214.38,160.00 214.38,165.00 186.29,165.00" fill="#1a73e8" class="region"/>
+<polygon points="214.38,155.00 242.48,155.00 242.48,160.00 214.38,160.00" fill="#d93025" class="region"/>
+<polygon points="242.48,155.00 270.58,155.00 270.58,160.00 242.48,160.00" fill="#d93025" class="region"/>
+<polygon points="214.38,160.00 242.48,160.00 242.48,165.00 214.38,165.00" fill="#1a73e8" class="region"/>
+<polygon points="242.48,160.00 270.58,160.00 270.58,165.00 242.48,165.00" fill="#d93025" class="region"/>
 <rect x="270.58" y="155.00" width="56.19" height="10.00" fill="#d93025" class="region"/>
 <rect x="326.77" y="155.00" width="56.19" height="10.00" fill="#d93025" class="region"/>
 <rect x="382.96" y="155.00" width="56.19" height="10.00" fill="#d93025" class="region"/>
 <rect x="439.15" y="155.00" width="56.19" height="10.00" fill="#d93025" class="region"/>
 <rect x="495.35" y="155.00" width="56.19" height="10.00" fill="#d93025" class="region"/>
 <polygon points="551.54,155.00 606.77,155.00 606.77,160.00 551.54,160.00" fill="#d93025" class="region"/>
-<polygon points="606.77,155.00 662.00,155.00 662.00,160.00 606.77,160.00" fill="#188038" class="region"/>
+<polygon points="606.77,155.00 662.00,155.00 662.00,160.00 606.77,160.00" fill="#d93025" class="region"/>
 <polygon points="551.54,160.00 606.77,160.00 606.77,165.00 551.54,165.00" fill="#d93025" class="region"/>
 <polygon points="606.77,160.00 662.00,160.00 662.00,165.00 606.77,165.00" fill="#188038" class="region"/>
 <polygon points="102.00,165.00 130.10,165.00 130.10,170.00 102.00,170.00" fill="#d93025" class="region"/>
 <polygon points="130.10,165.00 158.19,165.00 158.19,170.00 130.10,170.00" fill="#1a73e8" class="region"/>
 <polygon points="102.00,170.00 130.10,170.00 130.10,175.00 102.00,175.00" fill="#d93025" class="region"/>
 <polygon points="130.10,170.00 158.19,170.00 158.19,175.00 130.10,175.00" fill="#1a73e8" class="region"/>
-<polygon points="158.19,165.00 186.29,165.00 186.29,170.00 158.19,170.00" fill="#1a73e8" class="region"/>
-<polygon points="186.29,165.00 214.38,165.00 214.38,170.00 186.29,170.00" fill="#d93025" class="region"/>
-<polygon points="158.19,170.00 186.29,170.00 186.29,175.00 158.19,175.00" fill="#1a73e8" class="region"/>
-<polygon points="186.29,170.00 214.38,170.00 214.38,175.00 186.29,175.00" fill="#1a73e8" class="region"/>
-<polygon points="214.38,165.00 242.48,165.00 242.48,170.00 214.38,170.00" fill="#d93025" class="region"/>
+<rect x="158.19" y="165.00" width="56.19" height="10.00" fill="#1a73e8" class="region"/>
+<polygon points="214.38,165.00 242.48,165.00 242.48,170.00 214.38,170.00" fill="#1a73e8" class="region"/>
 <polygon points="242.48,165.00 270.58,165.00 270.58,170.00 242.48,170.00" fill="#d93025" class="region"/>
 <polygon points="214.38,170.00 242.48,170.00 242.48,175.00 214.38,175.00" fill="#1a73e8" class="region"/>
 <polygon points="242.48,170.00 270.58,170.00 270.58,175.00 242.48,175.00" fill="#d93025" class="region"/>
@@ -69,13 +69,10 @@
 <rect x="326.77" y="165.00" width="56.19" height="10.00" fill="#d93025" class="region"/>
 <rect x="382.96" y="165.00" width="56.19" height="10.00" fill="#d93025" class="region"/>
 <rect x="439.15" y="165.00" width="56.19" height="10.00" fill="#d93025" class="region"/>
-<polygon points="495.35,165.00 523.44,165.00 523.44,170.00 495.35,170.00" fill="#d93025" class="region"/>
-<polygon points="523.44,165.00 551.54,165.00 551.54,170.00 523.44,170.00" fill="#d93025" class="region"/>
-<polygon points="495.35,170.00 523.44,170.00 523.44,175.00 495.35,175.00" fill="#d93025" class="region"/>
-<polygon points="523.44,170.00 551.54,170.00 551.54,175.00 523.44,175.00" fill="#188038" class="region"/>
+<rect x="495.35" y="165.00" width="56.19" height="10.00" fill="#d93025" class="region"/>
 <polygon points="551.54,165.00 606.77,165.00 606.77,170.00 551.54,170.00" fill="#d93025" class="region"/>
 <polygon points="606.77,165.00 662.00,165.00 662.00,170.00 606.77,170.00" fill="#188038" class="region"/>
-<polygon points="551.54,170.00 606.77,170.00 606.77,175.00 551.54,175.00" fill="#188038" class="region"/>
+<polygon points="551.54,170.00 606.77,170.00 606.77,175.00 551.54,175.00" fill="#d93025" class="region"/>
 <polygon points="606.77,170.00 662.00,170.00 662.00,175.00 606.77,175.00" fill="#188038" class="region"/>
 <rect x="662.00" y="165.00" width="186.67" height="10.00" fill="#188038" class="region"/>
 <polygon points="102.00,175.00 130.10,175.00 130.10,180.00 102.00,180.00" fill="#d93025" class="region"/>
@@ -92,10 +89,13 @@
 <rect x="382.96" y="175.00" width="56.19" height="10.00" fill="#d93025" class="region"/>
 <rect x="439.15" y="175.00" width="56.19" height="10.00" fill="#d93025" class="region"/>
 <polygon points="495.35,175.00 523.44,175.00 523.44,180.00 495.35,180.00" fill="#d93025" class="region"/>
-<polygon points="523.44,175.00 551.54,175.00 551.54,180.00 523.44,180.00" fill="#188038" class="region"/>
+<polygon points="523.44,175.00 551.54,175.00 551.54,180.00 523.44,180.00" fill="#d93025" class="region"/>
 <polygon points="495.35,180.00 523.44,180.00 523.44,185.00 495.35,185.00" fill="#d93025" class="region"/>
 <polygon points="523.44,180.00 551.54,180.00 551.54,185.00 523.44,185.00" fill="#188038" class="region"/>
-<rect x="551.54" y="175.00" width="110.46" height="10.00" fill="#188038" class="region"/>
+<polygon points="551.54,175.00 606.77,175.00 606.77,180.00 551.54,180.00" fill="#d93025" class="region"/>
+<polygon points="606.77,175.00 662.00,175.00 662.00,180.00 606.77,180.00" fill="#188038" class="region"/>
+<polygon points="551.54,180.00 606.77,180.00 606.77,185.00 551.54,185.00" fill="#188038" class="region"/>
+<polygon points="606.77,180.00 662.00,180.00 662.00,185.00 606.77,185.00" fill="#188038" class="region"/>
 <rect x="662.00" y="175.00" width="186.67" height="10.00" fill="#188038" class="region"/>
 <rect x="848.67" y="175.00" width="186.67" height="10.00" fill="#188038" class="region"/>
 <rect x="1035.33" y="175.00" width="186.67" height="10.00" fill="#188038" class="region"/>
@@ -226,11 +226,8 @@
 <polygon points="326.77,365.00 354.87,365.00 354.87,405.00 326.77,405.00" fill="#1a73e8" class="region"/>
 <polygon points="354.87,365.00 382.96,365.00 382.96,405.00 354.87,405.00" fill="#188038" class="region"/>
 <polygon points="326.77,405.00 354.87,405.00 354.87,445.00 326.77,445.00" fill="#1a73e8" class="region"/>
-<polygon points="354.87,405.00 382.96,405.00 382.96,445.00 354.87,445.00" fill="#1a73e8" class="region"/>
-<polygon points="382.96,365.00 411.06,365.00 411.06,405.00 382.96,405.00" fill="#188038" class="region"/>
-<polygon points="411.06,365.00 439.15,365.00 439.15,405.00 411.06,405.00" fill="#188038" class="region"/>
-<polygon points="382.96,405.00 411.06,405.00 411.06,445.00 382.96,445.00" fill="#1a73e8" class="region"/>
-<polygon points="411.06,405.00 439.15,405.00 439.15,445.00 411.06,445.00" fill="#188038" class="region"/>
+<polygon points="354.87,405.00 382.96,405.00 382.96,445.00 354.87,445.00" fill="#188038" class="region"/>
+<rect x="382.96" y="365.00" width="56.19" height="80.00" fill="#188038" class="region"/>
 <rect x="439.15" y="365.00" width="56.19" height="80.00" fill="#188038" class="region"/>
 <rect x="495.35" y="365.00" width="56.19" height="80.00" fill="#188038" class="region"/>
 <rect x="551.54" y="365.00" width="110.46" height="80.00" fill="#188038" class="region"/>
@@ -254,13 +251,10 @@
 <polygon points="270.58,485.00 298.67,485.00 298.67,525.00 270.58,525.00" fill="#188038" class="region"/>
 <polygon points="298.67,485.00 326.77,485.00 326.77,525.00 298.67,525.00" fill="#188038" class="region"/>
 <polygon points="326.77,445.00 354.87,445.00 354.87,485.00 326.77,485.00" fill="#1a73e8" class="region"/>
-<polygon points="354.87,445.00 382.96,445.00 382.96,485.00 354.87,485.00" fill="#1a73e8" class="region"/>
+<polygon points="354.87,445.00 382.96,445.00 382.96,485.00 354.87,485.00" fill="#188038" class="region"/>
 <polygon points="326.77,485.00 354.87,485.00 354.87,525.00 326.77,525.00" fill="#188038" class="region"/>
 <polygon points="354.87,485.00 382.96,485.00 382.96,525.00 354.87,525.00" fill="#188038" class="region"/>
-<polygon points="382.96,445.00 411.06,445.00 411.06,485.00 382.96,485.00" fill="#1a73e8" class="region"/>
-<polygon points="411.06,445.00 439.15,445.00 439.15,485.00 411.06,485.00" fill="#188038" class="region"/>
-<polygon points="382.96,485.00 411.06,485.00 411.06,525.00 382.96,525.00" fill="#188038" class="region"/>
-<polygon points="411.06,485.00 439.15,485.00 439.15,525.00 411.06,525.00" fill="#188038" class="region"/>
+<rect x="382.96" y="445.00" width="56.19" height="80.00" fill="#188038" class="region"/>
 <rect x="439.15" y="445.00" width="56.19" height="80.00" fill="#188038" class="region"/>
 <rect x="495.35" y="445.00" width="56.19" height="80.00" fill="#188038" class="region"/>
 <rect x="551.54" y="445.00" width="110.46" height="80.00" fill="#188038" class="region"/>
@@ -342,16 +336,23 @@
 <text x="92" y="769.00" text-anchor="end" class="axis">128</text>
 <rect x="102" y="145" width="1120" height="620" class="frame"/>
 <circle cx="102.00" cy="145.00" r="5.5" fill="#d93025" class="point"/>
-<circle cx="158.19" cy="145.00" r="5.5" fill="#1a73e8" class="tie"/>
+<circle cx="158.19" cy="145.00" r="5.5" fill="#1a73e8" class="point"/>
+<polygon points="191.06,138.50 197.56,145.00 191.06,151.50 184.56,145.00" fill="#188038" class="point"/>
 <circle cx="214.38" cy="145.00" r="5.5" fill="#d93025" class="point"/>
 <circle cx="270.58" cy="145.00" r="5.5" fill="#d93025" class="point"/>
 <circle cx="326.77" cy="145.00" r="5.5" fill="#d93025" class="point"/>
 <circle cx="382.96" cy="145.00" r="5.5" fill="#d93025" class="point"/>
 <circle cx="439.15" cy="145.00" r="5.5" fill="#d93025" class="point"/>
+<polygon points="467.69,138.50 474.19,145.00 467.69,151.50 461.19,145.00" fill="#d93025" class="point"/>
+<polygon points="481.57,138.50 488.07,145.00 481.57,151.50 475.07,145.00" fill="#d93025" class="point"/>
+<polygon points="488.75,138.50 495.25,145.00 488.75,151.50 482.25,145.00" fill="#188038" class="tie"/>
 <circle cx="495.35" cy="145.00" r="5.5" fill="#188038" class="point"/>
-<circle cx="551.54" cy="145.00" r="5.5" fill="#d93025" class="tie"/>
+<circle cx="551.54" cy="145.00" r="5.5" fill="#188038" class="point"/>
+<polygon points="495.35,143.50 501.85,150.00 495.35,156.50 488.85,150.00" fill="#d93025" class="point"/>
+<polygon points="551.54,143.50 558.04,150.00 551.54,156.50 545.04,150.00" fill="#d93025" class="point"/>
 <circle cx="102.00" cy="155.00" r="5.5" fill="#d93025" class="point"/>
 <circle cx="158.19" cy="155.00" r="5.5" fill="#1a73e8" class="point"/>
+<polygon points="191.06,148.50 197.56,155.00 191.06,161.50 184.56,155.00" fill="#188038" class="point"/>
 <circle cx="214.38" cy="155.00" r="5.5" fill="#d93025" class="point"/>
 <circle cx="270.58" cy="155.00" r="5.5" fill="#d93025" class="point"/>
 <circle cx="326.77" cy="155.00" r="5.5" fill="#d93025" class="point"/>
@@ -359,128 +360,218 @@
 <circle cx="439.15" cy="155.00" r="5.5" fill="#d93025" class="point"/>
 <circle cx="495.35" cy="155.00" r="5.5" fill="#d93025" class="point"/>
 <circle cx="551.54" cy="155.00" r="5.5" fill="#d93025" class="point"/>
-<circle cx="662.00" cy="155.00" r="5.5" fill="#188038" class="tie"/>
+<circle cx="662.00" cy="155.00" r="5.5" fill="#d93025" class="point"/>
+<polygon points="214.38,153.50 220.88,160.00 214.38,166.50 207.88,160.00" fill="#d93025" class="tie"/>
+<polygon points="551.54,153.50 558.04,160.00 551.54,166.50 545.04,160.00" fill="#d93025" class="point"/>
+<polygon points="579.18,153.50 585.68,160.00 579.18,166.50 572.68,160.00" fill="#d93025" class="point"/>
+<polygon points="606.77,153.50 613.27,160.00 606.77,166.50 600.27,160.00" fill="#188038" class="point"/>
+<polygon points="662.00,153.50 668.50,160.00 662.00,166.50 655.50,160.00" fill="#188038" class="point"/>
 <circle cx="102.00" cy="165.00" r="5.5" fill="#d93025" class="point"/>
 <circle cx="158.19" cy="165.00" r="5.5" fill="#1a73e8" class="point"/>
-<circle cx="214.38" cy="165.00" r="5.5" fill="#d93025" class="point"/>
+<circle cx="214.38" cy="165.00" r="5.5" fill="#1a73e8" class="tie"/>
+<polygon points="232.47,158.50 238.97,165.00 232.47,171.50 225.97,165.00" fill="#d93025" class="point"/>
+<polygon points="247.25,158.50 253.75,165.00 247.25,171.50 240.75,165.00" fill="#d93025" class="point"/>
 <circle cx="270.58" cy="165.00" r="5.5" fill="#d93025" class="point"/>
 <circle cx="326.77" cy="165.00" r="5.5" fill="#d93025" class="point"/>
 <circle cx="382.96" cy="165.00" r="5.5" fill="#d93025" class="point"/>
 <circle cx="439.15" cy="165.00" r="5.5" fill="#d93025" class="point"/>
 <circle cx="495.35" cy="165.00" r="5.5" fill="#d93025" class="point"/>
+<polygon points="523.43,158.50 529.93,165.00 523.43,171.50 516.93,165.00" fill="#d93025" class="point"/>
 <circle cx="551.54" cy="165.00" r="5.5" fill="#d93025" class="tie"/>
+<polygon points="579.18,158.50 585.68,165.00 579.18,171.50 572.68,165.00" fill="#d93025" class="point"/>
+<polygon points="593.01,158.50 599.51,165.00 593.01,171.50 586.51,165.00" fill="#d93025" class="point"/>
+<polygon points="606.77,158.50 613.27,165.00 606.77,171.50 600.27,165.00" fill="#188038" class="point"/>
 <circle cx="662.00" cy="165.00" r="5.5" fill="#188038" class="point"/>
 <circle cx="848.67" cy="165.00" r="5.5" fill="#188038" class="point"/>
+<polygon points="232.47,163.50 238.97,170.00 232.47,176.50 225.97,170.00" fill="#d93025" class="point"/>
 <circle cx="102.00" cy="175.00" r="5.5" fill="#d93025" class="point"/>
 <circle cx="158.19" cy="175.00" r="5.5" fill="#1a73e8" class="point"/>
 <circle cx="214.38" cy="175.00" r="5.5" fill="#1a73e8" class="point"/>
+<polygon points="232.47,168.50 238.97,175.00 232.47,181.50 225.97,175.00" fill="#1a73e8" class="point"/>
+<polygon points="247.25,168.50 253.75,175.00 247.25,181.50 240.75,175.00" fill="#d93025" class="point"/>
 <circle cx="270.58" cy="175.00" r="5.5" fill="#d93025" class="point"/>
 <circle cx="326.77" cy="175.00" r="5.5" fill="#d93025" class="point"/>
 <circle cx="382.96" cy="175.00" r="5.5" fill="#d93025" class="point"/>
 <circle cx="439.15" cy="175.00" r="5.5" fill="#d93025" class="point"/>
 <circle cx="495.35" cy="175.00" r="5.5" fill="#d93025" class="point"/>
-<circle cx="551.54" cy="175.00" r="5.5" fill="#188038" class="tie"/>
+<polygon points="523.43,168.50 529.93,175.00 523.43,181.50 516.93,175.00" fill="#d93025" class="point"/>
+<circle cx="551.54" cy="175.00" r="5.5" fill="#d93025" class="point"/>
+<polygon points="579.18,168.50 585.68,175.00 579.18,181.50 572.68,175.00" fill="#d93025" class="point"/>
+<polygon points="593.01,168.50 599.51,175.00 593.01,181.50 586.51,175.00" fill="#d93025" class="point"/>
+<polygon points="606.77,168.50 613.27,175.00 606.77,181.50 600.27,175.00" fill="#188038" class="point"/>
 <circle cx="662.00" cy="175.00" r="5.5" fill="#188038" class="point"/>
 <circle cx="848.67" cy="175.00" r="5.5" fill="#188038" class="point"/>
 <circle cx="1035.33" cy="175.00" r="5.5" fill="#188038" class="point"/>
 <circle cx="1222.00" cy="175.00" r="5.5" fill="#188038" class="point"/>
+<polygon points="102.00,173.50 108.50,180.00 102.00,186.50 95.50,180.00" fill="#1a73e8" class="point"/>
+<polygon points="214.38,173.50 220.88,180.00 214.38,186.50 207.88,180.00" fill="#1a73e8" class="point"/>
+<polygon points="326.77,173.50 333.27,180.00 326.77,186.50 320.27,180.00" fill="#d93025" class="point"/>
+<polygon points="439.15,173.50 445.65,180.00 439.15,186.50 432.65,180.00" fill="#d93025" class="point"/>
+<polygon points="551.54,173.50 558.04,180.00 551.54,186.50 545.04,180.00" fill="#188038" class="tie"/>
 <circle cx="102.00" cy="185.00" r="5.5" fill="#1a73e8" class="point"/>
 <circle cx="158.19" cy="185.00" r="5.5" fill="#1a73e8" class="point"/>
 <circle cx="214.38" cy="185.00" r="5.5" fill="#1a73e8" class="point"/>
+<polygon points="247.25,178.50 253.75,185.00 247.25,191.50 240.75,185.00" fill="#1a73e8" class="point"/>
+<polygon points="259.75,178.50 266.25,185.00 259.75,191.50 253.25,185.00" fill="#d93025" class="point"/>
 <circle cx="270.58" cy="185.00" r="5.5" fill="#d93025" class="point"/>
 <circle cx="326.77" cy="185.00" r="5.5" fill="#d93025" class="point"/>
 <circle cx="382.96" cy="185.00" r="5.5" fill="#d93025" class="point"/>
 <circle cx="439.15" cy="185.00" r="5.5" fill="#d93025" class="point"/>
 <circle cx="495.35" cy="185.00" r="5.5" fill="#d93025" class="point"/>
+<polygon points="523.43,178.50 529.93,185.00 523.43,191.50 516.93,185.00" fill="#d93025" class="point"/>
+<polygon points="537.39,178.50 543.89,185.00 537.39,191.50 530.89,185.00" fill="#d93025" class="point"/>
+<polygon points="544.60,178.50 551.10,185.00 544.60,191.50 538.10,185.00" fill="#188038" class="tie"/>
 <circle cx="551.54" cy="185.00" r="5.5" fill="#188038" class="tie"/>
 <circle cx="662.00" cy="185.00" r="5.5" fill="#188038" class="point"/>
 <circle cx="848.67" cy="185.00" r="5.5" fill="#188038" class="point"/>
 <circle cx="1035.33" cy="185.00" r="5.5" fill="#188038" class="point"/>
 <circle cx="1222.00" cy="185.00" r="5.5" fill="#188038" class="point"/>
+<polygon points="270.58,188.50 277.08,195.00 270.58,201.50 264.08,195.00" fill="#d93025" class="point"/>
+<polygon points="270.58,193.50 277.08,200.00 270.58,206.50 264.08,200.00" fill="#d93025" class="tie"/>
 <circle cx="102.00" cy="205.00" r="5.5" fill="#1a73e8" class="point"/>
 <circle cx="158.19" cy="205.00" r="5.5" fill="#1a73e8" class="point"/>
 <circle cx="214.38" cy="205.00" r="5.5" fill="#1a73e8" class="point"/>
-<circle cx="270.58" cy="205.00" r="5.5" fill="#1a73e8" class="tie"/>
+<circle cx="270.58" cy="205.00" r="5.5" fill="#1a73e8" class="point"/>
+<polygon points="280.13,198.50 286.63,205.00 280.13,211.50 273.63,205.00" fill="#d93025" class="point"/>
+<polygon points="296.39,198.50 302.89,205.00 296.39,211.50 289.89,205.00" fill="#d93025" class="point"/>
 <circle cx="326.77" cy="205.00" r="5.5" fill="#d93025" class="point"/>
 <circle cx="382.96" cy="205.00" r="5.5" fill="#d93025" class="point"/>
 <circle cx="439.15" cy="205.00" r="5.5" fill="#d93025" class="point"/>
 <circle cx="495.35" cy="205.00" r="5.5" fill="#d93025" class="point"/>
+<polygon points="523.43,198.50 529.93,205.00 523.43,211.50 516.93,205.00" fill="#d93025" class="point"/>
+<polygon points="537.39,198.50 543.89,205.00 537.39,211.50 530.89,205.00" fill="#d93025" class="point"/>
+<polygon points="544.60,198.50 551.10,205.00 544.60,211.50 538.10,205.00" fill="#188038" class="point"/>
 <circle cx="551.54" cy="205.00" r="5.5" fill="#188038" class="point"/>
 <circle cx="662.00" cy="205.00" r="5.5" fill="#188038" class="point"/>
 <circle cx="848.67" cy="205.00" r="5.5" fill="#188038" class="point"/>
 <circle cx="1035.33" cy="205.00" r="5.5" fill="#188038" class="point"/>
 <circle cx="1222.00" cy="205.00" r="5.5" fill="#188038" class="point"/>
+<polygon points="280.13,208.50 286.63,215.00 280.13,221.50 273.63,215.00" fill="#1a73e8" class="point"/>
 <circle cx="102.00" cy="225.00" r="5.5" fill="#1a73e8" class="point"/>
 <circle cx="158.19" cy="225.00" r="5.5" fill="#1a73e8" class="point"/>
 <circle cx="214.38" cy="225.00" r="5.5" fill="#1a73e8" class="point"/>
 <circle cx="270.58" cy="225.00" r="5.5" fill="#1a73e8" class="point"/>
+<polygon points="280.13,218.50 286.63,225.00 280.13,231.50 273.63,225.00" fill="#1a73e8" class="point"/>
+<polygon points="288.67,218.50 295.17,225.00 288.67,231.50 282.17,225.00" fill="#1a73e8" class="point"/>
+<polygon points="296.39,218.50 302.89,225.00 296.39,231.50 289.89,225.00" fill="#d93025" class="tie"/>
 <circle cx="326.77" cy="225.00" r="5.5" fill="#d93025" class="point"/>
 <circle cx="382.96" cy="225.00" r="5.5" fill="#d93025" class="point"/>
 <circle cx="439.15" cy="225.00" r="5.5" fill="#d93025" class="point"/>
 <circle cx="495.35" cy="225.00" r="5.5" fill="#d93025" class="point"/>
+<polygon points="523.43,218.50 529.93,225.00 523.43,231.50 516.93,225.00" fill="#d93025" class="point"/>
+<polygon points="537.39,218.50 543.89,225.00 537.39,231.50 530.89,225.00" fill="#d93025" class="point"/>
+<polygon points="544.60,218.50 551.10,225.00 544.60,231.50 538.10,225.00" fill="#188038" class="point"/>
 <circle cx="551.54" cy="225.00" r="5.5" fill="#188038" class="point"/>
 <circle cx="662.00" cy="225.00" r="5.5" fill="#188038" class="point"/>
 <circle cx="848.67" cy="225.00" r="5.5" fill="#188038" class="point"/>
 <circle cx="1035.33" cy="225.00" r="5.5" fill="#188038" class="point"/>
 <circle cx="1222.00" cy="225.00" r="5.5" fill="#188038" class="point"/>
+<polygon points="495.35,228.50 501.85,235.00 495.35,241.50 488.85,235.00" fill="#d93025" class="tie"/>
+<polygon points="495.35,233.50 501.85,240.00 495.35,246.50 488.85,240.00" fill="#188038" class="tie"/>
 <circle cx="102.00" cy="245.00" r="5.5" fill="#1a73e8" class="point"/>
 <circle cx="158.19" cy="245.00" r="5.5" fill="#1a73e8" class="point"/>
 <circle cx="214.38" cy="245.00" r="5.5" fill="#1a73e8" class="point"/>
 <circle cx="270.58" cy="245.00" r="5.5" fill="#1a73e8" class="point"/>
+<polygon points="296.39,238.50 302.89,245.00 296.39,251.50 289.89,245.00" fill="#1a73e8" class="point"/>
+<polygon points="309.94,238.50 316.44,245.00 309.94,251.50 303.44,245.00" fill="#1a73e8" class="point"/>
+<polygon points="315.94,238.50 322.44,245.00 315.94,251.50 309.44,245.00" fill="#1a73e8" class="tie"/>
 <circle cx="326.77" cy="245.00" r="5.5" fill="#d93025" class="point"/>
-<circle cx="382.96" cy="245.00" r="5.5" fill="#d93025" class="point"/>
+<circle cx="382.96" cy="245.00" r="5.5" fill="#d93025" class="tie"/>
 <circle cx="439.15" cy="245.00" r="5.5" fill="#d93025" class="point"/>
-<circle cx="495.35" cy="245.00" r="5.5" fill="#188038" class="point"/>
+<polygon points="467.69,238.50 474.19,245.00 467.69,251.50 461.19,245.00" fill="#d93025" class="point"/>
+<polygon points="481.57,238.50 488.07,245.00 481.57,251.50 475.07,245.00" fill="#d93025" class="point"/>
+<polygon points="488.75,238.50 495.25,245.00 488.75,251.50 482.25,245.00" fill="#d93025" class="point"/>
+<circle cx="495.35" cy="245.00" r="5.5" fill="#188038" class="tie"/>
 <circle cx="551.54" cy="245.00" r="5.5" fill="#188038" class="point"/>
 <circle cx="662.00" cy="245.00" r="5.5" fill="#188038" class="point"/>
 <circle cx="848.67" cy="245.00" r="5.5" fill="#188038" class="point"/>
 <circle cx="1035.33" cy="245.00" r="5.5" fill="#188038" class="point"/>
 <circle cx="1222.00" cy="245.00" r="5.5" fill="#188038" class="point"/>
+<polygon points="326.77,253.50 333.27,260.00 326.77,266.50 320.27,260.00" fill="#d93025" class="point"/>
+<polygon points="326.77,263.50 333.27,270.00 326.77,276.50 320.27,270.00" fill="#d93025" class="tie"/>
+<polygon points="326.77,268.50 333.27,275.00 326.77,281.50 320.27,275.00" fill="#1a73e8" class="point"/>
 <circle cx="102.00" cy="280.00" r="5.5" fill="#1a73e8" class="point"/>
 <circle cx="158.19" cy="280.00" r="5.5" fill="#1a73e8" class="point"/>
 <circle cx="214.38" cy="280.00" r="5.5" fill="#1a73e8" class="point"/>
 <circle cx="270.58" cy="280.00" r="5.5" fill="#1a73e8" class="point"/>
 <circle cx="326.77" cy="280.00" r="5.5" fill="#1a73e8" class="point"/>
+<polygon points="331.68,273.50 338.18,280.00 331.68,286.50 325.18,280.00" fill="#d93025" class="tie"/>
+<polygon points="340.70,273.50 347.20,280.00 340.70,286.50 334.20,280.00" fill="#d93025" class="point"/>
+<polygon points="356.19,273.50 362.69,280.00 356.19,286.50 349.69,280.00" fill="#d93025" class="point"/>
 <circle cx="382.96" cy="280.00" r="5.5" fill="#d93025" class="point"/>
 <circle cx="439.15" cy="280.00" r="5.5" fill="#d93025" class="tie"/>
+<polygon points="467.69,273.50 474.19,280.00 467.69,286.50 461.19,280.00" fill="#d93025" class="point"/>
+<polygon points="481.57,273.50 488.07,280.00 481.57,286.50 475.07,280.00" fill="#d93025" class="point"/>
+<polygon points="488.75,273.50 495.25,280.00 488.75,286.50 482.25,280.00" fill="#188038" class="tie"/>
 <circle cx="495.35" cy="280.00" r="5.5" fill="#188038" class="point"/>
 <circle cx="551.54" cy="280.00" r="5.5" fill="#188038" class="point"/>
 <circle cx="662.00" cy="280.00" r="5.5" fill="#188038" class="point"/>
 <circle cx="848.67" cy="280.00" r="5.5" fill="#188038" class="point"/>
 <circle cx="1035.33" cy="280.00" r="5.5" fill="#188038" class="point"/>
 <circle cx="1222.00" cy="280.00" r="5.5" fill="#188038" class="point"/>
+<polygon points="382.96,293.50 389.46,300.00 382.96,306.50 376.46,300.00" fill="#d93025" class="tie"/>
+<polygon points="439.15,293.50 445.65,300.00 439.15,306.50 432.65,300.00" fill="#d93025" class="point"/>
+<polygon points="439.15,298.50 445.65,305.00 439.15,311.50 432.65,305.00" fill="#188038" class="tie"/>
+<polygon points="439.15,303.50 445.65,310.00 439.15,316.50 432.65,310.00" fill="#188038" class="point"/>
 <circle cx="102.00" cy="325.00" r="5.5" fill="#1a73e8" class="point"/>
 <circle cx="158.19" cy="325.00" r="5.5" fill="#1a73e8" class="point"/>
 <circle cx="214.38" cy="325.00" r="5.5" fill="#1a73e8" class="point"/>
 <circle cx="270.58" cy="325.00" r="5.5" fill="#1a73e8" class="point"/>
 <circle cx="326.77" cy="325.00" r="5.5" fill="#1a73e8" class="point"/>
-<circle cx="382.96" cy="325.00" r="5.5" fill="#d93025" class="tie"/>
+<polygon points="340.70,318.50 347.20,325.00 340.70,331.50 334.20,325.00" fill="#1a73e8" class="point"/>
+<polygon points="348.81,318.50 355.31,325.00 348.81,331.50 342.31,325.00" fill="#1a73e8" class="point"/>
+<polygon points="356.19,318.50 362.69,325.00 356.19,331.50 349.69,325.00" fill="#d93025" class="point"/>
+<circle cx="382.96" cy="325.00" r="5.5" fill="#d93025" class="point"/>
+<polygon points="410.60,318.50 417.10,325.00 410.60,331.50 404.10,325.00" fill="#d93025" class="point"/>
+<polygon points="425.38,318.50 431.88,325.00 425.38,331.50 418.88,325.00" fill="#d93025" class="point"/>
+<polygon points="432.56,318.50 439.06,325.00 432.56,331.50 426.06,325.00" fill="#188038" class="point"/>
 <circle cx="439.15" cy="325.00" r="5.5" fill="#188038" class="point"/>
+<polygon points="446.42,318.50 452.92,325.00 446.42,331.50 439.92,325.00" fill="#d93025" class="tie"/>
+<polygon points="453.09,318.50 459.59,325.00 453.09,331.50 446.59,325.00" fill="#d93025" class="point"/>
+<polygon points="467.69,318.50 474.19,325.00 467.69,331.50 461.19,325.00" fill="#d93025" class="point"/>
+<polygon points="481.57,318.50 488.07,325.00 481.57,331.50 475.07,325.00" fill="#d93025" class="point"/>
+<polygon points="488.75,318.50 495.25,325.00 488.75,331.50 482.25,325.00" fill="#188038" class="point"/>
 <circle cx="495.35" cy="325.00" r="5.5" fill="#188038" class="point"/>
 <circle cx="551.54" cy="325.00" r="5.5" fill="#188038" class="point"/>
 <circle cx="662.00" cy="325.00" r="5.5" fill="#188038" class="point"/>
 <circle cx="848.67" cy="325.00" r="5.5" fill="#188038" class="point"/>
 <circle cx="1035.33" cy="325.00" r="5.5" fill="#188038" class="point"/>
 <circle cx="1222.00" cy="325.00" r="5.5" fill="#188038" class="point"/>
+<polygon points="382.96,323.50 389.46,330.00 382.96,336.50 376.46,330.00" fill="#d93025" class="point"/>
+<polygon points="382.96,328.50 389.46,335.00 382.96,341.50 376.46,335.00" fill="#188038" class="tie"/>
+<polygon points="382.96,338.50 389.46,345.00 382.96,351.50 376.46,345.00" fill="#188038" class="tie"/>
+<polygon points="439.15,338.50 445.65,345.00 439.15,351.50 432.65,345.00" fill="#188038" class="tie"/>
 <circle cx="102.00" cy="365.00" r="5.5" fill="#1a73e8" class="point"/>
 <circle cx="158.19" cy="365.00" r="5.5" fill="#1a73e8" class="point"/>
 <circle cx="214.38" cy="365.00" r="5.5" fill="#1a73e8" class="point"/>
 <circle cx="270.58" cy="365.00" r="5.5" fill="#1a73e8" class="point"/>
 <circle cx="326.77" cy="365.00" r="5.5" fill="#1a73e8" class="point"/>
+<polygon points="356.19,358.50 362.69,365.00 356.19,371.50 349.69,365.00" fill="#1a73e8" class="point"/>
+<polygon points="369.19,358.50 375.69,365.00 369.19,371.50 362.69,365.00" fill="#1a73e8" class="tie"/>
+<polygon points="374.98,358.50 381.48,365.00 374.98,371.50 368.48,365.00" fill="#188038" class="point"/>
 <circle cx="382.96" cy="365.00" r="5.5" fill="#188038" class="point"/>
-<circle cx="439.15" cy="365.00" r="5.5" fill="#188038" class="tie"/>
+<circle cx="439.15" cy="365.00" r="5.5" fill="#188038" class="point"/>
 <circle cx="495.35" cy="365.00" r="5.5" fill="#188038" class="point"/>
 <circle cx="551.54" cy="365.00" r="5.5" fill="#188038" class="point"/>
 <circle cx="662.00" cy="365.00" r="5.5" fill="#188038" class="point"/>
 <circle cx="848.67" cy="365.00" r="5.5" fill="#188038" class="point"/>
 <circle cx="1035.33" cy="365.00" r="5.5" fill="#188038" class="point"/>
 <circle cx="1222.00" cy="365.00" r="5.5" fill="#188038" class="point"/>
+<polygon points="382.96,378.50 389.46,385.00 382.96,391.50 376.46,385.00" fill="#188038" class="point"/>
+<polygon points="382.96,388.50 389.46,395.00 382.96,401.50 376.46,395.00" fill="#1a73e8" class="point"/>
+<polygon points="382.96,398.50 389.46,405.00 382.96,411.50 376.46,405.00" fill="#1a73e8" class="point"/>
+<polygon points="382.96,418.50 389.46,425.00 382.96,431.50 376.46,425.00" fill="#1a73e8" class="point"/>
+<polygon points="382.96,428.50 389.46,435.00 382.96,441.50 376.46,435.00" fill="#1a73e8" class="point"/>
 <circle cx="102.00" cy="445.00" r="5.5" fill="#1a73e8" class="point"/>
 <circle cx="158.19" cy="445.00" r="5.5" fill="#1a73e8" class="point"/>
 <circle cx="214.38" cy="445.00" r="5.5" fill="#1a73e8" class="point"/>
 <circle cx="270.58" cy="445.00" r="5.5" fill="#1a73e8" class="point"/>
 <circle cx="326.77" cy="445.00" r="5.5" fill="#1a73e8" class="point"/>
-<circle cx="382.96" cy="445.00" r="5.5" fill="#1a73e8" class="point"/>
+<polygon points="356.19,438.50 362.69,445.00 356.19,451.50 349.69,445.00" fill="#1a73e8" class="point"/>
+<polygon points="369.19,438.50 375.69,445.00 369.19,451.50 362.69,445.00" fill="#1a73e8" class="point"/>
+<polygon points="374.98,438.50 381.48,445.00 374.98,451.50 368.48,445.00" fill="#1a73e8" class="point"/>
+<circle cx="382.96" cy="445.00" r="5.5" fill="#188038" class="tie"/>
+<polygon points="410.60,438.50 417.10,445.00 410.60,451.50 404.10,445.00" fill="#188038" class="point"/>
 <circle cx="439.15" cy="445.00" r="5.5" fill="#188038" class="point"/>
 <circle cx="495.35" cy="445.00" r="5.5" fill="#188038" class="point"/>
 <circle cx="551.54" cy="445.00" r="5.5" fill="#188038" class="point"/>
@@ -488,6 +579,12 @@
 <circle cx="848.67" cy="445.00" r="5.5" fill="#188038" class="point"/>
 <circle cx="1035.33" cy="445.00" r="5.5" fill="#188038" class="point"/>
 <circle cx="1222.00" cy="445.00" r="5.5" fill="#188038" class="point"/>
+<polygon points="102.00,443.50 108.50,450.00 102.00,456.50 95.50,450.00" fill="#d93025" class="point"/>
+<polygon points="158.19,443.50 164.69,450.00 158.19,456.50 151.69,450.00" fill="#188038" class="point"/>
+<polygon points="214.38,443.50 220.88,450.00 214.38,456.50 207.88,450.00" fill="#188038" class="point"/>
+<polygon points="270.58,443.50 277.08,450.00 270.58,456.50 264.08,450.00" fill="#188038" class="point"/>
+<polygon points="326.77,443.50 333.27,450.00 326.77,456.50 320.27,450.00" fill="#188038" class="point"/>
+<polygon points="382.96,443.50 389.46,450.00 382.96,456.50 376.46,450.00" fill="#188038" class="point"/>
 <circle cx="102.00" cy="525.00" r="5.5" fill="#d93025" class="point"/>
 <circle cx="158.19" cy="525.00" r="5.5" fill="#188038" class="point"/>
 <circle cx="214.38" cy="525.00" r="5.5" fill="#188038" class="point"/>
@@ -714,10 +811,13 @@
 <polygon points="326.77,1027.50 354.87,1027.50 354.87,1050.00 326.77,1050.00" fill="#1a73e8" class="region"/>
 <polygon points="354.87,1027.50 382.96,1027.50 382.96,1050.00 354.87,1050.00" fill="#d93025" class="region"/>
 <rect x="382.96" y="1005.00" width="56.19" height="45.00" fill="#d93025" class="region"/>
-<rect x="439.15" y="1005.00" width="56.19" height="45.00" fill="#d93025" class="region"/>
+<polygon points="439.15,1005.00 467.25,1005.00 467.25,1027.50 439.15,1027.50" fill="#d93025" class="region"/>
+<polygon points="467.25,1005.00 495.35,1005.00 495.35,1027.50 467.25,1027.50" fill="#d93025" class="region"/>
+<polygon points="439.15,1027.50 467.25,1027.50 467.25,1050.00 439.15,1050.00" fill="#d93025" class="region"/>
+<polygon points="467.25,1027.50 495.35,1027.50 495.35,1050.00 467.25,1050.00" fill="#188038" class="region"/>
 <polygon points="495.35,1005.00 523.44,1005.00 523.44,1027.50 495.35,1027.50" fill="#d93025" class="region"/>
 <polygon points="523.44,1005.00 551.54,1005.00 551.54,1027.50 523.44,1027.50" fill="#188038" class="region"/>
-<polygon points="495.35,1027.50 523.44,1027.50 523.44,1050.00 495.35,1050.00" fill="#d93025" class="region"/>
+<polygon points="495.35,1027.50 523.44,1027.50 523.44,1050.00 495.35,1050.00" fill="#188038" class="region"/>
 <polygon points="523.44,1027.50 551.54,1027.50 551.54,1050.00 523.44,1050.00" fill="#188038" class="region"/>
 <rect x="551.54" y="1005.00" width="110.46" height="45.00" fill="#188038" class="region"/>
 <rect x="662.00" y="1005.00" width="186.67" height="45.00" fill="#188038" class="region"/>
@@ -731,15 +831,15 @@
 <polygon points="354.87,1050.00 382.96,1050.00 382.96,1070.00 354.87,1070.00" fill="#d93025" class="region"/>
 <polygon points="326.77,1070.00 354.87,1070.00 354.87,1090.00 326.77,1090.00" fill="#1a73e8" class="region"/>
 <polygon points="354.87,1070.00 382.96,1070.00 382.96,1090.00 354.87,1090.00" fill="#d93025" class="region"/>
-<rect x="382.96" y="1050.00" width="56.19" height="40.00" fill="#d93025" class="region"/>
+<polygon points="382.96,1050.00 411.06,1050.00 411.06,1070.00 382.96,1070.00" fill="#d93025" class="region"/>
+<polygon points="411.06,1050.00 439.15,1050.00 439.15,1070.00 411.06,1070.00" fill="#d93025" class="region"/>
+<polygon points="382.96,1070.00 411.06,1070.00 411.06,1090.00 382.96,1090.00" fill="#d93025" class="region"/>
+<polygon points="411.06,1070.00 439.15,1070.00 439.15,1090.00 411.06,1090.00" fill="#188038" class="region"/>
 <polygon points="439.15,1050.00 467.25,1050.00 467.25,1070.00 439.15,1070.00" fill="#d93025" class="region"/>
-<polygon points="467.25,1050.00 495.35,1050.00 495.35,1070.00 467.25,1070.00" fill="#d93025" class="region"/>
-<polygon points="439.15,1070.00 467.25,1070.00 467.25,1090.00 439.15,1090.00" fill="#d93025" class="region"/>
+<polygon points="467.25,1050.00 495.35,1050.00 495.35,1070.00 467.25,1070.00" fill="#188038" class="region"/>
+<polygon points="439.15,1070.00 467.25,1070.00 467.25,1090.00 439.15,1090.00" fill="#188038" class="region"/>
 <polygon points="467.25,1070.00 495.35,1070.00 495.35,1090.00 467.25,1090.00" fill="#188038" class="region"/>
-<polygon points="495.35,1050.00 523.44,1050.00 523.44,1070.00 495.35,1070.00" fill="#d93025" class="region"/>
-<polygon points="523.44,1050.00 551.54,1050.00 551.54,1070.00 523.44,1070.00" fill="#188038" class="region"/>
-<polygon points="495.35,1070.00 523.44,1070.00 523.44,1090.00 495.35,1090.00" fill="#188038" class="region"/>
-<polygon points="523.44,1070.00 551.54,1070.00 551.54,1090.00 523.44,1090.00" fill="#188038" class="region"/>
+<rect x="495.35" y="1050.00" width="56.19" height="40.00" fill="#188038" class="region"/>
 <rect x="551.54" y="1050.00" width="110.46" height="40.00" fill="#188038" class="region"/>
 <rect x="662.00" y="1050.00" width="186.67" height="40.00" fill="#188038" class="region"/>
 <rect x="848.67" y="1050.00" width="186.67" height="40.00" fill="#188038" class="region"/>
@@ -753,13 +853,10 @@
 <polygon points="326.77,1130.00 354.87,1130.00 354.87,1170.00 326.77,1170.00" fill="#1a73e8" class="region"/>
 <polygon points="354.87,1130.00 382.96,1130.00 382.96,1170.00 354.87,1170.00" fill="#1a73e8" class="region"/>
 <polygon points="382.96,1090.00 411.06,1090.00 411.06,1130.00 382.96,1130.00" fill="#d93025" class="region"/>
-<polygon points="411.06,1090.00 439.15,1090.00 439.15,1130.00 411.06,1130.00" fill="#d93025" class="region"/>
+<polygon points="411.06,1090.00 439.15,1090.00 439.15,1130.00 411.06,1130.00" fill="#188038" class="region"/>
 <polygon points="382.96,1130.00 411.06,1130.00 411.06,1170.00 382.96,1170.00" fill="#1a73e8" class="region"/>
 <polygon points="411.06,1130.00 439.15,1130.00 439.15,1170.00 411.06,1170.00" fill="#188038" class="region"/>
-<polygon points="439.15,1090.00 467.25,1090.00 467.25,1130.00 439.15,1130.00" fill="#d93025" class="region"/>
-<polygon points="467.25,1090.00 495.35,1090.00 495.35,1130.00 467.25,1130.00" fill="#188038" class="region"/>
-<polygon points="439.15,1130.00 467.25,1130.00 467.25,1170.00 439.15,1170.00" fill="#188038" class="region"/>
-<polygon points="467.25,1130.00 495.35,1130.00 495.35,1170.00 467.25,1170.00" fill="#188038" class="region"/>
+<rect x="439.15" y="1090.00" width="56.19" height="80.00" fill="#188038" class="region"/>
 <rect x="495.35" y="1090.00" width="56.19" height="80.00" fill="#188038" class="region"/>
 <rect x="551.54" y="1090.00" width="110.46" height="80.00" fill="#188038" class="region"/>
 <rect x="662.00" y="1090.00" width="186.67" height="80.00" fill="#188038" class="region"/>
@@ -812,7 +909,7 @@
 <rect x="1035.33" y="1250.00" width="186.67" height="80.00" fill="#188038" class="region"/>
 <polygon points="102.00,1330.00 130.10,1330.00 130.10,1410.00 102.00,1410.00" fill="#d93025" class="region"/>
 <polygon points="130.10,1330.00 158.19,1330.00 158.19,1410.00 130.10,1410.00" fill="#188038" class="region"/>
-<polygon points="102.00,1410.00 130.10,1410.00 130.10,1490.00 102.00,1490.00" fill="#d93025" class="region"/>
+<polygon points="102.00,1410.00 130.10,1410.00 130.10,1490.00 102.00,1490.00" fill="#188038" class="region"/>
 <polygon points="130.10,1410.00 158.19,1410.00 158.19,1490.00 130.10,1490.00" fill="#188038" class="region"/>
 <rect x="158.19" y="1330.00" width="56.19" height="160.00" fill="#188038" class="region"/>
 <rect x="214.38" y="1330.00" width="56.19" height="160.00" fill="#188038" class="region"/>
@@ -871,6 +968,7 @@
 <rect x="102" y="870" width="1120" height="620" class="frame"/>
 <circle cx="102.00" cy="870.00" r="5.5" fill="#d93025" class="point"/>
 <circle cx="158.19" cy="870.00" r="5.5" fill="#1a73e8" class="point"/>
+<polygon points="191.06,863.50 197.56,870.00 191.06,876.50 184.56,870.00" fill="#188038" class="point"/>
 <circle cx="214.38" cy="870.00" r="5.5" fill="#d93025" class="point"/>
 <circle cx="270.58" cy="870.00" r="5.5" fill="#d93025" class="point"/>
 <circle cx="326.77" cy="870.00" r="5.5" fill="#d93025" class="point"/>
@@ -880,6 +978,7 @@
 <circle cx="551.54" cy="870.00" r="5.5" fill="#d93025" class="point"/>
 <circle cx="102.00" cy="880.00" r="5.5" fill="#d93025" class="point"/>
 <circle cx="158.19" cy="880.00" r="5.5" fill="#1a73e8" class="point"/>
+<polygon points="191.06,873.50 197.56,880.00 191.06,886.50 184.56,880.00" fill="#188038" class="point"/>
 <circle cx="214.38" cy="880.00" r="5.5" fill="#d93025" class="point"/>
 <circle cx="270.58" cy="880.00" r="5.5" fill="#d93025" class="point"/>
 <circle cx="326.77" cy="880.00" r="5.5" fill="#d93025" class="point"/>
@@ -888,50 +987,81 @@
 <circle cx="495.35" cy="880.00" r="5.5" fill="#d93025" class="point"/>
 <circle cx="551.54" cy="880.00" r="5.5" fill="#d93025" class="point"/>
 <circle cx="662.00" cy="880.00" r="5.5" fill="#d93025" class="point"/>
+<polygon points="102.00,878.50 108.50,885.00 102.00,891.50 95.50,885.00" fill="#d93025" class="point"/>
+<polygon points="214.38,878.50 220.88,885.00 214.38,891.50 207.88,885.00" fill="#d93025" class="point"/>
+<polygon points="662.00,878.50 668.50,885.00 662.00,891.50 655.50,885.00" fill="#d93025" class="point"/>
 <circle cx="102.00" cy="890.00" r="5.5" fill="#1a73e8" class="tie"/>
 <circle cx="158.19" cy="890.00" r="5.5" fill="#1a73e8" class="point"/>
-<circle cx="214.38" cy="890.00" r="5.5" fill="#1a73e8" class="tie"/>
+<circle cx="214.38" cy="890.00" r="5.5" fill="#1a73e8" class="point"/>
+<polygon points="232.47,883.50 238.97,890.00 232.47,896.50 225.97,890.00" fill="#d93025" class="point"/>
+<polygon points="247.25,883.50 253.75,890.00 247.25,896.50 240.75,890.00" fill="#d93025" class="point"/>
 <circle cx="270.58" cy="890.00" r="5.5" fill="#d93025" class="point"/>
 <circle cx="326.77" cy="890.00" r="5.5" fill="#d93025" class="point"/>
 <circle cx="382.96" cy="890.00" r="5.5" fill="#d93025" class="point"/>
 <circle cx="439.15" cy="890.00" r="5.5" fill="#d93025" class="point"/>
 <circle cx="495.35" cy="890.00" r="5.5" fill="#d93025" class="point"/>
 <circle cx="551.54" cy="890.00" r="5.5" fill="#d93025" class="point"/>
+<polygon points="579.18,883.50 585.68,890.00 579.18,896.50 572.68,890.00" fill="#d93025" class="point"/>
+<polygon points="593.01,883.50 599.51,890.00 593.01,896.50 586.51,890.00" fill="#d93025" class="point"/>
+<polygon points="606.77,883.50 613.27,890.00 606.77,896.50 600.27,890.00" fill="#188038" class="point"/>
 <circle cx="662.00" cy="890.00" r="5.5" fill="#188038" class="point"/>
 <circle cx="848.67" cy="890.00" r="5.5" fill="#188038" class="point"/>
+<polygon points="232.47,888.50 238.97,895.00 232.47,901.50 225.97,895.00" fill="#d93025" class="tie"/>
 <circle cx="102.00" cy="900.00" r="5.5" fill="#1a73e8" class="point"/>
 <circle cx="158.19" cy="900.00" r="5.5" fill="#1a73e8" class="point"/>
 <circle cx="214.38" cy="900.00" r="5.5" fill="#1a73e8" class="point"/>
+<polygon points="232.47,893.50 238.97,900.00 232.47,906.50 225.97,900.00" fill="#1a73e8" class="point"/>
+<polygon points="247.25,893.50 253.75,900.00 247.25,906.50 240.75,900.00" fill="#d93025" class="point"/>
 <circle cx="270.58" cy="900.00" r="5.5" fill="#d93025" class="point"/>
 <circle cx="326.77" cy="900.00" r="5.5" fill="#d93025" class="point"/>
 <circle cx="382.96" cy="900.00" r="5.5" fill="#d93025" class="point"/>
 <circle cx="439.15" cy="900.00" r="5.5" fill="#d93025" class="point"/>
 <circle cx="495.35" cy="900.00" r="5.5" fill="#d93025" class="point"/>
 <circle cx="551.54" cy="900.00" r="5.5" fill="#d93025" class="point"/>
+<polygon points="579.18,893.50 585.68,900.00 579.18,906.50 572.68,900.00" fill="#d93025" class="point"/>
+<polygon points="593.01,893.50 599.51,900.00 593.01,906.50 586.51,900.00" fill="#d93025" class="point"/>
+<polygon points="606.77,893.50 613.27,900.00 606.77,906.50 600.27,900.00" fill="#188038" class="point"/>
 <circle cx="662.00" cy="900.00" r="5.5" fill="#188038" class="point"/>
 <circle cx="848.67" cy="900.00" r="5.5" fill="#188038" class="point"/>
 <circle cx="1035.33" cy="900.00" r="5.5" fill="#188038" class="point"/>
+<polygon points="247.25,898.50 253.75,905.00 247.25,911.50 240.75,905.00" fill="#1a73e8" class="tie"/>
 <circle cx="102.00" cy="910.00" r="5.5" fill="#1a73e8" class="point"/>
 <circle cx="158.19" cy="910.00" r="5.5" fill="#1a73e8" class="point"/>
 <circle cx="214.38" cy="910.00" r="5.5" fill="#1a73e8" class="point"/>
+<polygon points="247.25,903.50 253.75,910.00 247.25,916.50 240.75,910.00" fill="#1a73e8" class="point"/>
+<polygon points="259.75,903.50 266.25,910.00 259.75,916.50 253.25,910.00" fill="#1a73e8" class="tie"/>
 <circle cx="270.58" cy="910.00" r="5.5" fill="#d93025" class="point"/>
 <circle cx="326.77" cy="910.00" r="5.5" fill="#d93025" class="point"/>
 <circle cx="382.96" cy="910.00" r="5.5" fill="#d93025" class="point"/>
 <circle cx="439.15" cy="910.00" r="5.5" fill="#d93025" class="point"/>
 <circle cx="495.35" cy="910.00" r="5.5" fill="#d93025" class="point"/>
-<circle cx="551.54" cy="910.00" r="5.5" fill="#d93025" class="tie"/>
+<circle cx="551.54" cy="910.00" r="5.5" fill="#d93025" class="point"/>
+<polygon points="579.18,903.50 585.68,910.00 579.18,916.50 572.68,910.00" fill="#d93025" class="point"/>
+<polygon points="593.01,903.50 599.51,910.00 593.01,916.50 586.51,910.00" fill="#d93025" class="point"/>
+<polygon points="606.77,903.50 613.27,910.00 606.77,916.50 600.27,910.00" fill="#188038" class="point"/>
 <circle cx="662.00" cy="910.00" r="5.5" fill="#188038" class="point"/>
 <circle cx="848.67" cy="910.00" r="5.5" fill="#188038" class="point"/>
 <circle cx="1035.33" cy="910.00" r="5.5" fill="#188038" class="point"/>
 <circle cx="1222.00" cy="910.00" r="5.5" fill="#188038" class="point"/>
+<polygon points="270.58,913.50 277.08,920.00 270.58,926.50 264.08,920.00" fill="#d93025" class="point"/>
+<polygon points="551.54,913.50 558.04,920.00 551.54,926.50 545.04,920.00" fill="#d93025" class="point"/>
+<polygon points="270.58,918.50 277.08,925.00 270.58,931.50 264.08,925.00" fill="#d93025" class="tie"/>
+<polygon points="410.60,918.50 417.10,925.00 410.60,931.50 404.10,925.00" fill="#d93025" class="point"/>
+<polygon points="551.54,918.50 558.04,925.00 551.54,931.50 545.04,925.00" fill="#188038" class="tie"/>
 <circle cx="102.00" cy="930.00" r="5.5" fill="#1a73e8" class="point"/>
 <circle cx="158.19" cy="930.00" r="5.5" fill="#1a73e8" class="point"/>
 <circle cx="214.38" cy="930.00" r="5.5" fill="#1a73e8" class="point"/>
 <circle cx="270.58" cy="930.00" r="5.5" fill="#1a73e8" class="point"/>
+<polygon points="280.13,923.50 286.63,930.00 280.13,936.50 273.63,930.00" fill="#1a73e8" class="tie"/>
+<polygon points="288.67,923.50 295.17,930.00 288.67,936.50 282.17,930.00" fill="#d93025" class="point"/>
+<polygon points="296.39,923.50 302.89,930.00 296.39,936.50 289.89,930.00" fill="#d93025" class="point"/>
 <circle cx="326.77" cy="930.00" r="5.5" fill="#d93025" class="point"/>
 <circle cx="382.96" cy="930.00" r="5.5" fill="#d93025" class="point"/>
 <circle cx="439.15" cy="930.00" r="5.5" fill="#d93025" class="point"/>
 <circle cx="495.35" cy="930.00" r="5.5" fill="#d93025" class="point"/>
+<polygon points="523.43,923.50 529.93,930.00 523.43,936.50 516.93,930.00" fill="#d93025" class="point"/>
+<polygon points="537.39,923.50 543.89,930.00 537.39,936.50 530.89,930.00" fill="#d93025" class="point"/>
+<polygon points="544.60,923.50 551.10,930.00 544.60,936.50 538.10,930.00" fill="#188038" class="tie"/>
 <circle cx="551.54" cy="930.00" r="5.5" fill="#188038" class="tie"/>
 <circle cx="662.00" cy="930.00" r="5.5" fill="#188038" class="point"/>
 <circle cx="848.67" cy="930.00" r="5.5" fill="#188038" class="point"/>
@@ -941,73 +1071,141 @@
 <circle cx="158.19" cy="950.00" r="5.5" fill="#1a73e8" class="point"/>
 <circle cx="214.38" cy="950.00" r="5.5" fill="#1a73e8" class="point"/>
 <circle cx="270.58" cy="950.00" r="5.5" fill="#1a73e8" class="point"/>
+<polygon points="280.13,943.50 286.63,950.00 280.13,956.50 273.63,950.00" fill="#1a73e8" class="point"/>
+<polygon points="288.67,943.50 295.17,950.00 288.67,956.50 282.17,950.00" fill="#1a73e8" class="point"/>
+<polygon points="296.39,943.50 302.89,950.00 296.39,956.50 289.89,950.00" fill="#d93025" class="tie"/>
 <circle cx="326.77" cy="950.00" r="5.5" fill="#d93025" class="point"/>
 <circle cx="382.96" cy="950.00" r="5.5" fill="#d93025" class="point"/>
 <circle cx="439.15" cy="950.00" r="5.5" fill="#d93025" class="point"/>
 <circle cx="495.35" cy="950.00" r="5.5" fill="#d93025" class="point"/>
-<circle cx="551.54" cy="950.00" r="5.5" fill="#188038" class="tie"/>
+<polygon points="523.43,943.50 529.93,950.00 523.43,956.50 516.93,950.00" fill="#d93025" class="point"/>
+<polygon points="537.39,943.50 543.89,950.00 537.39,956.50 530.89,950.00" fill="#d93025" class="point"/>
+<polygon points="544.60,943.50 551.10,950.00 544.60,956.50 538.10,950.00" fill="#188038" class="point"/>
+<circle cx="551.54" cy="950.00" r="5.5" fill="#188038" class="point"/>
 <circle cx="662.00" cy="950.00" r="5.5" fill="#188038" class="point"/>
 <circle cx="848.67" cy="950.00" r="5.5" fill="#188038" class="point"/>
 <circle cx="1035.33" cy="950.00" r="5.5" fill="#188038" class="point"/>
 <circle cx="1222.00" cy="950.00" r="5.5" fill="#188038" class="point"/>
+<polygon points="495.35,953.50 501.85,960.00 495.35,966.50 488.85,960.00" fill="#d93025" class="point"/>
 <circle cx="102.00" cy="970.00" r="5.5" fill="#1a73e8" class="point"/>
 <circle cx="158.19" cy="970.00" r="5.5" fill="#1a73e8" class="point"/>
 <circle cx="214.38" cy="970.00" r="5.5" fill="#1a73e8" class="point"/>
 <circle cx="270.58" cy="970.00" r="5.5" fill="#1a73e8" class="point"/>
+<polygon points="296.39,963.50 302.89,970.00 296.39,976.50 289.89,970.00" fill="#1a73e8" class="point"/>
+<polygon points="309.94,963.50 316.44,970.00 309.94,976.50 303.44,970.00" fill="#1a73e8" class="point"/>
+<polygon points="315.94,963.50 322.44,970.00 315.94,976.50 309.44,970.00" fill="#d93025" class="tie"/>
 <circle cx="326.77" cy="970.00" r="5.5" fill="#d93025" class="point"/>
 <circle cx="382.96" cy="970.00" r="5.5" fill="#d93025" class="point"/>
 <circle cx="439.15" cy="970.00" r="5.5" fill="#d93025" class="point"/>
-<circle cx="495.35" cy="970.00" r="5.5" fill="#d93025" class="point"/>
+<polygon points="467.69,963.50 474.19,970.00 467.69,976.50 461.19,970.00" fill="#d93025" class="point"/>
+<circle cx="495.35" cy="970.00" r="5.5" fill="#d93025" class="tie"/>
+<polygon points="523.43,963.50 529.93,970.00 523.43,976.50 516.93,970.00" fill="#d93025" class="point"/>
+<polygon points="537.39,963.50 543.89,970.00 537.39,976.50 530.89,970.00" fill="#d93025" class="point"/>
+<polygon points="544.60,963.50 551.10,970.00 544.60,976.50 538.10,970.00" fill="#188038" class="tie"/>
 <circle cx="551.54" cy="970.00" r="5.5" fill="#188038" class="point"/>
 <circle cx="662.00" cy="970.00" r="5.5" fill="#188038" class="point"/>
 <circle cx="848.67" cy="970.00" r="5.5" fill="#188038" class="point"/>
 <circle cx="1035.33" cy="970.00" r="5.5" fill="#188038" class="point"/>
 <circle cx="1222.00" cy="970.00" r="5.5" fill="#188038" class="point"/>
+<polygon points="326.77,978.50 333.27,985.00 326.77,991.50 320.27,985.00" fill="#d93025" class="point"/>
+<polygon points="495.35,978.50 501.85,985.00 495.35,991.50 488.85,985.00" fill="#d93025" class="tie"/>
+<polygon points="326.77,988.50 333.27,995.00 326.77,1001.50 320.27,995.00" fill="#d93025" class="point"/>
+<polygon points="326.77,993.50 333.27,1000.00 326.77,1006.50 320.27,1000.00" fill="#1a73e8" class="point"/>
 <circle cx="102.00" cy="1005.00" r="5.5" fill="#1a73e8" class="point"/>
 <circle cx="158.19" cy="1005.00" r="5.5" fill="#1a73e8" class="point"/>
 <circle cx="214.38" cy="1005.00" r="5.5" fill="#1a73e8" class="point"/>
 <circle cx="270.58" cy="1005.00" r="5.5" fill="#1a73e8" class="point"/>
 <circle cx="326.77" cy="1005.00" r="5.5" fill="#1a73e8" class="point"/>
+<polygon points="331.68,998.50 338.18,1005.00 331.68,1011.50 325.18,1005.00" fill="#d93025" class="point"/>
+<polygon points="340.70,998.50 347.20,1005.00 340.70,1011.50 334.20,1005.00" fill="#d93025" class="point"/>
+<polygon points="356.19,998.50 362.69,1005.00 356.19,1011.50 349.69,1005.00" fill="#d93025" class="point"/>
 <circle cx="382.96" cy="1005.00" r="5.5" fill="#d93025" class="point"/>
 <circle cx="439.15" cy="1005.00" r="5.5" fill="#d93025" class="point"/>
-<circle cx="495.35" cy="1005.00" r="5.5" fill="#d93025" class="tie"/>
+<circle cx="495.35" cy="1005.00" r="5.5" fill="#d93025" class="point"/>
+<polygon points="523.43,998.50 529.93,1005.00 523.43,1011.50 516.93,1005.00" fill="#d93025" class="point"/>
+<polygon points="537.39,998.50 543.89,1005.00 537.39,1011.50 530.89,1005.00" fill="#d93025" class="point"/>
+<polygon points="544.60,998.50 551.10,1005.00 544.60,1011.50 538.10,1005.00" fill="#188038" class="point"/>
 <circle cx="551.54" cy="1005.00" r="5.5" fill="#188038" class="point"/>
 <circle cx="662.00" cy="1005.00" r="5.5" fill="#188038" class="point"/>
 <circle cx="848.67" cy="1005.00" r="5.5" fill="#188038" class="point"/>
 <circle cx="1035.33" cy="1005.00" r="5.5" fill="#188038" class="point"/>
 <circle cx="1222.00" cy="1005.00" r="5.5" fill="#188038" class="point"/>
+<polygon points="495.35,1018.50 501.85,1025.00 495.35,1031.50 488.85,1025.00" fill="#d93025" class="tie"/>
+<polygon points="495.35,1023.50 501.85,1030.00 495.35,1036.50 488.85,1030.00" fill="#188038" class="tie"/>
+<polygon points="495.35,1028.50 501.85,1035.00 495.35,1041.50 488.85,1035.00" fill="#188038" class="tie"/>
 <circle cx="102.00" cy="1050.00" r="5.5" fill="#1a73e8" class="point"/>
 <circle cx="158.19" cy="1050.00" r="5.5" fill="#1a73e8" class="point"/>
 <circle cx="214.38" cy="1050.00" r="5.5" fill="#1a73e8" class="point"/>
 <circle cx="270.58" cy="1050.00" r="5.5" fill="#1a73e8" class="point"/>
 <circle cx="326.77" cy="1050.00" r="5.5" fill="#1a73e8" class="point"/>
-<circle cx="382.96" cy="1050.00" r="5.5" fill="#d93025" class="point"/>
-<circle cx="439.15" cy="1050.00" r="5.5" fill="#d93025" class="point"/>
-<circle cx="495.35" cy="1050.00" r="5.5" fill="#d93025" class="tie"/>
+<polygon points="331.68,1043.50 338.18,1050.00 331.68,1056.50 325.18,1050.00" fill="#1a73e8" class="point"/>
+<polygon points="340.70,1043.50 347.20,1050.00 340.70,1056.50 334.20,1050.00" fill="#d93025" class="point"/>
+<polygon points="356.19,1043.50 362.69,1050.00 356.19,1056.50 349.69,1050.00" fill="#d93025" class="tie"/>
+<circle cx="382.96" cy="1050.00" r="5.5" fill="#d93025" class="tie"/>
+<circle cx="439.15" cy="1050.00" r="5.5" fill="#d93025" class="tie"/>
+<polygon points="467.69,1043.50 474.19,1050.00 467.69,1056.50 461.19,1050.00" fill="#d93025" class="point"/>
+<polygon points="481.57,1043.50 488.07,1050.00 481.57,1056.50 475.07,1050.00" fill="#d93025" class="point"/>
+<polygon points="488.75,1043.50 495.25,1050.00 488.75,1056.50 482.25,1050.00" fill="#188038" class="point"/>
+<circle cx="495.35" cy="1050.00" r="5.5" fill="#188038" class="tie"/>
+<polygon points="502.03,1043.50 508.53,1050.00 502.03,1056.50 495.53,1050.00" fill="#188038" class="point"/>
+<polygon points="509.28,1043.50 515.78,1050.00 509.28,1056.50 502.78,1050.00" fill="#d93025" class="point"/>
+<polygon points="523.43,1043.50 529.93,1050.00 523.43,1056.50 516.93,1050.00" fill="#d93025" class="point"/>
+<polygon points="537.39,1043.50 543.89,1050.00 537.39,1056.50 530.89,1050.00" fill="#d93025" class="point"/>
+<polygon points="544.60,1043.50 551.10,1050.00 544.60,1056.50 538.10,1050.00" fill="#188038" class="point"/>
 <circle cx="551.54" cy="1050.00" r="5.5" fill="#188038" class="point"/>
 <circle cx="662.00" cy="1050.00" r="5.5" fill="#188038" class="point"/>
 <circle cx="848.67" cy="1050.00" r="5.5" fill="#188038" class="point"/>
 <circle cx="1035.33" cy="1050.00" r="5.5" fill="#188038" class="point"/>
 <circle cx="1222.00" cy="1050.00" r="5.5" fill="#188038" class="point"/>
+<polygon points="382.96,1053.50 389.46,1060.00 382.96,1066.50 376.46,1060.00" fill="#d93025" class="point"/>
+<polygon points="382.96,1058.50 389.46,1065.00 382.96,1071.50 376.46,1065.00" fill="#d93025" class="tie"/>
+<polygon points="382.96,1063.50 389.46,1070.00 382.96,1076.50 376.46,1070.00" fill="#188038" class="tie"/>
+<polygon points="396.89,1063.50 403.39,1070.00 396.89,1076.50 390.39,1070.00" fill="#d93025" class="point"/>
+<polygon points="410.60,1063.50 417.10,1070.00 410.60,1076.50 404.10,1070.00" fill="#d93025" class="point"/>
+<polygon points="439.15,1063.50 445.65,1070.00 439.15,1076.50 432.65,1070.00" fill="#d93025" class="tie"/>
+<polygon points="467.69,1063.50 474.19,1070.00 467.69,1076.50 461.19,1070.00" fill="#d93025" class="point"/>
+<polygon points="481.57,1063.50 488.07,1070.00 481.57,1076.50 475.07,1070.00" fill="#d93025" class="point"/>
+<polygon points="495.35,1063.50 501.85,1070.00 495.35,1076.50 488.85,1070.00" fill="#188038" class="point"/>
+<polygon points="382.96,1068.50 389.46,1075.00 382.96,1081.50 376.46,1075.00" fill="#188038" class="tie"/>
+<polygon points="439.15,1068.50 445.65,1075.00 439.15,1081.50 432.65,1075.00" fill="#188038" class="tie"/>
+<polygon points="382.96,1073.50 389.46,1080.00 382.96,1086.50 376.46,1080.00" fill="#d93025" class="tie"/>
+<polygon points="410.60,1073.50 417.10,1080.00 410.60,1086.50 404.10,1080.00" fill="#d93025" class="point"/>
+<polygon points="439.15,1073.50 445.65,1080.00 439.15,1086.50 432.65,1080.00" fill="#188038" class="point"/>
 <circle cx="102.00" cy="1090.00" r="5.5" fill="#1a73e8" class="point"/>
 <circle cx="158.19" cy="1090.00" r="5.5" fill="#1a73e8" class="point"/>
 <circle cx="214.38" cy="1090.00" r="5.5" fill="#1a73e8" class="point"/>
 <circle cx="270.58" cy="1090.00" r="5.5" fill="#1a73e8" class="point"/>
 <circle cx="326.77" cy="1090.00" r="5.5" fill="#1a73e8" class="point"/>
+<polygon points="356.19,1083.50 362.69,1090.00 356.19,1096.50 349.69,1090.00" fill="#1a73e8" class="point"/>
+<polygon points="369.19,1083.50 375.69,1090.00 369.19,1096.50 362.69,1090.00" fill="#1a73e8" class="point"/>
+<polygon points="374.98,1083.50 381.48,1090.00 374.98,1096.50 368.48,1090.00" fill="#188038" class="tie"/>
 <circle cx="382.96" cy="1090.00" r="5.5" fill="#d93025" class="tie"/>
-<circle cx="439.15" cy="1090.00" r="5.5" fill="#d93025" class="tie"/>
+<polygon points="410.60,1083.50 417.10,1090.00 410.60,1096.50 404.10,1090.00" fill="#d93025" class="point"/>
+<polygon points="425.38,1083.50 431.88,1090.00 425.38,1096.50 418.88,1090.00" fill="#d93025" class="point"/>
+<polygon points="432.56,1083.50 439.06,1090.00 432.56,1096.50 426.06,1090.00" fill="#188038" class="point"/>
+<circle cx="439.15" cy="1090.00" r="5.5" fill="#188038" class="tie"/>
 <circle cx="495.35" cy="1090.00" r="5.5" fill="#188038" class="point"/>
 <circle cx="551.54" cy="1090.00" r="5.5" fill="#188038" class="point"/>
 <circle cx="662.00" cy="1090.00" r="5.5" fill="#188038" class="point"/>
 <circle cx="848.67" cy="1090.00" r="5.5" fill="#188038" class="point"/>
 <circle cx="1035.33" cy="1090.00" r="5.5" fill="#188038" class="point"/>
 <circle cx="1222.00" cy="1090.00" r="5.5" fill="#188038" class="point"/>
+<polygon points="382.96,1093.50 389.46,1100.00 382.96,1106.50 376.46,1100.00" fill="#188038" class="tie"/>
+<polygon points="382.96,1103.50 389.46,1110.00 382.96,1116.50 376.46,1110.00" fill="#188038" class="point"/>
+<polygon points="382.96,1113.50 389.46,1120.00 382.96,1126.50 376.46,1120.00" fill="#1a73e8" class="point"/>
+<polygon points="382.96,1123.50 389.46,1130.00 382.96,1136.50 376.46,1130.00" fill="#1a73e8" class="point"/>
 <circle cx="102.00" cy="1170.00" r="5.5" fill="#1a73e8" class="point"/>
 <circle cx="158.19" cy="1170.00" r="5.5" fill="#1a73e8" class="point"/>
 <circle cx="214.38" cy="1170.00" r="5.5" fill="#1a73e8" class="point"/>
 <circle cx="270.58" cy="1170.00" r="5.5" fill="#1a73e8" class="point"/>
 <circle cx="326.77" cy="1170.00" r="5.5" fill="#1a73e8" class="point"/>
 <circle cx="382.96" cy="1170.00" r="5.5" fill="#1a73e8" class="point"/>
+<polygon points="390.23,1163.50 396.73,1170.00 390.23,1176.50 383.73,1170.00" fill="#1a73e8" class="point"/>
+<polygon points="396.89,1163.50 403.39,1170.00 396.89,1176.50 390.39,1170.00" fill="#188038" class="point"/>
+<polygon points="403.05,1163.50 409.55,1170.00 403.05,1176.50 396.55,1170.00" fill="#d93025" class="tie"/>
+<polygon points="410.60,1163.50 417.10,1170.00 410.60,1176.50 404.10,1170.00" fill="#d93025" class="tie"/>
+<polygon points="425.38,1163.50 431.88,1170.00 425.38,1176.50 418.88,1170.00" fill="#d93025" class="point"/>
+<polygon points="432.56,1163.50 439.06,1170.00 432.56,1176.50 426.06,1170.00" fill="#188038" class="point"/>
 <circle cx="439.15" cy="1170.00" r="5.5" fill="#188038" class="point"/>
 <circle cx="495.35" cy="1170.00" r="5.5" fill="#188038" class="point"/>
 <circle cx="551.54" cy="1170.00" r="5.5" fill="#188038" class="point"/>
@@ -1015,6 +1213,12 @@
 <circle cx="848.67" cy="1170.00" r="5.5" fill="#188038" class="point"/>
 <circle cx="1035.33" cy="1170.00" r="5.5" fill="#188038" class="point"/>
 <circle cx="1222.00" cy="1170.00" r="5.5" fill="#188038" class="point"/>
+<polygon points="102.00,1168.50 108.50,1175.00 102.00,1181.50 95.50,1175.00" fill="#d93025" class="point"/>
+<polygon points="158.19,1168.50 164.69,1175.00 158.19,1181.50 151.69,1175.00" fill="#188038" class="point"/>
+<polygon points="214.38,1168.50 220.88,1175.00 214.38,1181.50 207.88,1175.00" fill="#188038" class="point"/>
+<polygon points="270.58,1168.50 277.08,1175.00 270.58,1181.50 264.08,1175.00" fill="#188038" class="point"/>
+<polygon points="326.77,1168.50 333.27,1175.00 326.77,1181.50 320.27,1175.00" fill="#188038" class="point"/>
+<polygon points="382.96,1168.50 389.46,1175.00 382.96,1181.50 376.46,1175.00" fill="#188038" class="point"/>
 <circle cx="102.00" cy="1250.00" r="5.5" fill="#d93025" class="point"/>
 <circle cx="158.19" cy="1250.00" r="5.5" fill="#188038" class="point"/>
 <circle cx="214.38" cy="1250.00" r="5.5" fill="#188038" class="point"/>
@@ -1041,7 +1245,10 @@
 <circle cx="848.67" cy="1330.00" r="5.5" fill="#188038" class="point"/>
 <circle cx="1035.33" cy="1330.00" r="5.5" fill="#188038" class="point"/>
 <circle cx="1222.00" cy="1330.00" r="5.5" fill="#188038" class="point"/>
-<circle cx="102.00" cy="1490.00" r="5.5" fill="#d93025" class="tie"/>
+<polygon points="102.00,1403.50 108.50,1410.00 102.00,1416.50 95.50,1410.00" fill="#d93025" class="point"/>
+<polygon points="102.00,1443.50 108.50,1450.00 102.00,1456.50 95.50,1450.00" fill="#d93025" class="point"/>
+<polygon points="102.00,1463.50 108.50,1470.00 102.00,1476.50 95.50,1470.00" fill="#d93025" class="point"/>
+<circle cx="102.00" cy="1490.00" r="5.5" fill="#188038" class="point"/>
 <circle cx="158.19" cy="1490.00" r="5.5" fill="#188038" class="point"/>
 <circle cx="214.38" cy="1490.00" r="5.5" fill="#188038" class="point"/>
 <circle cx="270.58" cy="1490.00" r="5.5" fill="#188038" class="point"/>
