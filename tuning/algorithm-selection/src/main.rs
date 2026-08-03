@@ -404,9 +404,24 @@ fn build_patterns(seed: u64, k: usize, pattern_count: usize) -> Vec<String> {
 
 fn build_matcher(patterns: &[String], algorithm: Algorithm) -> Result<PatternMatcher, String> {
     let result = match algorithm {
-        Algorithm::Bndmq => PatternMatcher::new(patterns, false, false, false, None),
-        Algorithm::Hash => PatternMatcher::new(patterns, false, true, false, None),
-        Algorithm::AhoCorasick => PatternMatcher::new(patterns, true, false, false, None),
+        Algorithm::Bndmq => PatternMatcher::new(
+            patterns,
+            pattern_matching::SearchAlgorithm::Bndmq,
+            false,
+            None,
+        ),
+        Algorithm::Hash => PatternMatcher::new(
+            patterns,
+            pattern_matching::SearchAlgorithm::Hash,
+            false,
+            None,
+        ),
+        Algorithm::AhoCorasick => PatternMatcher::new(
+            patterns,
+            pattern_matching::SearchAlgorithm::AhoCorasick,
+            false,
+            None,
+        ),
     };
     result.map_err(|error| error.to_string())
 }

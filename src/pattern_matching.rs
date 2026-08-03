@@ -80,6 +80,104 @@ pub struct MatchHit {
     pub position: usize,
 }
 
+/// Search behavior that affects which matcher performs best.
+#[derive(Debug, Clone, Copy, Eq, PartialEq)]
+pub enum MatchMode {
+    /// Stop after finding the first match in a record.
+    First,
+    /// Find all matches in a record.
+    All,
+}
+
+/// Pattern-matching implementation selected for a search.
+#[derive(Debug, Clone, Copy, Eq, PartialEq)]
+pub enum SearchAlgorithm {
+    AhoCorasick,
+    Bndmq,
+    Hash,
+}
+
+/// Select the fastest matcher for the pattern set and search behavior.
+///
+/// These deliberately compact rules summarize the algorithm-tuning results.
+/// Mixed-length patterns use Aho-Corasick because the hash matcher requires a
+/// common length and separate BNDMq searches become expensive as their number
+/// grows.
+pub fn select_search_algorithm(pattern_list: &[String], mode: MatchMode) -> SearchAlgorithm {
+    let Some(first_pattern) = pattern_list.first() else {
+        return SearchAlgorithm::AhoCorasick;
+    };
+
+    let pattern_len = first_pattern.len();
+    if pattern_len == 0
+        || pattern_list
+            .iter()
+            .any(|pattern| pattern.len() != pattern_len)
+    {
+        return SearchAlgorithm::AhoCorasick;
+    }
+
+    let pattern_count = pattern_list.len();
+
+    if pattern_len <= 6 {
+        if mode == MatchMode::First && pattern_len == 4 && pattern_count >= 128 {
+            return SearchAlgorithm::Hash;
+        }
+        return match pattern_count {
+            2 => SearchAlgorithm::Bndmq,
+            3 => SearchAlgorithm::Hash,
+            _ => SearchAlgorithm::AhoCorasick,
+        };
+    }
+
+    if pattern_len == 7 {
+        return if mode == MatchMode::First && pattern_count >= 500 {
+            SearchAlgorithm::Hash
+        } else {
+            SearchAlgorithm::AhoCorasick
+        };
+    }
+
+    if pattern_len > 64 {
+        return if pattern_count == 1 {
+            SearchAlgorithm::AhoCorasick
+        } else {
+            SearchAlgorithm::Hash
+        };
+    }
+
+    // Aho-Corasick wins the single-pattern, short-pattern first-match cases.
+    if mode == MatchMode::First && pattern_len <= 10 && pattern_count == 1 {
+        return SearchAlgorithm::AhoCorasick;
+    }
+
+    if pattern_count <= pattern_len / 2 {
+        return SearchAlgorithm::Bndmq;
+    }
+
+    let hash_cutoff = match mode {
+        MatchMode::First => match pattern_len {
+            8..=10 => 500,
+            11..=23 => 225,
+            24..=47 => 128,
+            48..=64 => 32,
+            _ => unreachable!(),
+        },
+        MatchMode::All => match pattern_len {
+            8..=12 => 500,
+            13..=47 => 225,
+            48..=64 => 56,
+            _ => unreachable!(),
+        },
+    };
+
+    if pattern_count >= hash_cutoff {
+        SearchAlgorithm::Hash
+    } else {
+        SearchAlgorithm::AhoCorasick
+    }
+}
+
 /// Parser-independent pattern matcher used by FASTX and alignment commands.
 #[derive(Debug)]
 pub enum PatternMatcher {
@@ -92,29 +190,30 @@ impl PatternMatcher {
     /// Build the requested matcher implementation from the preprocessed pattern list.
     pub fn new(
         pattern_list: &[String],
-        use_aho_corasick: bool,
-        use_hash: bool,
+        algorithm: SearchAlgorithm,
         case_insensitive: bool,
         q_size: Option<usize>,
     ) -> Result<Self> {
-        if use_aho_corasick {
-            let ac = AhoCorasick::builder()
-                // Use DFA for better search performance at higher memory cost.
-                .kind(Some(aho_corasick::AhoCorasickKind::DFA))
-                .ascii_case_insensitive(case_insensitive)
-                .build(pattern_list)?;
-            Ok(Self::AhoCorasick { ac })
-        } else if use_hash {
-            Ok(Self::Hash {
-                matcher: HashMatcher::new(pattern_list)?,
-            })
-        } else {
-            let mut matchers = Vec::with_capacity(pattern_list.len());
-            for pattern in pattern_list {
-                let q = q_size.unwrap_or_else(|| tune_q_value(pattern).unwrap());
-                matchers.push(BNDMq::new(pattern.as_bytes(), q)?);
+        match algorithm {
+            SearchAlgorithm::AhoCorasick => {
+                let ac = AhoCorasick::builder()
+                    // Use DFA for better search performance at higher memory cost.
+                    .kind(Some(aho_corasick::AhoCorasickKind::DFA))
+                    .ascii_case_insensitive(case_insensitive)
+                    .build(pattern_list)?;
+                Ok(Self::AhoCorasick { ac })
             }
-            Ok(Self::Bndmq { matchers })
+            SearchAlgorithm::Hash => Ok(Self::Hash {
+                matcher: HashMatcher::new(pattern_list)?,
+            }),
+            SearchAlgorithm::Bndmq => {
+                let mut matchers = Vec::with_capacity(pattern_list.len());
+                for pattern in pattern_list {
+                    let q = q_size.unwrap_or_else(|| tune_q_value(pattern).unwrap());
+                    matchers.push(BNDMq::new(pattern.as_bytes(), q)?);
+                }
+                Ok(Self::Bndmq { matchers })
+            }
         }
     }
 
@@ -852,7 +951,8 @@ mod tests {
     #[test]
     fn test_pattern_matcher_bndmq() {
         let patterns = vec!["abc".to_string()];
-        let matcher = PatternMatcher::new(&patterns, false, false, false, Some(2)).unwrap();
+        let matcher =
+            PatternMatcher::new(&patterns, SearchAlgorithm::Bndmq, false, Some(2)).unwrap();
 
         assert!(matcher.find_any(b"abcabc"));
         assert!(!matcher.find_any(b"defdef"));
@@ -879,7 +979,8 @@ mod tests {
     #[test]
     fn test_pattern_matcher_aho_corasick() {
         let patterns = vec!["abc".to_string()];
-        let matcher = PatternMatcher::new(&patterns, true, false, false, None).unwrap();
+        let matcher =
+            PatternMatcher::new(&patterns, SearchAlgorithm::AhoCorasick, false, None).unwrap();
 
         assert!(matcher.find_any(b"abcabc"));
         assert!(!matcher.find_any(b"defdef"));
@@ -1025,12 +1126,79 @@ mod tests {
     #[test]
     fn test_pattern_matcher_hash_marks_distinct_patterns() {
         let patterns = vec!["aba".to_string(), "bab".to_string()];
-        let matcher = PatternMatcher::new(&patterns, false, true, false, None).unwrap();
+        let matcher = PatternMatcher::new(&patterns, SearchAlgorithm::Hash, false, None).unwrap();
         let mut matched = vec![false; patterns.len()];
 
         matcher.mark_matching_patterns(b"ababa", &mut matched);
 
         assert_eq!(matched, vec![true, true]);
         assert_eq!(matcher.algorithm_name(), "rolling hash");
+    }
+
+    fn select(pattern_len: usize, pattern_count: usize, mode: MatchMode) -> SearchAlgorithm {
+        let patterns = vec!["A".repeat(pattern_len); pattern_count];
+        select_search_algorithm(&patterns, mode)
+    }
+
+    #[test]
+    fn selector_uses_aho_corasick_for_mixed_lengths() {
+        let patterns = vec!["AAAA".to_string(), "AAAAA".to_string()];
+
+        assert_eq!(
+            select_search_algorithm(&patterns, MatchMode::First),
+            SearchAlgorithm::AhoCorasick
+        );
+    }
+
+    #[test]
+    fn selector_handles_short_patterns() {
+        assert_eq!(select(4, 2, MatchMode::First), SearchAlgorithm::Bndmq);
+        assert_eq!(select(4, 3, MatchMode::First), SearchAlgorithm::Hash);
+        assert_eq!(select(4, 4, MatchMode::First), SearchAlgorithm::AhoCorasick);
+        assert_eq!(select(4, 128, MatchMode::First), SearchAlgorithm::Hash);
+        assert_eq!(select(4, 128, MatchMode::All), SearchAlgorithm::AhoCorasick);
+        assert_eq!(
+            select(7, 499, MatchMode::First),
+            SearchAlgorithm::AhoCorasick
+        );
+        assert_eq!(select(7, 500, MatchMode::First), SearchAlgorithm::Hash);
+        assert_eq!(select(7, 500, MatchMode::All), SearchAlgorithm::AhoCorasick);
+    }
+
+    #[test]
+    fn selector_handles_bndmq_region_and_long_patterns() {
+        assert_eq!(select(8, 1, MatchMode::First), SearchAlgorithm::AhoCorasick);
+        assert_eq!(select(8, 1, MatchMode::All), SearchAlgorithm::Bndmq);
+        assert_eq!(select(31, 15, MatchMode::First), SearchAlgorithm::Bndmq);
+        assert_eq!(
+            select(31, 16, MatchMode::First),
+            SearchAlgorithm::AhoCorasick
+        );
+        assert_eq!(
+            select(65, 1, MatchMode::First),
+            SearchAlgorithm::AhoCorasick
+        );
+        assert_eq!(select(65, 2, MatchMode::First), SearchAlgorithm::Hash);
+    }
+
+    #[test]
+    fn selector_applies_hash_cutoffs() {
+        let cases = [
+            (MatchMode::First, 10, 499, 500),
+            (MatchMode::First, 11, 224, 225),
+            (MatchMode::First, 24, 127, 128),
+            (MatchMode::First, 48, 31, 32),
+            (MatchMode::All, 12, 499, 500),
+            (MatchMode::All, 13, 224, 225),
+            (MatchMode::All, 48, 55, 56),
+        ];
+
+        for (mode, pattern_len, below_cutoff, cutoff) in cases {
+            assert_eq!(
+                select(pattern_len, below_cutoff, mode),
+                SearchAlgorithm::AhoCorasick
+            );
+            assert_eq!(select(pattern_len, cutoff, mode), SearchAlgorithm::Hash);
+        }
     }
 }

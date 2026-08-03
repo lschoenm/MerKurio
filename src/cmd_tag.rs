@@ -18,11 +18,11 @@ use std::path::PathBuf;
 use std::str::from_utf8;
 use std::{env, fs, io};
 
-use crate::helpers::{
-    check_log_flag_conflict, error_if_directory, parse_pattern_list, recommend_aho_corasick,
-};
+use crate::helpers::{check_log_flag_conflict, error_if_directory, parse_pattern_list};
 use crate::logger::{BufferedLogger, JsonLogger};
-use crate::pattern_matching::PatternMatcher;
+use crate::pattern_matching::{
+    MatchMode, PatternMatcher, SearchAlgorithm, select_search_algorithm,
+};
 
 #[derive(Args)]
 #[clap(group(
@@ -176,8 +176,6 @@ pub fn tag_records(args: CmdTag) -> Result<()> {
     )
     .map_err(|e| anyhow::anyhow!(e))?;
 
-    let mut args = args;
-
     // Check if input file path points to a directory
     error_if_directory(&args.in_file, "Record file path")?;
 
@@ -194,13 +192,16 @@ pub fn tag_records(args: CmdTag) -> Result<()> {
     )
     .with_context(|| "Problem parsing pattern list.")?;
 
-    // Case-insensitive matching always uses the Aho-Corasick algorithm
-    if args.case_insensitive {
-        args.aho_corasick = true;
-    // Optimize search parameters only if user did not provide them
-    } else if args.q_size.is_none() && !args.aho_corasick {
-        args.aho_corasick = recommend_aho_corasick(&pattern_list)?;
-    }
+    // Tagging records needs the complete set of matching patterns.
+    let algorithm = if args.case_insensitive || args.aho_corasick {
+        SearchAlgorithm::AhoCorasick
+    } else if args.hash {
+        SearchAlgorithm::Hash
+    } else if args.q_size.is_some() {
+        SearchAlgorithm::Bndmq
+    } else {
+        select_search_algorithm(&pattern_list, MatchMode::All)
+    };
 
     // Set one of thre possible logging options:
     // 1) log to stdout,
@@ -243,13 +244,8 @@ pub fn tag_records(args: CmdTag) -> Result<()> {
             .map_err(|_| anyhow::anyhow!("Invalid tag format."))?
     };
 
-    let matcher = PatternMatcher::new(
-        &pattern_list,
-        args.aho_corasick,
-        args.hash,
-        args.case_insensitive,
-        args.q_size,
-    )?;
+    let matcher =
+        PatternMatcher::new(&pattern_list, algorithm, args.case_insensitive, args.q_size)?;
 
     fn infer_record_writer(
         threads: u16,

@@ -199,17 +199,6 @@ pub fn check_log_flag_conflict(
     Ok(())
 }
 
-/// Returns true if Aho-Corasick search algorithm is recommended based on the number of patterns and their length.
-pub fn recommend_aho_corasick(pattern_list: &[String]) -> Result<bool> {
-    let num_patterns = pattern_list.len();
-    let max_len = pattern_list.iter().map(|x| x.len()).max().unwrap();
-    if num_patterns >= 14 || max_len > 64 {
-        Ok(true)
-    } else {
-        Ok(false)
-    }
-}
-
 //
 // ---------------------------------- Tests ----------------------------------
 //
@@ -549,20 +538,5 @@ mod tests {
         assert!(
             check_log_flag_conflict(&Some(PathBuf::from("STDOUT")), &None, &None, true).is_ok()
         );
-    }
-
-    #[test]
-    fn test_tune_search_algorithm_patterns_few() {
-        let ac = recommend_aho_corasick(&["AAA".to_string(), "CCC".to_string()]).unwrap();
-        assert_eq!(ac, false);
-    }
-
-    #[test]
-    fn test_tune_search_algorithm_patterns_long() {
-        let ac = recommend_aho_corasick(&[
-            "AAAAAAAACCCCCCCCGGGGGGGGTTTTTTTTAAAAAAAACCCCCCCCGGGGGGGGTTTTTTTTA".to_string(),
-        ])
-        .unwrap();
-        assert_eq!(ac, true);
     }
 }

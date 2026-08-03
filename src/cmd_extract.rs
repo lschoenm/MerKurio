@@ -5,10 +5,9 @@
 //! to a new FASTQ/A file, with the file format determined by the input file.
 //! Also, print detailed match information to stdout or a file if provided.
 //!
-//! The search algorithm is automatically selected based on the number of patterns
-//! and their length. The BNDMq algorithm is used by default, but the user can
-//! manually set the size of the _q_-grams. If the number of patterns is high or
-//! the patterns are long, the Aho-Corasick algorithm is used.
+//! The search algorithm is automatically selected from the number and length of
+//! the patterns and whether detailed matches are required. Users can also force
+//! an implementation with the algorithm-specific command-line options.
 
 use anyhow::{Context, Result};
 use clap::{ArgAction, ArgGroup, Args, crate_name, crate_version};
@@ -31,10 +30,12 @@ use crate::extract_processing::{
 use crate::fastx_output::{FastxFormat, FastxRecordView, write_fastx_record};
 use crate::helpers::{
     add_suffix_to_file_prefix, check_log_flag_conflict, error_if_directory,
-    identify_uncompressed_type, parse_pattern_list, recommend_aho_corasick,
+    identify_uncompressed_type, parse_pattern_list,
 };
 use crate::logger::{BufferedLogger, JsonLogger, append_json_log_fields, append_log_fields};
-use crate::pattern_matching::PatternMatcher;
+use crate::pattern_matching::{
+    MatchMode, PatternMatcher, SearchAlgorithm, select_search_algorithm,
+};
 
 const DEFAULT_EXTRACT_PARALLEL_CHUNK_SIZE: usize = 1024;
 
@@ -642,8 +643,6 @@ pub fn extract_records(args: CmdExtract) -> Result<()> {
     )
     .map_err(|e| anyhow::anyhow!(e))?;
 
-    let mut args = args;
-
     let pattern_list = parse_pattern_list(
         &args.kmer_file,
         args.kmer_seq,
@@ -654,13 +653,20 @@ pub fn extract_records(args: CmdExtract) -> Result<()> {
     )
     .with_context(|| "Problem parsing pattern list.")?;
 
-    // Case-insensitive matching always uses the Aho-Corasick algorithm
-    if args.case_insensitive {
-        args.aho_corasick = true;
-    // Optimize search parameters only if user did not provide them
-    } else if args.q_size.is_none() && !args.aho_corasick {
-        args.aho_corasick = recommend_aho_corasick(&pattern_list)?;
-    }
+    let match_mode = if args.out_log.is_some() || args.json_log.is_some() {
+        MatchMode::All
+    } else {
+        MatchMode::First
+    };
+    let algorithm = if args.case_insensitive || args.aho_corasick {
+        SearchAlgorithm::AhoCorasick
+    } else if args.hash {
+        SearchAlgorithm::Hash
+    } else if args.q_size.is_some() {
+        SearchAlgorithm::Bndmq
+    } else {
+        select_search_algorithm(&pattern_list, match_mode)
+    };
 
     // Set one of thre possible logging options:
     // 1) log to stdout,
@@ -766,8 +772,7 @@ pub fn extract_records(args: CmdExtract) -> Result<()> {
 
     let matcher = Arc::new(PatternMatcher::new(
         &pattern_list,
-        args.aho_corasick,
-        args.hash,
+        algorithm,
         args.case_insensitive,
         args.q_size,
     )?);

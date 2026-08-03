@@ -37,7 +37,7 @@
     },
     "inverted_matching": false,
     "program": "merkurio",
-    "search_algorithm": "BNDMq",
+    "search_algorithm": "Aho-Corasick",
     "subcommand": "extract",
     "timestamp": "2025-07-22T08:44:53+02:00[Europe/Vienna]",
     "version": "3.1.1"
