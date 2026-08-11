@@ -1,10 +1,9 @@
 #!/bin/bash
 
-# Strict error handling
-set -euo pipefail
+set -e  # Exit on error
 
 # Create results directory if it doesn't exist
-mkdir -p "../results"
+mkdir -p ../results
 
 # Set number of warmup runs and benchmark runs
 WARMUP=20
@@ -25,69 +24,43 @@ SEQKIT="../seqkit"
 # back_to_sequences: https://github.com/pierrepeterlongo/back_to_sequences
 BACK_TO_SEQUENCES="back_to_sequences"
 
-check_tool_existence() {
-    local tool_name="$1"
-    local tool_command="$2"
-
-    if [[ "$tool_command" == */* ]]; then
-        if [[ ! -x "$tool_command" ]]; then
-            echo "Missing required tool: $tool_name ($tool_command)" >&2
-            exit 1
-        fi
-    elif ! command -v "$tool_command" >/dev/null 2>&1; then
-        echo "Missing required tool: $tool_name ($tool_command)" >&2
-        exit 1
-    fi
-}
-
-check_tool_existence "hyperfine" "hyperfine"
-check_tool_existence "nice" "nice"
-check_tool_existence "taskset" "taskset"
-check_tool_existence "MerKurio" "$MERKURIO"
-check_tool_existence "seqtool" "$ST"
-check_tool_existence "grep" "$GREP"
-check_tool_existence "fetch_reads" "$FETCH_READS"
-check_tool_existence "Cookiecutter" "$CK"
-check_tool_existence "seqkit" "$SEQKIT"
-check_tool_existence "back_to_sequences" "$BACK_TO_SEQUENCES"
-
 # Print system information and tool versions
 echo "Machine running benchmarks:"
 uname -a
 echo "$(date)"
 echo "Versions used:"
-echo "* MerKurio: $("$MERKURIO" --version)"
-echo "* seqtool: $("$ST" --version)"
-echo "* fgrep: $("$GREP" --version)"
+echo "* MerKurio: $($MERKURIO --version)"
+echo "* seqtool: $($ST --version)"
+echo "* fgrep: $($GREP --version)"
 echo "* fetch_reads: no official release <https://github.com/voichek/fetch_reads_with_kmers>"
 echo "* Cookiecutter 1.0.0"
-echo "* seqkit: $("$SEQKIT" version)"
-echo "* back_to_sequences: $("$BACK_TO_SEQUENCES" --version)"
+echo "* seqkit: $($SEQKIT version)"
+echo "* back_to_sequences: $($BACK_TO_SEQUENCES --version)"
 echo ""
 echo "Running benchmarks with $WARMUP warmup runs and $RUNS benchmark runs..."
 echo "Using CPU 0 for all benchmarks (taskset -c 0) and highest priority (nice -20)"
 echo ""
 
 # Save versions to file
-echo "Versions used ($(date)):" > "../results/versions.txt"
-echo "* MerKurio: $("$MERKURIO" --version)" >> "../results/versions.txt"
-echo "* seqtool: $("$ST" --version) <https://github.com/markschl/seqtool>" >> "../results/versions.txt"
-echo "* fgrep: $("$GREP" --version)" >> "../results/versions.txt"
-echo "* fetch_reads: no official release <https://github.com/voichek/fetch_reads_with_kmers>" >> "../results/versions.txt"
-echo "* Cookiecutter: 1.0.0" >> "../results/versions.txt"
-echo "* seqkit: $("$SEQKIT" version)" >> "../results/versions.txt"
-echo "* back_to_sequences: $("$BACK_TO_SEQUENCES" --version)" >> "../results/versions.txt"
+echo "Versions used ($(date)):" > ../results/versions.txt
+echo "* MerKurio: $($MERKURIO --version)" >> ../results/versions.txt
+echo "* seqtool: $($ST --version) <https://github.com/markschl/seqtool>" >> ../results/versions.txt
+echo "* fgrep: $($GREP --version)" >> ../results/versions.txt
+echo "* fetch_reads: no official release <https://github.com/voichek/fetch_reads_with_kmers>" >> ../results/versions.txt
+echo "* Cookiecutter: 1.0.0" >> ../results/versions.txt
+echo "* seqkit: $($SEQKIT version)" >> ../results/versions.txt
+echo "* back_to_sequences: $($BACK_TO_SEQUENCES --version)" >> ../results/versions.txt
 
 # Function to run FASTA benchmarks
 run_fasta_benchmarks() {
-    local k="$1"
-    local num_kmers="$2"
+    local k=$1
+    local num_kmers=$2
     local pattern_file="../patterns/fasta_${num_kmers}x${k}mers.fasta"
     local pattern_txt="../patterns/fasta_${num_kmers}x${k}mers.txt"
     local data_file="../data/genome-sl.fasta"
     local output_dir="../results/fasta"
     
-    mkdir -p "$output_dir"
+    mkdir -p $output_dir
     
     echo -e "\n>>> Running benchmarks for ${num_kmers} x ${k} bp for FASTA"
     hyperfine --style color --warmup $WARMUP --runs $RUNS --export-csv $output_dir/${num_kmers}x${k}mers-results.csv \
@@ -98,16 +71,17 @@ run_fasta_benchmarks() {
         "nice -20 taskset -c 0 $MERKURIO extract -i $data_file -f $pattern_file > $output_dir/out-${num_kmers}x${k}mers-merkurio.fasta"
 }
 
-# Runs benchmark on a single FASTQ file (only first mates)
+# Function to run FASTQ benchmarks
 run_fastq_benchmarks() {
-    local k="$1"
-    local num_kmers="$2"
+    local k=$1
+    local num_kmers=$2
     local pattern_file="../patterns/fastq_${num_kmers}x${k}mers.fasta"
     local pattern_txt="../patterns/fastq_${num_kmers}x${k}mers.txt"
     local data_file="../data/frag_1.fastq"
+    local data_file2="../data/frag_2.fastq"
     local output_dir="../results/fastq"
     
-    mkdir -p "$output_dir"
+    mkdir -p $output_dir
     
     # Use `--seqtype other` to strictly match N characters
     echo -e "\n>>> Running benchmarks for ${num_kmers} x ${k} bp for FASTQ"
@@ -120,9 +94,9 @@ run_fastq_benchmarks() {
         "nice -20 taskset -c 0 $MERKURIO extract -i $data_file -f $pattern_file > $output_dir/out-${num_kmers}x${k}mers-merkurio.fastq"
 }
 
-# Runs benchmarks on paired-end FASTQ files (only for 31-mers), with reverse complements
+# Function to run paired-end FASTQ benchmarks (only for 31-mers) with reverse complements!
 run_paired_end_benchmarks() {
-    local num_kmers="$1"
+    local num_kmers=$1
     local pattern_file="../patterns/fastq_${num_kmers}x31mers.fasta"
     local pattern_txt="../patterns/fastq_${num_kmers}x31mers.txt"
     local pattern_txt_rc="../patterns/fastq_${num_kmers}x31mers_with_rc.txt"
@@ -130,7 +104,7 @@ run_paired_end_benchmarks() {
     local data_file2="../data/frag_2.fastq"
     local output_dir="../results/fastq-paired"
     
-    mkdir -p "$output_dir"
+    mkdir -p $output_dir
     
     echo -e "\n>>> Running benchmarks for ${num_kmers} x 31 bp for paired-end FASTQ"
     hyperfine --style color --warmup $WARMUP --runs $RUNS --export-csv $output_dir/${num_kmers}x31mers-results.csv \
@@ -140,13 +114,13 @@ run_paired_end_benchmarks() {
 }
 
 
-# Run FASTA benchmarks (skipped)
+# Run FASTA benchmarks
 # run_fasta_benchmarks 31 1
 # run_fasta_benchmarks 31 100
 # run_fasta_benchmarks 100 1
 # run_fasta_benchmarks 100 100
 
-# Run single-file FASTQ benchmarks
+# Run FASTQ benchmarks
 run_fastq_benchmarks 31 1
 run_fastq_benchmarks 31 100
 
