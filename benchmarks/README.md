@@ -19,7 +19,7 @@ Additionally, [hyperfine](https://github.com/sharkdp/hyperfine) is needed to exe
 
 To download the data, run `./01-download-data.sh`.
 
-To generate the query _k_-mers, run `./02-generate-patterns.sh`. This uses a seed to get reproducible results.
+To generate the query _k_-mers, run `./02-generate-kmers.sh`. This uses a seed to get reproducible results.
 
 To start the benchmarks, run `./03-run-benchmarks.sh`.
 

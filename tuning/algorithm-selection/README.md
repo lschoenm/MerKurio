@@ -182,10 +182,10 @@ use only the original regular parameter grid. This keeps sparse, targeted
 refinement cells from cluttering those plots or changing the corpus-size
 models.
 
-The current result files predate the 100-million-base corpus-budget design.
-Rerun the complete sweep before deriving selection rules from this version.
-Results remain hardware- and workload-dependent and should not be treated as a
-portable recommendation.
+The checked-in result files use the 100-million-base corpus budget recorded in
+`results/metadata.txt`. Rerun the complete sweep after changing the matcher or
+benchmark harness before revising the selection rules. Results remain hardware-
+and workload-dependent and should not be treated as a portable recommendation.
 
 The winner map is evidence for a later, deliberately simple production
 selection rule. It should not be copied directly into a large lookup table.
