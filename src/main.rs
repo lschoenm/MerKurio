@@ -4,6 +4,7 @@ pub mod extract_processing;
 pub mod fastx_output;
 pub mod helpers;
 pub mod logger;
+pub mod ordered_pipeline;
 pub mod pattern_matching;
 pub mod pattern_preprocessing;
 

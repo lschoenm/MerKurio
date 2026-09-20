@@ -24,15 +24,14 @@ use crossbeam_channel::{Receiver, Sender, bounded};
 use paraseq::{Record, fastx};
 use std::sync::Arc;
 
-use crate::extract_processing::{
-    ExtractSummary, FileSlot, IndexedResult, PipelineConfig, run_bounded_ordered_pipeline,
-};
+use crate::extract_processing::{ExtractSummary, FileSlot};
 use crate::fastx_output::{FastxFormat, FastxRecordView, write_fastx_record};
 use crate::helpers::{
     add_suffix_to_file_prefix, check_log_flag_conflict, error_if_directory,
     identify_uncompressed_type, parse_pattern_list,
 };
 use crate::logger::{BufferedLogger, JsonLogger, append_json_log_fields, append_log_fields};
+use crate::ordered_pipeline::{IndexedResult, PipelineConfig, run_bounded_ordered_pipeline};
 use crate::pattern_matching::{
     MatchMode, PatternMatcher, SearchAlgorithm, select_search_algorithm,
 };
