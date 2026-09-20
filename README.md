@@ -114,7 +114,7 @@ merkurio extract -i input.fastq -f query_kmers.txt --threads 4 -o output.fastq
 
 ### The `tag` Subcommand
 
-Running `merkurio tag` will tag aligned sequences in a BAM/SAM file with _k_-mers. If a record contains one or more of the _k_-mers, it is annotated with a tag ("km" by default; must be exactly two characters long) and the respective _k_-mers. Multithreading is supported for BAM files. Optionally, keep only records which are matching at least one _k_-mer.
+Running `merkurio tag` will tag aligned sequences in a BAM/SAM file with _k_-mers. If a record contains one or more of the _k_-mers, it is annotated with a tag ("km" by default; must be exactly two characters long) and the respective _k_-mers. Parallel matching and tagging are supported for both SAM and BAM files, preserving input order. `--threads` caps total threads including reading and writing; BAM helper threads are disabled. Optionally, keep only records which are matching at least one _k_-mer.
 
 Detailed match statistics are written to stdout or to a file if specified, showing which records got hit by sequences along with a zero-based position. Matching statistics can also be saved in JSON format for easier parsing. Matching records output can be suppressed if one is only interested in the matching statistics.
 
