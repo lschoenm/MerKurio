@@ -12,15 +12,15 @@ RUNS=100
 # Replace with paths to the tested tools
 MERKURIO="../../target/release/merkurio"
 # Seqtool: https://github.com/markschl/seqtool/releases/tag/v0.4.0-beta.3
-ST="../st-0.4.0-beta.3"
+ST="../comparison_binaries/st-0.4.0-beta.3"
 # Grep: https://www.gnu.org/software/grep/
-GREP="../grep"
+GREP="../comparison_binaries/grep"
 # fetch_reads: https://github.com/voichek/fetch_reads_with_kmers/releases/tag/V0_1_beta
-FETCH_READS="../fetch_reads"
+FETCH_READS="../comparison_binaries/fetch_reads"
 # Cookiecutter: https://github.com/ad3002/Cookiecutter/releases/tag/v1.0.0
-CK="../cookiecutter-extract-1.0.0"
+CK="../comparison_binaries/cookiecutter-extract-1.0.0"
 # SeqKit: https://github.com/shenwei356/seqkit/releases/tag/v2.10.0
-SEQKIT="../seqkit"
+SEQKIT="../comparison_binaries/seqkit"
 # back_to_sequences: https://github.com/pierrepeterlongo/back_to_sequences
 BACK_TO_SEQUENCES="back_to_sequences"
 
@@ -51,6 +51,34 @@ echo "* Cookiecutter: 1.0.0" >> ../results/versions.txt
 echo "* seqkit: $($SEQKIT version)" >> ../results/versions.txt
 echo "* back_to_sequences: $($BACK_TO_SEQUENCES --version)" >> ../results/versions.txt
 
+# Compare selected record IDs, ignoring order and extra header annotations.
+record_ids() {
+    awk -v format="$1" '
+        (format == "fasta" && /^>/) || (format == "fastq" && NR % 4 == 1) {
+            id = $1; sub(/^[@>]/, "", id); sub(/\r$/, "", id); print id
+        }
+    ' "$2" | LC_ALL=C sort
+}
+
+compare_outputs() {
+    local format=$1 reference=$2
+    shift 2
+    local output
+    for output in "$reference" "$@"; do
+        if [[ ! -f "$output" ]]; then
+            echo "Missing benchmark output: $output" >&2
+            return 1
+        fi
+    done
+    for output in "$@"; do
+        if ! cmp -s <(record_ids "$format" "$reference") <(record_ids "$format" "$output"); then
+            echo "Output mismatch: $output selects different record IDs than $reference" >&2
+            return 1
+        fi
+    done
+    echo "Output comparison passed: $reference"
+}
+
 # Function to run FASTA benchmarks
 run_fasta_benchmarks() {
     local k=$1
@@ -69,6 +97,12 @@ run_fasta_benchmarks() {
         "nice -20 taskset -c 0 $SEQKIT grep -j 1 -P -s -f $pattern_txt $data_file > $output_dir/out-${num_kmers}x${k}mers-seqkit.fasta" \
         "nice -20 taskset -c 0 $BACK_TO_SEQUENCES --in-kmers $pattern_file --in-sequences $data_file --out-sequences $output_dir/out-${num_kmers}x${k}mers-back_to_sequences.fasta --out-kmers $output_dir/out-${num_kmers}x${k}mers-back_to_sequences.kmers.fasta -k $k --stranded -t 1" \
         "nice -20 taskset -c 0 $MERKURIO extract -i $data_file -f $pattern_file > $output_dir/out-${num_kmers}x${k}mers-merkurio.fasta"
+
+    compare_outputs fasta "$output_dir/out-${num_kmers}x${k}mers-merkurio.fasta" \
+        "$output_dir/out-${num_kmers}x${k}mers-st.fasta" \
+        "$output_dir/out-${num_kmers}x${k}mers-fgrep.fasta" \
+        "$output_dir/out-${num_kmers}x${k}mers-seqkit.fasta" \
+        "$output_dir/out-${num_kmers}x${k}mers-back_to_sequences.fasta"
 }
 
 # Function to run FASTQ benchmarks
@@ -92,6 +126,13 @@ run_fastq_benchmarks() {
         "nice -20 taskset -c 0 $SEQKIT grep -j 1 -P -s -f $pattern_txt $data_file > $output_dir/out-${num_kmers}x${k}mers-seqkit.fastq" \
         "nice -20 taskset -c 0 $BACK_TO_SEQUENCES --in-kmers $pattern_file --in-sequences $data_file --out-sequences $output_dir/out-${num_kmers}x${k}mers-back_to_sequences.fastq --out-kmers $output_dir/out-${num_kmers}x${k}mers-back_to_sequences.kmers.fasta -k $k --stranded -t 1" \
         "nice -20 taskset -c 0 $MERKURIO extract -i $data_file -f $pattern_file > $output_dir/out-${num_kmers}x${k}mers-merkurio.fastq"
+
+    compare_outputs fastq "$output_dir/out-${num_kmers}x${k}mers-merkurio.fastq" \
+        "$output_dir/out-${num_kmers}x${k}mers-st.fastq" \
+        "$output_dir/out-${num_kmers}x${k}mers-fgrep.fastq" \
+        "$output_dir/out-${num_kmers}x${k}mers-ck/frag_1.filtered.fastq" \
+        "$output_dir/out-${num_kmers}x${k}mers-seqkit.fastq" \
+        "$output_dir/out-${num_kmers}x${k}mers-back_to_sequences.fastq"
 }
 
 # Function to run paired-end FASTQ benchmarks (only for 31-mers) with reverse complements!
@@ -111,6 +152,13 @@ run_paired_end_benchmarks() {
         "nice -20 taskset -c 0 $FETCH_READS $data_file $data_file2 $pattern_file 31 $output_dir/out-${num_kmers}x31mers-fetch" \
         "nice -20 taskset -c 0 $CK -1 $data_file -2 $data_file2 -f $pattern_txt_rc -o $output_dir/out-${num_kmers}x31mers-ck" \
         "nice -20 taskset -c 0 $MERKURIO extract -i $data_file -2 $data_file2 -f $pattern_file -o $output_dir/out-${num_kmers}x31mers -r"
+
+    compare_outputs fastq "$output_dir/out-${num_kmers}x31mers_1.fastq" \
+        "$output_dir/out-${num_kmers}x31mers-fetch_R1.fastq" \
+        "$output_dir/out-${num_kmers}x31mers-ck/frag_1.filtered.fastq"
+    compare_outputs fastq "$output_dir/out-${num_kmers}x31mers_2.fastq" \
+        "$output_dir/out-${num_kmers}x31mers-fetch_R2.fastq" \
+        "$output_dir/out-${num_kmers}x31mers-ck/frag_2.filtered.fastq"
 }
 
 
@@ -123,8 +171,10 @@ run_paired_end_benchmarks() {
 # Run FASTQ benchmarks
 run_fastq_benchmarks 31 1
 run_fastq_benchmarks 31 100
+run_fastq_benchmarks 31 1000000
 
 # Run paired-end FASTQ benchmarks (only for 31-mers)
 run_paired_end_benchmarks 1
 run_paired_end_benchmarks 100
+run_paired_end_benchmarks 1000000
 echo "Benchmarks complete!" 
