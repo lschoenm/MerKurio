@@ -8,6 +8,8 @@ mkdir -p ../results
 # Set number of warmup runs and benchmark runs
 WARMUP=20
 RUNS=100
+# Maximum duration of each invocation, including warmups.
+TIMEOUT=5m
 
 # Replace with paths to the tested tools
 MERKURIO="../../target/release/merkurio"
@@ -38,6 +40,7 @@ echo "* seqkit: $($SEQKIT version)"
 echo "* back_to_sequences: $($BACK_TO_SEQUENCES --version)"
 echo ""
 echo "Running benchmarks with $WARMUP warmup runs and $RUNS benchmark runs..."
+echo "Timeout per invocation: $TIMEOUT (forced termination after 5 additional seconds)"
 echo "Using CPU 0 for all benchmarks (taskset -c 0) and highest priority (nice -20)"
 echo ""
 
@@ -92,11 +95,11 @@ run_fasta_benchmarks() {
     
     echo -e "\n>>> Running benchmarks for ${num_kmers} x ${k} bp for FASTA"
     hyperfine --style color --warmup $WARMUP --runs $RUNS --export-csv $output_dir/${num_kmers}x${k}mers-results.csv \
-        "nice -20 taskset -c 0 $ST find -t 1 file:$pattern_file $data_file -o $output_dir/out-${num_kmers}x${k}mers-st.fasta -f" \
-        "nice -20 taskset -c 0 $GREP -f $pattern_txt $data_file -B 1 --no-group-separator > $output_dir/out-${num_kmers}x${k}mers-fgrep.fasta" \
-        "nice -20 taskset -c 0 $SEQKIT grep -j 1 -P -s -f $pattern_txt $data_file > $output_dir/out-${num_kmers}x${k}mers-seqkit.fasta" \
-        "nice -20 taskset -c 0 $BACK_TO_SEQUENCES --in-kmers $pattern_file --in-sequences $data_file --out-sequences $output_dir/out-${num_kmers}x${k}mers-back_to_sequences.fasta --out-kmers $output_dir/out-${num_kmers}x${k}mers-back_to_sequences.kmers.fasta -k $k --stranded -t 1" \
-        "nice -20 taskset -c 0 $MERKURIO extract -i $data_file -f $pattern_file > $output_dir/out-${num_kmers}x${k}mers-merkurio.fasta"
+        "timeout --verbose --kill-after=5s $TIMEOUT nice -20 taskset -c 0 $ST find -t 1 file:$pattern_file $data_file -o $output_dir/out-${num_kmers}x${k}mers-st.fasta -f" \
+        "timeout --verbose --kill-after=5s $TIMEOUT nice -20 taskset -c 0 $GREP -f $pattern_txt $data_file -B 1 --no-group-separator > $output_dir/out-${num_kmers}x${k}mers-fgrep.fasta" \
+        "timeout --verbose --kill-after=5s $TIMEOUT nice -20 taskset -c 0 $SEQKIT grep -j 1 -P -s -f $pattern_txt $data_file > $output_dir/out-${num_kmers}x${k}mers-seqkit.fasta" \
+        "timeout --verbose --kill-after=5s $TIMEOUT nice -20 taskset -c 0 $BACK_TO_SEQUENCES --in-kmers $pattern_file --in-sequences $data_file --out-sequences $output_dir/out-${num_kmers}x${k}mers-back_to_sequences.fasta --out-kmers $output_dir/out-${num_kmers}x${k}mers-back_to_sequences.kmers.fasta -k $k --stranded -t 1" \
+        "timeout --verbose --kill-after=5s $TIMEOUT nice -20 taskset -c 0 $MERKURIO extract -i $data_file -f $pattern_file > $output_dir/out-${num_kmers}x${k}mers-merkurio.fasta"
 
     compare_outputs fasta "$output_dir/out-${num_kmers}x${k}mers-merkurio.fasta" \
         "$output_dir/out-${num_kmers}x${k}mers-st.fasta" \
@@ -120,12 +123,12 @@ run_fastq_benchmarks() {
     # Use `--seqtype other` to strictly match N characters
     echo -e "\n>>> Running benchmarks for ${num_kmers} x ${k} bp for FASTQ"
     hyperfine --style color --warmup $WARMUP --runs $RUNS --export-csv $output_dir/${num_kmers}x${k}mers-results.csv \
-        "nice -20 taskset -c 0 $ST find -t 1 file:$pattern_file $data_file -o $output_dir/out-${num_kmers}x${k}mers-st.fastq --seqtype other -f" \
-        "nice -20 taskset -c 0 $GREP -f $pattern_txt $data_file -B 1 -A 2 --no-group-separator > $output_dir/out-${num_kmers}x${k}mers-fgrep.fastq" \
-        "nice -20 taskset -c 0 $CK -i $data_file -f $pattern_txt -o $output_dir/out-${num_kmers}x${k}mers-ck" \
-        "nice -20 taskset -c 0 $SEQKIT grep -j 1 -P -s -f $pattern_txt $data_file > $output_dir/out-${num_kmers}x${k}mers-seqkit.fastq" \
-        "nice -20 taskset -c 0 $BACK_TO_SEQUENCES --in-kmers $pattern_file --in-sequences $data_file --out-sequences $output_dir/out-${num_kmers}x${k}mers-back_to_sequences.fastq --out-kmers $output_dir/out-${num_kmers}x${k}mers-back_to_sequences.kmers.fasta -k $k --stranded -t 1" \
-        "nice -20 taskset -c 0 $MERKURIO extract -i $data_file -f $pattern_file > $output_dir/out-${num_kmers}x${k}mers-merkurio.fastq"
+        "timeout --verbose --kill-after=5s $TIMEOUT nice -20 taskset -c 0 $ST find -t 1 file:$pattern_file $data_file -o $output_dir/out-${num_kmers}x${k}mers-st.fastq --seqtype other -f" \
+        "timeout --verbose --kill-after=5s $TIMEOUT nice -20 taskset -c 0 $GREP -f $pattern_txt $data_file -B 1 -A 2 --no-group-separator > $output_dir/out-${num_kmers}x${k}mers-fgrep.fastq" \
+        "timeout --verbose --kill-after=5s $TIMEOUT nice -20 taskset -c 0 $CK -i $data_file -f $pattern_txt -o $output_dir/out-${num_kmers}x${k}mers-ck" \
+        "timeout --verbose --kill-after=5s $TIMEOUT nice -20 taskset -c 0 $SEQKIT grep -j 1 -P -s -f $pattern_txt $data_file > $output_dir/out-${num_kmers}x${k}mers-seqkit.fastq" \
+        "timeout --verbose --kill-after=5s $TIMEOUT nice -20 taskset -c 0 $BACK_TO_SEQUENCES --in-kmers $pattern_file --in-sequences $data_file --out-sequences $output_dir/out-${num_kmers}x${k}mers-back_to_sequences.fastq --out-kmers $output_dir/out-${num_kmers}x${k}mers-back_to_sequences.kmers.fasta -k $k --stranded -t 1" \
+        "timeout --verbose --kill-after=5s $TIMEOUT nice -20 taskset -c 0 $MERKURIO extract -i $data_file -f $pattern_file > $output_dir/out-${num_kmers}x${k}mers-merkurio.fastq"
 
     compare_outputs fastq "$output_dir/out-${num_kmers}x${k}mers-merkurio.fastq" \
         "$output_dir/out-${num_kmers}x${k}mers-st.fastq" \
@@ -149,9 +152,9 @@ run_paired_end_benchmarks() {
     
     echo -e "\n>>> Running benchmarks for ${num_kmers} x 31 bp for paired-end FASTQ"
     hyperfine --style color --warmup $WARMUP --runs $RUNS --export-csv $output_dir/${num_kmers}x31mers-results.csv \
-        "nice -20 taskset -c 0 $FETCH_READS $data_file $data_file2 $pattern_file 31 $output_dir/out-${num_kmers}x31mers-fetch" \
-        "nice -20 taskset -c 0 $CK -1 $data_file -2 $data_file2 -f $pattern_txt_rc -o $output_dir/out-${num_kmers}x31mers-ck" \
-        "nice -20 taskset -c 0 $MERKURIO extract -i $data_file -2 $data_file2 -f $pattern_file -o $output_dir/out-${num_kmers}x31mers -r"
+        "timeout --verbose --kill-after=5s $TIMEOUT nice -20 taskset -c 0 $FETCH_READS $data_file $data_file2 $pattern_file 31 $output_dir/out-${num_kmers}x31mers-fetch" \
+        "timeout --verbose --kill-after=5s $TIMEOUT nice -20 taskset -c 0 $CK -1 $data_file -2 $data_file2 -f $pattern_txt_rc -o $output_dir/out-${num_kmers}x31mers-ck" \
+        "timeout --verbose --kill-after=5s $TIMEOUT nice -20 taskset -c 0 $MERKURIO extract -i $data_file -2 $data_file2 -f $pattern_file -o $output_dir/out-${num_kmers}x31mers -r"
 
     compare_outputs fastq "$output_dir/out-${num_kmers}x31mers_1.fastq" \
         "$output_dir/out-${num_kmers}x31mers-fetch_R1.fastq" \
