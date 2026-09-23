@@ -22,7 +22,8 @@ generate_kmers_fastq() {
             seq = $0
             if (length(seq) >= k) {  # Only process sequences that are long enough
                 for (i = 1; i <= length(seq) - k + 1; i++) {
-                    print substr(seq, i, k)
+                    kmer = substr(seq, i, k)
+                    if (kmer !~ /[^ACGT]/) print kmer
                 }
             }
         }
