@@ -40,10 +40,10 @@ You can display a help message with `-h` or `--help`.
 | `-f`       | `--kmer-file`  | `<Path to a file containing query sequences>` Can be in FASTA format or plain text, with empty lines and lines preceded by a `#` being ignored.                                                                                                            |
 | `-o`       | `--out-fastx`  | `<Output file path>` If not provided, output is written to stdout (i.e., the terminal). The correct file extension is added automatically.                                                                                                                 |
 | `-2`       | `--in-fastq-2` | `<Path to the second input file for paired-end reads>` When processing paired-end reads, a match in one read of the pair will extract both. Output is written to two separate files, appending `_1` and `_2` to the base names of the output files.        |
-| `-l`       | `--out-log`    | Set this flag without any arguments to write matching statistics to stdout, or write to file if a path to the output file is passed as an argument to this option. For an explanation of the matching statistics, see the [section below](extract-log.md). |
+| `-l`       | `--out-log`    | Set this flag without any arguments to write matching statistics to stdout, or write to file if a path to the output file is passed as an argument to this option. For an explanation of the matching statistics, see the [section below](log.md). |
 | `-j`       | `--json-log`   | Set this flag without any arguments to write matching statistics in JSON format to stdout, or provide a file path to write JSON log to a file. If both `-l` and `-j` are set without arguments, it will return an error.                                   |
 | `-S`       | `--suppress-output`    | Set this flag to suppress the output of matching records. Only the matching statistics are printed (either use `-l` or `-j` for plain text or JSON logging, respectively).  |
-| `-t`       | `--threads`            | `<Total number of processing threads>` One thread reads input and the remaining threads perform pattern matching. Default is 1. Use 0 to detect the available CPU count automatically. |
+| `-t`       | `--threads`            | `<Total number of processing threads>` One thread reads input and the remaining threads perform pattern matching. Default is 1. Use 0 to detect the available CPU count automatically. Values above the available CPU count are reduced accordingly. |
 
 ### Search parameters: 
 
