@@ -23,7 +23,7 @@ To generate the query _k_-mers, run `./02-generate-kmers.sh`. This uses a seed t
 
 To start the benchmarks, run `./03-run-benchmarks.sh`.
 
-Single-end and paired-end FASTQ benchmarks use 1, 100, and 1,000,000 query 31-mers. The million-query set contains distinct k-mers sampled from the input reads. All cases use 20 warmups and 100 timed runs. Each invocation (including warmups) has a five-minute timeout, followed by forced termination after five additional seconds if needed. Change `TIMEOUT` in `03-run-benchmarks.sh` to adjust it. Each tool is first run once as a preflight; tools that exceed the timeout are skipped, while other errors still stop the suite. This is a per-invocation limit, not a total limit for the suite.
+Single-end and paired-end FASTQ benchmarks use 1, 100, and 1,000,000 query 31-mers. The million-query set contains distinct k-mers sampled from the input reads. All cases use 20 warmups and 100 timed runs. Each tool is first run once as a preflight with a five-minute timeout, followed by forced termination after five additional seconds if needed. Tools that exceed the timeout are skipped, while other errors still stop the suite. Change `TIMEOUT` in `03-run-benchmarks.sh` to adjust the preflight limit.
 
 After each benchmark group, the script compares selected record IDs against MerKurio's output (each mate separately for paired reads). Order and extra header annotations are ignored; duplicate counts are preserved. A missing file or mismatch stops the script. This checks record selection, not sequence or quality content.
 

@@ -8,7 +8,7 @@ mkdir -p ../results
 # Set number of warmup runs and benchmark runs
 WARMUP=20
 RUNS=100
-# Maximum duration of each invocation, including warmups.
+# Maximum duration of each preflight run.
 TIMEOUT=5m
 
 # Replace with paths to the tested tools
@@ -40,7 +40,7 @@ echo "* seqkit: $($SEQKIT version)"
 echo "* back_to_sequences: $($BACK_TO_SEQUENCES --version)"
 echo ""
 echo "Running benchmarks with $WARMUP warmup runs and $RUNS benchmark runs..."
-echo "Timeout per invocation: $TIMEOUT (forced termination after 5 additional seconds)"
+echo "Preflight timeout: $TIMEOUT (forced termination after 5 additional seconds)"
 echo "Using CPU 0 for all benchmarks (taskset -c 0) and highest priority (nice -20)"
 echo ""
 
@@ -86,11 +86,12 @@ compare_outputs() {
 preflight_benchmark() {
     local name=$1
     local command=$2
+    local benchmark_command="nice -20 taskset -c 0 $command"
     BENCHMARK_ADDED=0
 
     echo "Checking $name..."
-    if bash -c "$command"; then
-        BENCHMARK_COMMANDS+=("$command")
+    if timeout --verbose --kill-after=5s "$TIMEOUT" bash -c "$benchmark_command"; then
+        BENCHMARK_COMMANDS+=("$benchmark_command")
         BENCHMARK_ADDED=1
     elif [[ $? -eq 124 ]]; then
         echo "Skipping $name: exceeded the $TIMEOUT timeout"
@@ -125,15 +126,15 @@ run_fasta_benchmarks() {
     mkdir -p $output_dir
     
     echo -e "\n>>> Running benchmarks for ${num_kmers} x ${k} bp for FASTA"
-    preflight_benchmark seqtool "timeout --verbose --kill-after=5s $TIMEOUT nice -20 taskset -c 0 $ST find -t 1 file:$pattern_file $data_file -o $output_dir/out-${num_kmers}x${k}mers-st.fasta -f"
+    preflight_benchmark seqtool "$ST find -t 1 file:$pattern_file $data_file -o $output_dir/out-${num_kmers}x${k}mers-st.fasta -f"
     st_ok=$BENCHMARK_ADDED
-    preflight_benchmark fgrep "timeout --verbose --kill-after=5s $TIMEOUT nice -20 taskset -c 0 $GREP -f $pattern_txt $data_file -B 1 --no-group-separator > $output_dir/out-${num_kmers}x${k}mers-fgrep.fasta"
+    preflight_benchmark fgrep "$GREP -f $pattern_txt $data_file -B 1 --no-group-separator > $output_dir/out-${num_kmers}x${k}mers-fgrep.fasta"
     grep_ok=$BENCHMARK_ADDED
-    preflight_benchmark seqkit "timeout --verbose --kill-after=5s $TIMEOUT nice -20 taskset -c 0 $SEQKIT grep -j 1 -P -s -f $pattern_txt $data_file > $output_dir/out-${num_kmers}x${k}mers-seqkit.fasta"
+    preflight_benchmark seqkit "$SEQKIT grep -j 1 -P -s -f $pattern_txt $data_file > $output_dir/out-${num_kmers}x${k}mers-seqkit.fasta"
     seqkit_ok=$BENCHMARK_ADDED
-    preflight_benchmark back_to_sequences "timeout --verbose --kill-after=5s $TIMEOUT nice -20 taskset -c 0 $BACK_TO_SEQUENCES --in-kmers $pattern_file --in-sequences $data_file --out-sequences $output_dir/out-${num_kmers}x${k}mers-back_to_sequences.fasta --out-kmers $output_dir/out-${num_kmers}x${k}mers-back_to_sequences.kmers.fasta -k $k --stranded -t 1"
+    preflight_benchmark back_to_sequences "$BACK_TO_SEQUENCES --in-kmers $pattern_file --in-sequences $data_file --out-sequences $output_dir/out-${num_kmers}x${k}mers-back_to_sequences.fasta --out-kmers $output_dir/out-${num_kmers}x${k}mers-back_to_sequences.kmers.fasta -k $k --stranded -t 1"
     back_ok=$BENCHMARK_ADDED
-    preflight_benchmark MerKurio "timeout --verbose --kill-after=5s $TIMEOUT nice -20 taskset -c 0 $MERKURIO extract -i $data_file -f $pattern_file > $output_dir/out-${num_kmers}x${k}mers-merkurio.fasta"
+    preflight_benchmark MerKurio "$MERKURIO extract -i $data_file -f $pattern_file > $output_dir/out-${num_kmers}x${k}mers-merkurio.fasta"
     merkurio_ok=$BENCHMARK_ADDED
 
     run_hyperfine "$output_dir/${num_kmers}x${k}mers-results.csv"
@@ -166,17 +167,17 @@ run_fastq_benchmarks() {
     
     # Use `--seqtype other` to strictly match N characters
     echo -e "\n>>> Running benchmarks for ${num_kmers} x ${k} bp for FASTQ"
-    preflight_benchmark seqtool "timeout --verbose --kill-after=5s $TIMEOUT nice -20 taskset -c 0 $ST find -t 1 file:$pattern_file $data_file -o $output_dir/out-${num_kmers}x${k}mers-st.fastq --seqtype other -f"
+    preflight_benchmark seqtool "$ST find -t 1 file:$pattern_file $data_file -o $output_dir/out-${num_kmers}x${k}mers-st.fastq --seqtype other -f"
     st_ok=$BENCHMARK_ADDED
-    preflight_benchmark fgrep "timeout --verbose --kill-after=5s $TIMEOUT nice -20 taskset -c 0 $GREP -f $pattern_txt $data_file -B 1 -A 2 --no-group-separator > $output_dir/out-${num_kmers}x${k}mers-fgrep.fastq"
+    preflight_benchmark fgrep "$GREP -f $pattern_txt $data_file -B 1 -A 2 --no-group-separator > $output_dir/out-${num_kmers}x${k}mers-fgrep.fastq"
     grep_ok=$BENCHMARK_ADDED
-    preflight_benchmark Cookiecutter "timeout --verbose --kill-after=5s $TIMEOUT nice -20 taskset -c 0 $CK -i $data_file -f $pattern_txt -o $output_dir/out-${num_kmers}x${k}mers-ck"
+    preflight_benchmark Cookiecutter "$CK -i $data_file -f $pattern_txt -o $output_dir/out-${num_kmers}x${k}mers-ck"
     ck_ok=$BENCHMARK_ADDED
-    preflight_benchmark seqkit "timeout --verbose --kill-after=5s $TIMEOUT nice -20 taskset -c 0 $SEQKIT grep -j 1 -P -s -f $pattern_txt $data_file > $output_dir/out-${num_kmers}x${k}mers-seqkit.fastq"
+    preflight_benchmark seqkit "$SEQKIT grep -j 1 -P -s -f $pattern_txt $data_file > $output_dir/out-${num_kmers}x${k}mers-seqkit.fastq"
     seqkit_ok=$BENCHMARK_ADDED
-    preflight_benchmark back_to_sequences "timeout --verbose --kill-after=5s $TIMEOUT nice -20 taskset -c 0 $BACK_TO_SEQUENCES --in-kmers $pattern_file --in-sequences $data_file --out-sequences $output_dir/out-${num_kmers}x${k}mers-back_to_sequences.fastq --out-kmers $output_dir/out-${num_kmers}x${k}mers-back_to_sequences.kmers.fasta -k $k --stranded -t 1"
+    preflight_benchmark back_to_sequences "$BACK_TO_SEQUENCES --in-kmers $pattern_file --in-sequences $data_file --out-sequences $output_dir/out-${num_kmers}x${k}mers-back_to_sequences.fastq --out-kmers $output_dir/out-${num_kmers}x${k}mers-back_to_sequences.kmers.fasta -k $k --stranded -t 1"
     back_ok=$BENCHMARK_ADDED
-    preflight_benchmark MerKurio "timeout --verbose --kill-after=5s $TIMEOUT nice -20 taskset -c 0 $MERKURIO extract -i $data_file -f $pattern_file > $output_dir/out-${num_kmers}x${k}mers-merkurio.fastq"
+    preflight_benchmark MerKurio "$MERKURIO extract -i $data_file -f $pattern_file > $output_dir/out-${num_kmers}x${k}mers-merkurio.fastq"
     merkurio_ok=$BENCHMARK_ADDED
 
     run_hyperfine "$output_dir/${num_kmers}x${k}mers-results.csv"
@@ -209,11 +210,11 @@ run_paired_end_benchmarks() {
     mkdir -p $output_dir
     
     echo -e "\n>>> Running benchmarks for ${num_kmers} x 31 bp for paired-end FASTQ"
-    preflight_benchmark fetch_reads "timeout --verbose --kill-after=5s $TIMEOUT nice -20 taskset -c 0 $FETCH_READS $data_file $data_file2 $pattern_file 31 $output_dir/out-${num_kmers}x31mers-fetch"
+    preflight_benchmark fetch_reads "$FETCH_READS $data_file $data_file2 $pattern_file 31 $output_dir/out-${num_kmers}x31mers-fetch"
     fetch_ok=$BENCHMARK_ADDED
-    preflight_benchmark Cookiecutter "timeout --verbose --kill-after=5s $TIMEOUT nice -20 taskset -c 0 $CK -1 $data_file -2 $data_file2 -f $pattern_txt_rc -o $output_dir/out-${num_kmers}x31mers-ck"
+    preflight_benchmark Cookiecutter "$CK -1 $data_file -2 $data_file2 -f $pattern_txt_rc -o $output_dir/out-${num_kmers}x31mers-ck"
     ck_ok=$BENCHMARK_ADDED
-    preflight_benchmark MerKurio "timeout --verbose --kill-after=5s $TIMEOUT nice -20 taskset -c 0 $MERKURIO extract -i $data_file -2 $data_file2 -f $pattern_file -o $output_dir/out-${num_kmers}x31mers -r"
+    preflight_benchmark MerKurio "$MERKURIO extract -i $data_file -2 $data_file2 -f $pattern_file -o $output_dir/out-${num_kmers}x31mers -r"
     merkurio_ok=$BENCHMARK_ADDED
 
     run_hyperfine "$output_dir/${num_kmers}x31mers-results.csv"
