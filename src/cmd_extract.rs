@@ -826,7 +826,11 @@ pub fn extract_records(args: CmdExtract) -> Result<()> {
             let write_output = !args.suppress_output;
             let chunk_processor = ChunkProcessor {
                 matcher: Arc::clone(&matcher),
-                patterns: Arc::new(pattern_list.clone()),
+                patterns: Arc::new(if logging_active {
+                    pattern_list.clone()
+                } else {
+                    Vec::new()
+                }),
                 file_names: [in_fastx_filename.to_string(), String::new()],
                 pattern_count: summary_pattern_count,
                 logging_active,
@@ -1029,7 +1033,11 @@ pub fn extract_records(args: CmdExtract) -> Result<()> {
             let write_output = !args.suppress_output;
             let chunk_processor = ChunkProcessor {
                 matcher: Arc::clone(&matcher),
-                patterns: Arc::new(pattern_list.clone()),
+                patterns: Arc::new(if logging_active {
+                    pattern_list.clone()
+                } else {
+                    Vec::new()
+                }),
                 file_names: [
                     in_fastx_filename.to_string(),
                     in_fastq_2_filename.to_string(),

@@ -80,13 +80,13 @@ fn read_chunk(reader: &mut dyn RecordReader, index: u64, size: usize) -> Result<
 
 impl Processor {
     fn process(&self, work: Work) -> Result<Output> {
+        let logging = self.plain_log || self.json_log;
         let mut output = Output {
             records: Vec::new(),
             plain: String::new(),
             json: Vec::new(),
-            summary: Summary::new(self.patterns.len()),
+            summary: Summary::new(if logging { self.patterns.len() } else { 0 }),
         };
-        let logging = self.plain_log || self.json_log;
         let mut json_first = true;
         let mut matched = vec![false; self.patterns.len()];
         for mut record in work.records {
@@ -171,7 +171,11 @@ pub(super) fn run(
     logger: &mut BufferedLogger,
     json_logger: &mut Option<JsonLogger>,
 ) -> Result<Summary> {
-    let mut summary = Summary::new(processor.patterns.len());
+    let mut summary = Summary::new(if processor.plain_log || processor.json_log {
+        processor.patterns.len()
+    } else {
+        0
+    });
     let mut consume = |output: Output| -> Result<()> {
         if let Some(writer) = writer.as_mut() {
             for record in &output.records {
