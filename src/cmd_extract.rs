@@ -707,6 +707,8 @@ pub fn extract_records(args: CmdExtract) -> Result<()> {
     let plain_logging_active = log_file.is_some();
     let json_logging_active = args.json_log.is_some();
     let logging_active = plain_logging_active || json_logging_active;
+    // Avoid allocating and merging per-pattern counters for every batch without logs.
+    let summary_pattern_count = if logging_active { pattern_list.len() } else { 0 };
 
     // Initialize buffered logger with 8KB buffer
     let mut logger = BufferedLogger::new(log_file, 8192);
@@ -826,14 +828,14 @@ pub fn extract_records(args: CmdExtract) -> Result<()> {
                 matcher: Arc::clone(&matcher),
                 patterns: Arc::new(pattern_list.clone()),
                 file_names: [in_fastx_filename.to_string(), String::new()],
-                pattern_count: pattern_list.len(),
+                pattern_count: summary_pattern_count,
                 logging_active,
                 plain_logging_active,
                 json_logging_active,
                 invert_match: args.invert_match,
                 write_output,
             };
-            let mut summary = ExtractSummary::new(pattern_list.len());
+            let mut summary = ExtractSummary::new(summary_pattern_count);
             let pipeline_config = PipelineConfig::new(matching_threads);
             let pool_size = record_set_pool_size(pipeline_config);
             let (record_pool_tx, record_pool_rx) = bounded::<fastx::RecordSet>(pool_size);
@@ -1032,14 +1034,14 @@ pub fn extract_records(args: CmdExtract) -> Result<()> {
                     in_fastx_filename.to_string(),
                     in_fastq_2_filename.to_string(),
                 ],
-                pattern_count: pattern_list.len(),
+                pattern_count: summary_pattern_count,
                 logging_active,
                 plain_logging_active,
                 json_logging_active,
                 invert_match: args.invert_match,
                 write_output,
             };
-            let mut summary = ExtractSummary::new(pattern_list.len());
+            let mut summary = ExtractSummary::new(summary_pattern_count);
             let pipeline_config = PipelineConfig::new(matching_threads);
             let pool_size = record_set_pool_size(pipeline_config);
             let (record_pool_tx, record_pool_rx) =

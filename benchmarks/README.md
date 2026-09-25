@@ -29,6 +29,8 @@ After each benchmark group, the script compares selected record IDs against MerK
 
 To format the results, run `./04-format-results.sh`.
 
+For an additional single-end FASTQ check, run `./05-run-multithreaded.sh`. It first compares MerKurio with 1, 2, 4 and 6 threads using 2 warmups and 10 timed runs for every query set, then compares programs with 4 threads using the usual run counts. It uses the same query sets and preflight timeout; results are saved in `results-multithreaded/` and are not included by script 04.
+
 ## Summary
 
 A summary Markdown file of the result times is then found in `results/summary.md`.

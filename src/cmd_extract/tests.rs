@@ -580,6 +580,22 @@ fn test_extract_parallel_threads_2_and_4_match_serial_single_end() -> Result<()>
 }
 
 #[test]
+fn test_extract_parallel_without_logging_matches_serial() -> Result<()> {
+    let mut options = SingleExtractOptions::simple(vec!["ACG".to_string()], 1);
+    options.log = false;
+    options.json = false;
+    let serial = run_single_extract(options.clone())?;
+    for threads in [2, 4] {
+        options.threads = threads;
+        let parallel = run_single_extract(options.clone())?;
+        compare_text_files(&parallel.out_fastx, &serial.out_fastx)?;
+        assert!(!parallel.out_log.exists());
+        assert!(!parallel.out_json.exists());
+    }
+    Ok(())
+}
+
+#[test]
 fn test_extract_parallel_threads_4_is_deterministic() -> Result<()> {
     let first = run_single_extract(SingleExtractOptions::simple(vec!["ACG".to_string()], 4))?;
     let second = run_single_extract(SingleExtractOptions::simple(vec!["ACG".to_string()], 4))?;
