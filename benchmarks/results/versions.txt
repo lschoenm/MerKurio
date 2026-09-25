@@ -1,4 +1,4 @@
-Versions used (Sun Sep 20 23:52:25 CEST 2026):
+Versions used (Fri Sep 25 08:12:33 CEST 2026):
 * MerKurio: merkurio 1.0.2
 * seqtool: seqtool 0.4.0-beta.3 <https://github.com/markschl/seqtool>
 * fgrep: grep (GNU grep) 3.11
@@ -13,5 +13,5 @@ Written by Mike Haertel and others; see
 grep -P uses PCRE2 10.34 2019-11-21
 * fetch_reads: no official release <https://github.com/voichek/fetch_reads_with_kmers>
 * Cookiecutter: 1.0.0
-* seqkit: seqkit v2.10.0
+* seqkit: seqkit v2.14.0
 * back_to_sequences: back_to_sequences 0.7.0
