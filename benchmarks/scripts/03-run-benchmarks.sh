@@ -140,7 +140,7 @@ run_fasta_benchmarks() {
     grep_ok=$BENCHMARK_ADDED
     preflight_benchmark seqkit "$SEQKIT grep -j 1 -P -s -f $pattern_txt $data_file > $output_dir/out-${num_kmers}x${k}mers-seqkit.fasta"
     seqkit_ok=$BENCHMARK_ADDED
-    preflight_benchmark back_to_sequences "$BACK_TO_SEQUENCES --in-kmers $pattern_file --in-sequences $data_file --out-sequences $output_dir/out-${num_kmers}x${k}mers-back_to_sequences.fasta --out-kmers $output_dir/out-${num_kmers}x${k}mers-back_to_sequences.kmers.fasta -k $k --stranded -t 1"
+    preflight_benchmark back_to_sequences "$BACK_TO_SEQUENCES --in-kmers $pattern_file --in-sequences $data_file --out-sequences $output_dir/out-${num_kmers}x${k}mers-back_to_sequences.fasta -k $k --stranded -t 1"
     back_ok=$BENCHMARK_ADDED
     preflight_benchmark MerKurio "$MERKURIO extract -i $data_file -f $pattern_file > $output_dir/out-${num_kmers}x${k}mers-merkurio.fasta"
     merkurio_ok=$BENCHMARK_ADDED
@@ -183,7 +183,7 @@ run_fastq_benchmarks() {
     ck_ok=$BENCHMARK_ADDED
     preflight_benchmark seqkit "$SEQKIT grep -j 1 -P -s -f $pattern_txt $data_file > $output_dir/out-${num_kmers}x${k}mers-seqkit.fastq"
     seqkit_ok=$BENCHMARK_ADDED
-    preflight_benchmark back_to_sequences "$BACK_TO_SEQUENCES --in-kmers $pattern_file --in-sequences $data_file --out-sequences $output_dir/out-${num_kmers}x${k}mers-back_to_sequences.fastq --out-kmers $output_dir/out-${num_kmers}x${k}mers-back_to_sequences.kmers.fasta -k $k --stranded -t 1"
+    preflight_benchmark back_to_sequences "$BACK_TO_SEQUENCES --in-kmers $pattern_file --in-sequences $data_file --out-sequences $output_dir/out-${num_kmers}x${k}mers-back_to_sequences.fastq -k $k --stranded -t 1"
     back_ok=$BENCHMARK_ADDED
     preflight_benchmark MerKurio "$MERKURIO extract -i $data_file -f $pattern_file > $output_dir/out-${num_kmers}x${k}mers-merkurio.fastq"
     merkurio_ok=$BENCHMARK_ADDED
