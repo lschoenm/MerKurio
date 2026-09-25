@@ -40,6 +40,7 @@ echo "* seqkit: $($SEQKIT version)"
 echo "* back_to_sequences: $($BACK_TO_SEQUENCES --version)"
 echo ""
 echo "Running benchmarks with $WARMUP warmup runs and $RUNS benchmark runs..."
+echo "The 1,000,000 k-mer cases use 2 warmup runs and 10 benchmark runs."
 echo "Preflight timeout: $TIMEOUT (forced termination after 5 additional seconds)"
 echo "Using CPU 0 for all benchmarks (taskset -c 0) and highest priority (nice -20)"
 echo ""
@@ -103,12 +104,19 @@ preflight_benchmark() {
 
 run_hyperfine() {
     local csv=$1
+    local num_kmers=$2
+    local warmup=$WARMUP
+    local runs=$RUNS
+    if [[ $num_kmers -eq 1000000 ]]; then
+        warmup=2
+        runs=10
+    fi
     if [[ ${#BENCHMARK_COMMANDS[@]} -eq 0 ]]; then
         echo "No commands completed the preflight run"
         return
     fi
     rm -f "$csv"
-    hyperfine --style color --warmup "$WARMUP" --runs "$RUNS" --export-csv "$csv" \
+    hyperfine --style color --warmup "$warmup" --runs "$runs" --export-csv "$csv" \
         "${BENCHMARK_COMMANDS[@]}"
 }
 
@@ -137,7 +145,7 @@ run_fasta_benchmarks() {
     preflight_benchmark MerKurio "$MERKURIO extract -i $data_file -f $pattern_file > $output_dir/out-${num_kmers}x${k}mers-merkurio.fasta"
     merkurio_ok=$BENCHMARK_ADDED
 
-    run_hyperfine "$output_dir/${num_kmers}x${k}mers-results.csv"
+    run_hyperfine "$output_dir/${num_kmers}x${k}mers-results.csv" "$num_kmers"
 
     if (( merkurio_ok )); then
         local outputs=()
@@ -180,7 +188,7 @@ run_fastq_benchmarks() {
     preflight_benchmark MerKurio "$MERKURIO extract -i $data_file -f $pattern_file > $output_dir/out-${num_kmers}x${k}mers-merkurio.fastq"
     merkurio_ok=$BENCHMARK_ADDED
 
-    run_hyperfine "$output_dir/${num_kmers}x${k}mers-results.csv"
+    run_hyperfine "$output_dir/${num_kmers}x${k}mers-results.csv" "$num_kmers"
 
     if (( merkurio_ok )); then
         local outputs=()
@@ -217,7 +225,7 @@ run_paired_end_benchmarks() {
     preflight_benchmark MerKurio "$MERKURIO extract -i $data_file -2 $data_file2 -f $pattern_file -o $output_dir/out-${num_kmers}x31mers -r"
     merkurio_ok=$BENCHMARK_ADDED
 
-    run_hyperfine "$output_dir/${num_kmers}x31mers-results.csv"
+    run_hyperfine "$output_dir/${num_kmers}x31mers-results.csv" "$num_kmers"
 
     # Cookiecutter separates matching pairs and matching singleton reads.
     if (( ck_ok )); then
