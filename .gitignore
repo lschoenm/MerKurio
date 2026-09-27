@@ -8,6 +8,20 @@ manual/book
 benchmarks/data/
 benchmarks/comparison_binaries/
 
+# Generated FASTQ outputs from all benchmark result directories.
+benchmarks/results*/**/*.fastq
+benchmarks/results*/**/*.fastq.*
+benchmarks/results*/**/*.fq
+benchmarks/results*/**/*.fq.*
+benchmarks/results*/**/*.fastx
+benchmarks/results*/**/*.fastx.*
+results/**/*.fastq
+results/**/*.fastq.*
+results/**/*.fq
+results/**/*.fq.*
+results/**/*.fastx
+results/**/*.fastx.*
+
 # Keep only benchmark result tables but no output files
 benchmarks/results/fasta/*
 !benchmarks/results/fasta/*csv
