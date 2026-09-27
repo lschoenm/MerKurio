@@ -1,6 +1,6 @@
 [package]
 name = "merkurio"
-version = "1.0.2"
+version = "1.1.0"
 edition = "2024"
 authors = ["Lukas Schönmann <lukas.schoenmann@boku.ac.at>"]
 repository = "https://github.com/lschoenm/MerKurio"
