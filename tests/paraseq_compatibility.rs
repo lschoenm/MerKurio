@@ -53,7 +53,8 @@ fn paraseq_reads_single_end_fasta_fixture() {
     assert_eq!(records.len(), 3);
     assert_eq!(records[0].id, b"seq1");
     assert_eq!(records[0].seq, b"ACGTACGT");
-    assert_eq!(records[0].seq_raw, b"ACGTACGT\n");
+    // The final line ending is a record delimiter, not raw sequence data.
+    assert_eq!(records[0].seq_raw, b"ACGTACGT");
     assert_eq!(records[0].qual, None);
 }
 
@@ -75,7 +76,9 @@ fn paraseq_strips_multiline_fasta_seq_but_keeps_raw_seq() {
     assert_eq!(records.len(), 1);
     assert_eq!(records[0].id, b"protein1");
     assert_eq!(records[0].seq.len(), 280);
-    assert_eq!(records[0].seq_raw.len(), 284);
+    // Four sequence lines retain three internal newlines, but no final newline.
+    assert_eq!(records[0].seq_raw.len(), 283);
+    assert!(!records[0].seq_raw.ends_with(b"\n"));
     assert!(records[0].seq_raw.contains(&b'\n'));
     assert!(!records[0].seq.contains(&b'\n'));
 }
