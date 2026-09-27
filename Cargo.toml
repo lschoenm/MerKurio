@@ -12,6 +12,9 @@ readme = "README.md"
 keywords = ["k-mer", "fasta", "fastq", "sam", "bam"]
 categories = ["science::bioinformatics", "command-line-utilities"]
 
+# Benchmark datasets are not needed to build or install the crate.
+exclude = ["/benchmarks/"]
+
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [[bin]]
