@@ -1,0 +1,21 @@
+unix_timestamp=1785244398
+git_commit=4e2988011ab090b76fdd4209b0e397a34c87b05d
+git_status=M .gitignore; ?? tuning/
+rustc=rustc 1.90.0-nightly (b56aaec52 2025-07-24)
+binary: rustc
+commit-hash: b56aaec52bc0fa35591a872fb4aac81f606e265c
+commit-date: 2025-07-24
+host: aarch64-apple-darwin
+release: 1.90.0-nightly
+LLVM version: 20.1.8
+system=Darwin Lukass-MacBook-Air.local 24.6.0 Darwin Kernel Version 24.6.0: Mon Jul 14 11:30:40 PDT 2025; root:xnu-11417.140.69~1/RELEASE_ARM64_T8132 arm64
+corpus=mixed_50_percent_hits
+k_min=4
+k_max=64
+max_q=12
+sequence_length=150
+sequences_per_pattern=512
+patterns_per_k=256
+runs=15
+target_run_ms=20
+seed=5576989381986773359

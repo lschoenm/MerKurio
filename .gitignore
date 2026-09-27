@@ -1,16 +1,26 @@
 .DS_Store
+__pycache__/
 target/
 test-files/
 manual/book
 
 # Ignore benchmark data and programs
 benchmarks/data/
-benchmarks/cookiecutter-extract-1.0.0
-benchmarks/fetch_reads
-benchmarks/seqkit
-benchmarks/st-0.4.0-beta.3
-benchmarks/fgrep
-benchmarks/grep*
+benchmarks/comparison_binaries/
+
+# Generated FASTQ outputs from all benchmark result directories.
+benchmarks/results*/**/*.fastq
+benchmarks/results*/**/*.fastq.*
+benchmarks/results*/**/*.fq
+benchmarks/results*/**/*.fq.*
+benchmarks/results*/**/*.fastx
+benchmarks/results*/**/*.fastx.*
+results/**/*.fastq
+results/**/*.fastq.*
+results/**/*.fq
+results/**/*.fq.*
+results/**/*.fastx
+results/**/*.fastx.*
 
 # Keep only benchmark result tables but no output files
 benchmarks/results/fasta/*
@@ -19,3 +29,9 @@ benchmarks/results/fastq/*
 !benchmarks/results/fastq/*csv
 benchmarks/results/fastq-paired/*
 !benchmarks/results/fastq-paired/*csv
+benchmarks/results/quick-extract/
+benchmarks/results/realistic-extract/
+
+# Ignore resumable tuning-worker scratch files; aggregate results remain tracked.
+tuning/algorithm-selection/results/.workers/
+tuning/algorithm-selection/results/refinement/parts/

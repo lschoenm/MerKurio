@@ -1,0 +1,20 @@
+[package]
+name = "merkurio-q-value-tuning"
+version = "0.1.0"
+edition = "2024"
+publish = false
+
+[dependencies]
+aho-corasick = "1.1.4"
+anyhow = "1.0.102"
+thiserror = "2.0.18"
+
+[profile.release]
+codegen-units = 1
+lto = true
+panic = "abort"
+opt-level = 3
+
+# Keep this utility independent from any workspace the main package may join.
+[workspace]
+

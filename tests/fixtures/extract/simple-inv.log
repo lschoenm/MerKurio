@@ -14,8 +14,8 @@ simple.fasta	seq3	CGT	3
 #
 #Number of patterns found: 2/2 (100.00 %)
 #Pattern	Count
-#ACG	2
-#CGT	2
+#ACG	3
+#CGT	3
 #
 #Total number of records searched: 3
 #Total number of characters searched: 24

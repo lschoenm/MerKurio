@@ -1,0 +1,8 @@
+Versions used (Thu Sep 24 22:07:56 CEST 2026):
+* MerKurio: 
+* seqtool:  <https://github.com/markschl/seqtool>
+* fgrep: 
+* fetch_reads: no official release <https://github.com/voichek/fetch_reads_with_kmers>
+* Cookiecutter: 1.0.0
+* seqkit: 
+* back_to_sequences: back_to_sequences 0.7.0

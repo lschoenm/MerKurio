@@ -1,0 +1,3 @@
+command,mean,stddev,median,user,system,min,max
+"nice -20 taskset -c 0,2,4,6 ../../target/release/merkurio extract -i ../data/frag_1.fastq -f ../patterns/fastq_1000000x31mers.fasta --threads 4 > ../results-multithreaded/1000000x31mers-4threads-merkurio.fastq",0.77340688944,0.017030907726607966,0.76634485104,0.8888011600000001,0.15250916,0.7478878840400001,0.79897612704
+"nice -20 taskset -c 0,2,4,6 back_to_sequences --in-kmers ../patterns/fastq_1000000x31mers.fasta --in-sequences ../data/frag_1.fastq --out-sequences ../results-multithreaded/1000000x31mers-4threads-back_to_sequences.fastx -k 31 --stranded -t 4",3.1721676245400006,0.78567239398117,3.2215334375399998,3.6168499600000006,0.41029346,1.56195627504,4.00631323504

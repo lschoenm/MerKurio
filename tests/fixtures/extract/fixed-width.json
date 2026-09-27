@@ -37,7 +37,7 @@
     },
     "inverted_matching": false,
     "program": "merkurio",
-    "search_algorithm": "BNDMq",
+    "search_algorithm": "Aho-Corasick",
     "subcommand": "extract",
     "timestamp": "2025-07-22T08:44:53+02:00[Europe/Vienna]",
     "version": "3.1.1"
@@ -51,7 +51,7 @@
     "searching_paired_end_reads": false
   },
   "pattern_hit_counts": {
-    "DKAT": 1
+    "DKAT": 2
   },
   "summary_statistics": {
     "number_of_characters_searched": 280,

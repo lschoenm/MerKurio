@@ -37,6 +37,7 @@ MerKurio provides two complementary subcommands:
 
 - 🔍 **Extract**: Search FASTA/FASTQ data for _k_-mers and write records with matching _k_-mers to the terminal or a new file.
   - Supports paired-end reads (a hit in one read extracts the whole pair).
+  - Supports parallel processing with a configurable total thread count.
 - 📑 **Tag**: Annotate BAM/SAM alignments with _k_-mer tags and filter them based on matching _k_-mers.
   - Adds a two‑letter tag (default `km`) with comma-separated matching k‑mers (follows the [SAM format specification](https://samtools.github.io/hts-specs/SAMtags.pdf)).
   - Optionally keeps only reads containing at least one _k_‑mer.
@@ -103,9 +104,17 @@ Another example where paired-end reads are extracted if they contain the sequenc
 merkurio extract -1 input_R1.fastq -2 input_R2.fastq -o output -s ACGT TGCA -l log.txt
 ```
 
+Use `--threads` to set the total number of processing threads. One thread reads
+the input and the remaining threads perform pattern matching. A value of `0`
+uses the available CPU count automatically:
+
+```bash
+merkurio extract -i input.fastq -f query_kmers.txt --threads 4 -o output.fastq
+```
+
 ### The `tag` Subcommand
 
-Running `merkurio tag` will tag aligned sequences in a BAM/SAM file with _k_-mers. If a record contains one or more of the _k_-mers, it is annotated with a tag ("km" by default; must be exactly two characters long) and the respective _k_-mers. Multithreading is supported for BAM files. Optionally, keep only records which are matching at least one _k_-mer.
+Running `merkurio tag` will tag aligned sequences in a BAM/SAM file with _k_-mers. If a record contains one or more of the _k_-mers, it is annotated with a tag ("km" by default; must be exactly two characters long) and the respective _k_-mers. Parallel matching and tagging are supported for both SAM and BAM files, preserving input order. `--threads` caps total threads including reading and writing; BAM helper threads are disabled. Optionally, keep only records which are matching at least one _k_-mer.
 
 Detailed match statistics are written to stdout or to a file if specified, showing which records got hit by sequences along with a zero-based position. Matching statistics can also be saved in JSON format for easier parsing. Matching records output can be suppressed if one is only interested in the matching statistics.
 

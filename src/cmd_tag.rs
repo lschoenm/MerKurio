@@ -6,7 +6,6 @@
 //! automatically based on the input file extension. Additionally, adds a tag to the BAM/SAM
 //! header with the program information.
 
-use aho_corasick::AhoCorasick;
 use anyhow::{Context, Result};
 use bam::record::tags;
 use bam::{RecordReader, RecordWriter};
@@ -19,11 +18,13 @@ use std::path::PathBuf;
 use std::str::from_utf8;
 use std::{env, fs, io};
 
-use crate::helpers::{
-    check_log_flag_conflict, error_if_directory, parse_pattern_list, recommend_aho_corasick,
-};
+use crate::helpers::{check_log_flag_conflict, error_if_directory, parse_pattern_list};
 use crate::logger::{BufferedLogger, JsonLogger};
-use crate::pattern_matching::{BNDMq, tune_q_value};
+use crate::pattern_matching::{
+    MatchMode, PatternMatcher, SearchAlgorithm, select_search_algorithm,
+};
+
+mod processing;
 
 #[derive(Args)]
 #[clap(group(
@@ -48,7 +49,7 @@ group(
     ArgGroup::new("algorithm")
         .required(false)
         .multiple(false)
-        .args(&["q_size", "aho_corasick"]),
+        .args(&["q_size", "aho_corasick", "hash"]),
 ),
 group(
     ArgGroup::new("case-sensitivity")
@@ -99,9 +100,13 @@ pub struct CmdTag {
     #[clap(short = 'j', long, default_value(None), default_missing_value("STDOUT"), num_args = 0..=1, )]
     json_log: Option<PathBuf>,
 
-    /// Number of parallel threads to use for processing BAM files.
+    /// Maximum total threads for SAM/BAM processing, including reading and writing. BAM helper threads are disabled. Use 0 to auto-detect available cores.
     #[clap(short = 'p', long, default_value("1"))]
-    threads: u16,
+    threads: usize,
+
+    /// Number of records per processing batch.
+    #[clap(long, default_value = "1024")]
+    chunk_size: usize,
 
     /// Suppress output of found records (no records are written to a file or stdout); use if only matching statistics are of interest.
     #[clap(
@@ -123,7 +128,13 @@ pub struct CmdTag {
     invert_match: bool,
 
     /// Use case-insensitive matching.
-    #[clap(short = 'I', long, action(ArgAction::SetTrue), default_value("false"))]
+    #[clap(
+        short = 'I',
+        long,
+        action(ArgAction::SetTrue),
+        default_value("false"),
+        conflicts_with("hash")
+    )]
     case_insensitive: bool,
 
     /// Convert all input sequences to lowercase.
@@ -147,6 +158,15 @@ pub struct CmdTag {
         hide_short_help = true
     )]
     aho_corasick: bool,
+
+    /// Use rolling-hash matching. All query sequences must have the same length.
+    #[clap(
+        long,
+        action(ArgAction::SetTrue),
+        default_value("false"),
+        hide_short_help = true
+    )]
+    hash: bool,
 }
 
 /// Core function of the `tag` subcommand that reads a SAM/BAM file, searches
@@ -161,8 +181,6 @@ pub fn tag_records(args: CmdTag) -> Result<()> {
         args.suppress_output,
     )
     .map_err(|e| anyhow::anyhow!(e))?;
-
-    let mut args = args;
 
     // Check if input file path points to a directory
     error_if_directory(&args.in_file, "Record file path")?;
@@ -180,13 +198,16 @@ pub fn tag_records(args: CmdTag) -> Result<()> {
     )
     .with_context(|| "Problem parsing pattern list.")?;
 
-    // Case-insensitive matching always uses the Aho-Corasick algorithm
-    if args.case_insensitive {
-        args.aho_corasick = true;
-    // Optimize search parameters only if user did not provide them
-    } else if args.q_size.is_none() && !args.aho_corasick {
-        args.aho_corasick = recommend_aho_corasick(&pattern_list)?;
-    }
+    // Tagging records needs the complete set of matching patterns.
+    let algorithm = if args.case_insensitive || args.aho_corasick {
+        SearchAlgorithm::AhoCorasick
+    } else if args.hash {
+        SearchAlgorithm::Hash
+    } else if args.q_size.is_some() {
+        SearchAlgorithm::Bndmq
+    } else {
+        select_search_algorithm(&pattern_list, MatchMode::All)
+    };
 
     // Set one of thre possible logging options:
     // 1) log to stdout,
@@ -215,9 +236,15 @@ pub fn tag_records(args: CmdTag) -> Result<()> {
     // Activate logging if a log or JSON log file is provided
     let logging_active = log_file.is_some() || args.json_log.is_some();
 
-    // Check if number of threads is at least 1
-    if args.threads < 1 {
-        anyhow::bail!("Number of threads must be at least 1.");
+    let threads = if args.threads == 0 {
+        std::thread::available_parallelism()
+            .map(|n| n.get())
+            .unwrap_or(1)
+    } else {
+        args.threads
+    };
+    if args.chunk_size == 0 {
+        anyhow::bail!("Chunk size must be at least 1.");
     }
     // Check if the tag is a valid tag name
     let tag_validated: [u8; 2] = if args.tag.len() != 2 {
@@ -229,30 +256,10 @@ pub fn tag_records(args: CmdTag) -> Result<()> {
             .map_err(|_| anyhow::anyhow!("Invalid tag format."))?
     };
 
-    // Initialize algorithm instances for each pattern. Only construct the Aho-
-    // Corasick automaton when requested.
-    let (ac, bndmq_collection): (Option<AhoCorasick>, Vec<(String, BNDMq)>) = if args.aho_corasick {
-        let ac = AhoCorasick::builder()
-            // Use DFA for better search performance at higher memory cost
-            .kind(Some(aho_corasick::AhoCorasickKind::DFA))
-            .ascii_case_insensitive(args.case_insensitive)
-            .build(pattern_list.clone())
-            .unwrap();
-        (Some(ac), Vec::new())
-    } else {
-        let mut bndmq_collection = Vec::with_capacity(pattern_list.len());
-        for pattern in &pattern_list {
-            // Tune q value for BNDMq based on the pattern length if not provided
-            let q = args
-                .q_size
-                .unwrap_or_else(|| tune_q_value(pattern).unwrap());
-            bndmq_collection.push((pattern.clone(), BNDMq::new(pattern.as_bytes(), q)?));
-        }
-        (None, bndmq_collection)
-    };
+    let matcher =
+        PatternMatcher::new(&pattern_list, algorithm, args.case_insensitive, args.q_size)?;
 
     fn infer_record_writer(
-        threads: u16,
         out_file: &Option<PathBuf>,
         extension: &str,
         header: bam::Header,
@@ -265,7 +272,7 @@ pub fn tag_records(args: CmdTag) -> Result<()> {
                 let path = out_file.with_extension(extension);
                 Ok(Box::new(
                     bam::bam_writer::BamWriterBuilder::new()
-                        .additional_threads(threads - 1)
+                        .additional_threads(0)
                         .from_path(&path, header)
                         .with_context(|| format!("Error writing BAM file: {}", path.display()))?,
                 ))
@@ -356,264 +363,60 @@ pub fn tag_records(args: CmdTag) -> Result<()> {
         logger.flush(); // Ensure header is written before records
     }
 
-    // Initialize counters for logging information
-    let mut nb_records_tot = 0;
-    let mut nb_bases: usize = 0;
-    let mut nb_hits_tot = 0;
-    let mut nb_records_hit = 0;
-    let mut pattern_hit_counts = vec![0u32; pattern_list.len()];
-
-    /// Process a single record, updating statistics and writing to output
-    fn process_record(
-        record: &mut bam::Record,
-        ac: Option<&AhoCorasick>,
-        bndmq_collection: &[(String, BNDMq)],
-        pattern_list: &[String],
-        tag_validated: [u8; 2],
-        logging_active: bool,
-        logger: &mut BufferedLogger,
-        in_records_filename: &str,
-        pattern_hit_counts: &mut [u32],
-        nb_hits_tot: &mut usize,
-        nb_records_hit: &mut usize,
-        nb_records_tot: &mut usize,
-        nb_bases: &mut usize,
-        filter_matching: bool,
-        suppress_output: bool,
-        invert_match: bool,
-        writer: &mut Box<dyn RecordWriter>,
-        json_logger: &mut Option<JsonLogger>,
-    ) -> Result<()> {
-        let mut kmers_found = Vec::new();
-
-        let use_ac = ac.is_some();
-
-        // Get occurrences of patterns in the sequence using Aho-Corasick or BNDMq
-        if use_ac {
-            for mat in ac
-                .unwrap()
-                .find_overlapping_iter(&record.sequence().to_vec())
-            {
-                if let Some(pattern) = pattern_list.get(mat.pattern().as_usize()) {
-                    kmers_found.push(pattern.clone());
-                    // Log match information
-                    if logging_active {
-                        *nb_hits_tot += 1;
-
-                        if let Some(count) = pattern_hit_counts.get_mut(mat.pattern().as_usize()) {
-                            *count += 1;
-                        }
-                        logger.log_fields(in_records_filename, record.name(), pattern, mat.start());
-                        if let Some(jl) = json_logger.as_mut() {
-                            jl.log_fields(in_records_filename, record.name(), pattern, mat.start());
-                        }
-                    }
-                } else {
-                    anyhow::bail!("Error retrieving matching pattern by index.")
-                }
-            }
-        } else {
-            // If logging active, search for matching positions and print them
-            if logging_active {
-                for (idx, (pattern, bndmq)) in bndmq_collection.iter().enumerate() {
-                    let mut found_any = false;
-                    for o in bndmq.find_iter(&record.sequence().to_vec()) {
-                        found_any = true;
-                        logger.log_fields(in_records_filename, record.name(), pattern, o);
-                        if let Some(jl) = json_logger.as_mut() {
-                            jl.log_fields(in_records_filename, record.name(), pattern, o);
-                        }
-                        *nb_hits_tot += 1;
-                    }
-                    if found_any {
-                        kmers_found.push(pattern.clone());
-                        if let Some(count) = pattern_hit_counts.get_mut(idx) {
-                            *count += 1;
-                        }
-                    }
-                }
-            // If logging disabled, only search for a match and break if found
-            } else {
-                for (pattern, bndmq) in bndmq_collection {
-                    if bndmq.find_match(&record.sequence().to_vec()) {
-                        kmers_found.push(pattern.clone());
-                    }
-                }
-            }
-        }
-
-        if logging_active {
-            *nb_records_tot += 1;
-            *nb_bases += record.query_len() as usize;
-            if !kmers_found.is_empty() {
-                *nb_records_hit += 1;
-            }
-        }
-
-        // Skip record based on matching criteria:
-        // - With filter_matching (-m): keep only records that match
-        // - With invert_match (-v): keep only records that don't match
-        // - Without either: keep all records
-        let should_keep = if filter_matching {
-            !kmers_found.is_empty() // Keep only matching records
-        } else if invert_match {
-            kmers_found.is_empty() // Keep only non-matching records
-        } else {
-            true // Keep all records
-        };
-
-        if !should_keep {
-            return Ok(());
-        }
-
-        // Tag record with presence of k-mers
-        match record.tags().get(&tag_validated) {
-            // Do nothing if tag is empty
-            Some(tags::TagValue::String([], _)) => (),
-            // Otherwise, append the new k-mers to the newly found k-mers
-            Some(tags::TagValue::String(val, _)) => {
-                let s =
-                    from_utf8(val).with_context(|| "Error reading existing tag value as UTF-8")?;
-                kmers_found.extend(s.split(',').map(String::from));
-            }
-            None => (),
-            _ => anyhow::bail!("Invalid tag value format. Expected string value."),
-        };
-
-        // Sort and deduplicate k-mers
-        kmers_found.sort_unstable();
-        kmers_found.dedup();
-
-        // Update record with new k-mers
-        record
-            .tags_mut()
-            .push_string(&tag_validated, kmers_found.join(",").as_bytes());
-
-        // Write record to output file if not suppressed
-        if !suppress_output {
-            writer
-                .write(record)
-                .with_context(|| "Error writing record to output file")?;
-        }
-
-        Ok(())
-    }
-
-    // Process records based on file type
-    match in_file_extension {
+    // Open readers without background BAM decompression threads.
+    let (reader, mut header): (Box<dyn RecordReader + Send>, bam::Header) = match in_file_extension
+    {
         "bam" => {
-            // Open BAM file for reading with x additional threads for decompression
-            let mut reader = bam::BamReader::from_path(&args.in_file, &args.threads - 1)
-                .with_context(|| format!("Error reading BAM file: {:?}", &args.in_file))?;
-            // Get header from BAM file and add program information
-            let command_line = env::args().collect::<Vec<String>>().join(" ");
-            let mut program_header_line = format!("@PG\tID:{0}\tPN:{0}\tCL:", crate_name!());
-            program_header_line.push_str(&command_line);
-            program_header_line.push_str(format!("\tVN:{}", crate_version!()).as_str());
-            let mut header = reader.header().clone();
-            header.push_line(&program_header_line).unwrap();
-            // Use empty header if suppress_output is set
-            if args.suppress_output {
-                header = bam::Header::new();
-            }
-            // Open file for writing with inferred writer
-            let mut writer = match out_file_extension {
-                "bam" | "sam" | "STDOUT" => {
-                    infer_record_writer(args.threads, &out_file, out_file_extension, header)
-                }
-                _ => anyhow::bail!("Output file must be a BAM or SAM file."),
-            }
-            .with_context(|| "Could not create writer.")?;
-
-            // Iterate over BAM records and process them
-            let mut record = bam::Record::new();
-            loop {
-                match reader.read_into(&mut record) {
-                    Ok(true) => {
-                        process_record(
-                            &mut record,
-                            ac.as_ref(),
-                            &bndmq_collection,
-                            &pattern_list,
-                            tag_validated,
-                            logging_active,
-                            &mut logger,
-                            in_records_filename,
-                            &mut pattern_hit_counts,
-                            &mut nb_hits_tot,
-                            &mut nb_records_hit,
-                            &mut nb_records_tot,
-                            &mut nb_bases,
-                            args.filter_matching,
-                            args.suppress_output,
-                            args.invert_match,
-                            &mut writer,
-                            &mut json_logger,
-                        )?;
-                    }
-                    Ok(false) => break,
-                    Err(e) => anyhow::bail!("Error during BAM record parsing: {}", e),
-                }
-            }
+            let reader = bam::BamReader::from_path(&args.in_file, 0)
+                .with_context(|| format!("Error reading BAM file: {:?}", args.in_file))?;
+            let header = reader.header().clone();
+            (Box::new(reader), header)
         }
         "sam" => {
-            // Open SAM file for reading
-            let mut reader = bam::SamReader::from_path(&args.in_file)
-                .with_context(|| format!("Error reading SAM file: {:?}", &args.in_file))?;
-            // Get header from SAM file and add program information
-            let command_line = env::args().collect::<Vec<String>>().join(" ");
-            let mut program_header_line = format!("@PG\tID:{0}\tPN:{0}\tCL:", crate_name!());
-            program_header_line.push_str(&command_line);
-            program_header_line.push_str(format!("\tVN:{}", crate_version!()).as_str());
-            let mut header = reader.header().clone();
-            header.push_line(&program_header_line).unwrap();
-            // Use empty header if suppress_output is set
-            if args.suppress_output {
-                header = bam::Header::new();
-            }
-            // Open file for writing with inferred writer
-            let mut writer = match out_file_extension {
-                "bam" | "sam" | "STDOUT" => {
-                    infer_record_writer(args.threads, &out_file, out_file_extension, header)
-                }
-                _ => anyhow::bail!("Output file must be a BAM or SAM file."),
-            }
-            .with_context(|| "Could not create writer.")?;
-
-            // Iterate over SAM records and process them
-            let mut record = bam::Record::new();
-            loop {
-                match reader.read_into(&mut record) {
-                    Ok(true) => {
-                        process_record(
-                            &mut record,
-                            ac.as_ref(),
-                            &bndmq_collection,
-                            &pattern_list,
-                            tag_validated,
-                            logging_active,
-                            &mut logger,
-                            in_records_filename,
-                            &mut pattern_hit_counts,
-                            &mut nb_hits_tot,
-                            &mut nb_records_hit,
-                            &mut nb_records_tot,
-                            &mut nb_bases,
-                            args.filter_matching,
-                            args.suppress_output,
-                            args.invert_match,
-                            &mut writer,
-                            &mut json_logger,
-                        )?;
-                    }
-                    Ok(false) => break,
-                    Err(e) => anyhow::bail!("Error during SAM record parsing: {}", e),
-                }
-            }
+            let reader = bam::SamReader::from_path(&args.in_file)
+                .with_context(|| format!("Error reading SAM file: {:?}", args.in_file))?;
+            let header = reader.header().clone();
+            (Box::new(reader), header)
         }
         _ => anyhow::bail!("Input file must be a BAM or SAM file."),
-    }
-
+    };
+    header.push_line(&format!(
+        "@PG\tID:{0}\tPN:{0}\tCL:{1}\tVN:{2}",
+        crate_name!(),
+        env::args().collect::<Vec<_>>().join(" "),
+        crate_version!()
+    ))?;
+    let writer = if args.suppress_output {
+        None
+    } else {
+        Some(infer_record_writer(&out_file, out_file_extension, header)?)
+    };
+    let processor = processing::Processor {
+        matcher,
+        patterns: pattern_list.clone(),
+        filename: in_records_filename.to_string(),
+        tag: tag_validated,
+        plain_log: args.out_log.is_some(),
+        json_log: args.json_log.is_some(),
+        filter: args.filter_matching,
+        invert: args.invert_match,
+        suppress: args.suppress_output,
+    };
+    let algorithm_name = processor.matcher.algorithm_name();
+    let summary = processing::run(
+        reader,
+        processor,
+        threads,
+        args.chunk_size,
+        writer,
+        &mut logger,
+        &mut json_logger,
+    )?;
+    let nb_records_tot = summary.records;
+    let nb_bases = summary.bases;
+    let nb_hits_tot = summary.hits;
+    let nb_records_hit = summary.records_hit;
+    let pattern_hit_counts = summary.counts;
     // Log summary statistics
     if logging_active {
         logger.flush();
@@ -663,7 +466,7 @@ pub fn tag_records(args: CmdTag) -> Result<()> {
             "timestamp": Zoned::now().round(Unit::Second)?,
             "subcommand": "tag",
             "command_line": env::args().collect::<Vec<String>>(),
-            "search_algorithm": if args.aho_corasick { "Aho-Corasick" } else { "BNDMq" },
+            "search_algorithm": algorithm_name,
             "inverted_matching": args.invert_match,
             "case_insensitive": args.case_insensitive,
             "input_files": input_files_json,
@@ -722,11 +525,13 @@ mod tests {
             out_log,
             json_log: None,
             threads,
+            chunk_size: 1024,
             out_file,
             suppress_output: false,
             invert_match: false,
             q_size: None,
             aho_corasick: false,
+            hash: true,
             case_insensitive: false,
             lowercase: false,
             uppercase: false,
@@ -739,7 +544,7 @@ mod tests {
 
     #[test]
     #[should_panic]
-    fn test_tag_records_zero_threads() {
+    fn test_tag_records_zero_chunk_size() {
         let in_file = PathBuf::from("tests/data/sample.sam");
         let kmer_seq = vec!["ACGT".to_string()];
         let kmer_file = None;
@@ -747,7 +552,7 @@ mod tests {
         let tag = "km".to_string();
         let keep_matching = false;
         let out_log = None;
-        let threads = 0;
+        let threads = 1;
         let out_file = Some(PathBuf::from("tests/data/sample_tagged.sam"));
 
         let args = CmdTag {
@@ -761,11 +566,13 @@ mod tests {
             out_log,
             json_log: None,
             threads,
+            chunk_size: 0,
             out_file,
             suppress_output: false,
             invert_match: false,
             q_size: None,
             aho_corasick: false,
+            hash: false,
             case_insensitive: false,
             lowercase: false,
             uppercase: false,
@@ -800,11 +607,13 @@ mod tests {
             out_log,
             json_log: None,
             threads,
+            chunk_size: 1024,
             out_file,
             suppress_output: false,
             invert_match: false,
             q_size: None,
             aho_corasick: false,
+            hash: false,
             case_insensitive: false,
             lowercase: false,
             uppercase: false,
@@ -1028,10 +837,12 @@ mod tests {
             out_log: Some(out_log.clone()),
             json_log: Some(out_json.clone()),
             threads: 2,
+            chunk_size: 1024,
             suppress_output: false,
             invert_match: false,
             q_size: None,
             aho_corasick: false,
+            hash: false,
             case_insensitive: false,
             lowercase: false,
             uppercase: false,
@@ -1070,10 +881,12 @@ mod tests {
             out_log: Some(out_log.clone()),
             json_log: Some(out_json.clone()),
             threads: 2,
+            chunk_size: 1024,
             suppress_output: false,
             invert_match: true,
             q_size: None,
             aho_corasick: false,
+            hash: false,
             case_insensitive: false,
             lowercase: false,
             uppercase: false,
@@ -1112,10 +925,12 @@ mod tests {
             out_log: Some(out_log.clone()),
             json_log: Some(out_json.clone()),
             threads: 2,
+            chunk_size: 1024,
             suppress_output: false,
             invert_match: false,
             q_size: None,
             aho_corasick: false,
+            hash: false,
             case_insensitive: false,
             lowercase: false,
             uppercase: false,
@@ -1131,5 +946,8 @@ mod tests {
         Ok(())
     }
 
-    // TODO: Add tests for BAM output - not as easy because of BAM comparison.
+    // Additional serial/parallel comparisons, including decoded BAM output, live in parallel_tests.
 }
+
+#[cfg(test)]
+mod parallel_tests;

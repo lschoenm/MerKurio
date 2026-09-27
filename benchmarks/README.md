@@ -19,11 +19,17 @@ Additionally, [hyperfine](https://github.com/sharkdp/hyperfine) is needed to exe
 
 To download the data, run `./01-download-data.sh`.
 
-To generate the query _k_-mers, run `./02-generate-patterns.sh`. This uses a seed to get reproducible results.
+To generate the query _k_-mers, run `./02-generate-kmers.sh`. This uses a seed to get reproducible results.
 
 To start the benchmarks, run `./03-run-benchmarks.sh`.
 
+Single-end and paired-end FASTQ benchmarks use 1, 100, and 1,000,000 query 31-mers. The million-query set contains distinct k-mers sampled from the input reads. The smaller cases use 20 warmups and 100 timed runs; the million-query cases use 2 warmups and 10 timed runs. Each tool is first run once as a preflight with a five-minute timeout, followed by forced termination after five additional seconds if needed. Tools that exceed the timeout are skipped, while other errors still stop the suite. Change `TIMEOUT` in `03-run-benchmarks.sh` to adjust the preflight limit.
+
+After each benchmark group, the script compares selected record IDs against MerKurio's output (each mate separately for paired reads). Order and extra header annotations are ignored; duplicate counts are preserved. A missing file or mismatch stops the script. This checks record selection, not sequence or quality content.
+
 To format the results, run `./04-format-results.sh`.
+
+For an additional single-end FASTQ check, run `./05-run-multithreaded.sh`. It first compares MerKurio with 1, 2, 4 and 6 threads using 2 warmups and 10 timed runs for every query set, then compares programs with 4 threads using the usual run counts. It uses the same query sets and preflight timeout; results are saved in `results-multithreaded/` and are not included by script 04.
 
 ## Summary
 

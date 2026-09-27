@@ -1,7 +1,10 @@
 pub mod cmd_extract;
 pub mod cmd_tag;
+pub mod extract_processing;
+pub mod fastx_output;
 pub mod helpers;
 pub mod logger;
+pub mod ordered_pipeline;
 pub mod pattern_matching;
 pub mod pattern_preprocessing;
 
@@ -83,6 +86,35 @@ mod tests {
             .iter(),
         );
         assert!(args.is_ok());
+    }
+
+    #[test]
+    fn test_cli_parser_extract_threads() {
+        let args = Cli::try_parse_from(
+            vec![
+                crate_name!(),
+                "extract",
+                "-i",
+                "tests/data/sample_1.fasta",
+                "--kmer-seq",
+                "ACGT",
+                "--threads",
+                "4",
+                "--chunk-size",
+                "16384",
+            ]
+            .iter(),
+        )
+        .unwrap();
+
+        match args.cmd {
+            Commands::Extract(extract_args) => {
+                let debug = format!("{extract_args:?}");
+                assert!(debug.contains("threads: 4"));
+                assert!(debug.contains("chunk_size: 16384"));
+            }
+            Commands::Tag(_) => panic!("expected extract command"),
+        }
     }
 
     #[test]
