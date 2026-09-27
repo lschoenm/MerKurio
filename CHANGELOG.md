@@ -1,3 +1,8 @@
+# Version 1.1.1 (2026-09-27)
+
+- Fix macOS release builds by using supported GitHub Actions runners.
+- Update release actions to Node.js 24.
+
 # Version 1.1.0 (2026-09-27)
 
 - Add parallel processing to `extract` and `tag`.

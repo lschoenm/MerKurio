@@ -17,3 +17,8 @@ pr-run-mode = "plan"
 unix-archive = ".tar.gz"
 # Skip checking whether the specified configuration files are up to date
 allow-dirty = ["ci"]
+
+# Explicit runner hosts avoid the retired macos-13 default in dist 0.28.6.
+[dist.github-custom-runners]
+x86_64-apple-darwin = { runner = "macos-15-intel", host = "x86_64-apple-darwin" }
+aarch64-apple-darwin = { runner = "macos-15", host = "aarch64-apple-darwin" }
