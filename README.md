@@ -195,6 +195,11 @@ cargo build --release
 
 The binary will be in `target/release/`.
 
+To optimize a local build for your own CPU, use `cargo build-local` instead.
+This enables `target-cpu=native`; use the resulting binary only on machines with
+compatible CPU features. Standard builds and dist releases use the default CPU
+target.
+
 ## License
 
 The code in this repository is licensed under the [MIT license](https://github.com/lschoenm/MerKurio/tree/master/LICENSE). 

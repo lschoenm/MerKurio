@@ -1,3 +1,7 @@
 # Build with the **nightly** -Zon-broken-pipe=kill flag to avoid broken pipe errors
 [build]
-rustflags = ["-Ctarget-cpu=native", "-Zon-broken-pipe=kill"]
+rustflags = ["-Zon-broken-pipe=kill"]
+
+# Opt in to this machine's CPU features for local release builds only.
+[alias]
+build-local = ["build", "--release", "--config", "build.rustflags=['-Ctarget-cpu=native']"]
