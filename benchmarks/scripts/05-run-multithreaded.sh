@@ -10,6 +10,7 @@ MERKURIO="../../target/release/merkurio"
 ST="../comparison_binaries/st-0.4.0-beta.3"
 SEQKIT="../comparison_binaries/seqkit"
 BACK_TO_SEQUENCES="back_to_sequences"
+K2RMINI="${K2RMINI:-K2Rmini}"
 
 # Separate from results so script 04 does not include this additional check.
 OUTPUT_DIR="../results-multithreaded"
@@ -28,6 +29,7 @@ date
 "$ST" --version
 "$SEQKIT" version
 "$BACK_TO_SEQUENCES" --version
+"$K2RMINI" --version
 
 # Detect the output format: back_to_sequences 0.8.4 writes FASTA even for FASTQ input.
 record_ids() {
@@ -92,6 +94,8 @@ run_benchmark() {
     else
         preflight_benchmark MerKurio "$prefix-merkurio.fastq" \
             "$MERKURIO extract -i $reads -f $pattern --threads $threads > $prefix-merkurio.fastq"
+        preflight_benchmark K2Rmini "$prefix-k2rmini.fasta" \
+            "$K2RMINI $reads -p $pattern -k 31 -t 1 -T $threads -o $prefix-k2rmini.fasta"
         preflight_benchmark seqtool "$prefix-st.fastq" \
             "$ST find -t $threads file:$pattern $reads -o $prefix-st.fastq --seqtype other -f"
         preflight_benchmark seqkit "$prefix-seqkit.fastq" \

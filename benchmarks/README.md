@@ -9,6 +9,7 @@ To run the benchmarks, you need to have the following tools installed for compar
 - `grep`, available at <https://www.gnu.org/software/grep/>.
 - `fetch_reads`, available at <https://github.com/voichek/fetch_reads_with_kmers>.
 - `cookiecutter`, available at <https://github.com/cookiecutter/cookiecutter>.
+- `K2Rmini`, available at <https://github.com/Malfoy/K2Rmini> (installed on `PATH`, or set `K2RMINI=/path/to/K2Rmini`).
 - `back_to_sequences`, available at <https://github.com/pierrepeterlongo/back_to_sequences>.
 
 Please ensure that the paths in the script `03-run-benchmarks.sh` point to the correct locations of the executables. 
@@ -25,7 +26,9 @@ To start the benchmarks, run `./03-run-benchmarks.sh`.
 
 Single-end and paired-end FASTQ benchmarks use 1, 100, and 1,000,000 query 31-mers. The million-query set contains distinct k-mers sampled from the input reads. The smaller cases use 20 warmups and 100 timed runs; the million-query cases use 2 warmups and 10 timed runs. Each tool is first run once as a preflight with a five-minute timeout, followed by forced termination after five additional seconds if needed. Tools that exceed the timeout are skipped, while other errors still stop the suite. Change `TIMEOUT` in `03-run-benchmarks.sh` to adjust the preflight limit.
 
-After each benchmark group, the script compares selected record IDs against MerKurio's output (each mate separately for paired reads). Order and extra header annotations are ignored; duplicate counts are preserved. A missing file or mismatch stops the script. This checks record selection, not sequence or quality content.
+After each benchmark group, the script compares selected record IDs against MerKurio's output (each mate separately for paired reads). Order and extra header annotations are ignored; duplicate counts are preserved. A missing file or mismatch stops the script. This checks record selection, not sequence or quality content. Output format is detected automatically because K2Rmini (and some back_to_sequences versions) writes FASTA for FASTQ input.
+
+K2Rmini participates in single-end FASTA/FASTQ benchmarks with `-t 1` (at least one matching query k-mer), `-k` set to the query length, and `-T 1`. The four-thread comparison uses `-T 4`. It is omitted from paired-end benchmarks because it has no native paired-read selection mode. It uses the default minimizer size of 21. Its 32-bit k-mer hashes can produce false positives; the record-ID check remains strict and stops on any mismatch.
 
 To format the results, run `./04-format-results.sh`.
 

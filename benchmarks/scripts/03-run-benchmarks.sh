@@ -25,6 +25,8 @@ CK="../comparison_binaries/cookiecutter-extract-1.0.0"
 SEQKIT="../comparison_binaries/seqkit"
 # back_to_sequences: https://github.com/pierrepeterlongo/back_to_sequences
 BACK_TO_SEQUENCES="back_to_sequences"
+# K2Rmini: https://github.com/Malfoy/K2Rmini
+K2RMINI="${K2RMINI:-K2Rmini}"
 
 # Print system information and tool versions
 echo "Machine running benchmarks:"
@@ -37,6 +39,7 @@ echo "* fgrep: $($GREP --version)"
 echo "* fetch_reads: no official release <https://github.com/voichek/fetch_reads_with_kmers>"
 echo "* Cookiecutter 1.0.0"
 echo "* seqkit: $($SEQKIT version)"
+echo "* K2Rmini: $($K2RMINI --version)"
 echo "* back_to_sequences: $($BACK_TO_SEQUENCES --version)"
 echo ""
 echo "Running benchmarks with $WARMUP warmup runs and $RUNS benchmark runs..."
@@ -54,12 +57,14 @@ echo "* fgrep: $($GREP --version)" >> ../results/versions.txt
 echo "* fetch_reads: no official release <https://github.com/voichek/fetch_reads_with_kmers>" >> ../results/versions.txt
 echo "* Cookiecutter: 1.0.0" >> ../results/versions.txt
 echo "* seqkit: $($SEQKIT version)" >> ../results/versions.txt
+echo "* K2Rmini: $($K2RMINI --version) <https://github.com/Malfoy/K2Rmini>" >> ../results/versions.txt
 echo "* back_to_sequences: $($BACK_TO_SEQUENCES --version)" >> ../results/versions.txt
 
 # Compare selected record IDs, ignoring order and extra header annotations.
 record_ids() {
-    awk -v format="$1" '
-        (format == "fasta" && /^>/) || (format == "fastq" && NR % 4 == 1) {
+    awk '
+        NR == 1 { fasta = /^>/ }
+        (fasta && /^>/) || (!fasta && NR % 4 == 1) {
             id = $1; sub(/^[@>]/, "", id); sub(/\r$/, "", id); print id
         }
     ' "$2" | LC_ALL=C sort
@@ -128,7 +133,7 @@ run_fasta_benchmarks() {
     local pattern_txt="../patterns/fasta_${num_kmers}x${k}mers.txt"
     local data_file="../data/genome-sl.fasta"
     local output_dir="../results/fasta"
-    local st_ok=0 grep_ok=0 seqkit_ok=0 back_ok=0 merkurio_ok=0
+    local st_ok=0 grep_ok=0 seqkit_ok=0 back_ok=0 k2rmini_ok=0 merkurio_ok=0
     BENCHMARK_COMMANDS=()
     
     mkdir -p $output_dir
@@ -142,6 +147,8 @@ run_fasta_benchmarks() {
     seqkit_ok=$BENCHMARK_ADDED
     preflight_benchmark back_to_sequences "$BACK_TO_SEQUENCES --in-kmers $pattern_file --in-sequences $data_file --out-sequences $output_dir/out-${num_kmers}x${k}mers-back_to_sequences.fasta -k $k --stranded -t 1"
     back_ok=$BENCHMARK_ADDED
+    preflight_benchmark K2Rmini "$K2RMINI $data_file -p $pattern_file -k $k -t 1 -T 1 -o $output_dir/out-${num_kmers}x${k}mers-k2rmini.fasta"
+    k2rmini_ok=$BENCHMARK_ADDED
     preflight_benchmark MerKurio "$MERKURIO extract -i $data_file -f $pattern_file > $output_dir/out-${num_kmers}x${k}mers-merkurio.fasta"
     merkurio_ok=$BENCHMARK_ADDED
 
@@ -153,6 +160,7 @@ run_fasta_benchmarks() {
         (( grep_ok )) && outputs+=("$output_dir/out-${num_kmers}x${k}mers-fgrep.fasta")
         (( seqkit_ok )) && outputs+=("$output_dir/out-${num_kmers}x${k}mers-seqkit.fasta")
         (( back_ok )) && outputs+=("$output_dir/out-${num_kmers}x${k}mers-back_to_sequences.fasta")
+        (( k2rmini_ok )) && outputs+=("$output_dir/out-${num_kmers}x${k}mers-k2rmini.fasta")
         compare_outputs fasta "$output_dir/out-${num_kmers}x${k}mers-merkurio.fasta" "${outputs[@]}"
     else
         echo "Output comparison skipped because MerKurio timed out"
@@ -168,7 +176,7 @@ run_fastq_benchmarks() {
     local data_file="../data/frag_1.fastq"
     local data_file2="../data/frag_2.fastq"
     local output_dir="../results/fastq"
-    local st_ok=0 grep_ok=0 ck_ok=0 seqkit_ok=0 back_ok=0 merkurio_ok=0
+    local st_ok=0 grep_ok=0 ck_ok=0 seqkit_ok=0 back_ok=0 k2rmini_ok=0 merkurio_ok=0
     BENCHMARK_COMMANDS=()
     
     mkdir -p $output_dir
@@ -185,6 +193,8 @@ run_fastq_benchmarks() {
     seqkit_ok=$BENCHMARK_ADDED
     preflight_benchmark back_to_sequences "$BACK_TO_SEQUENCES --in-kmers $pattern_file --in-sequences $data_file --out-sequences $output_dir/out-${num_kmers}x${k}mers-back_to_sequences.fastq -k $k --stranded -t 1"
     back_ok=$BENCHMARK_ADDED
+    preflight_benchmark K2Rmini "$K2RMINI $data_file -p $pattern_file -k $k -t 1 -T 1 -o $output_dir/out-${num_kmers}x${k}mers-k2rmini.fasta"
+    k2rmini_ok=$BENCHMARK_ADDED
     preflight_benchmark MerKurio "$MERKURIO extract -i $data_file -f $pattern_file > $output_dir/out-${num_kmers}x${k}mers-merkurio.fastq"
     merkurio_ok=$BENCHMARK_ADDED
 
@@ -197,6 +207,7 @@ run_fastq_benchmarks() {
         (( ck_ok )) && outputs+=("$output_dir/out-${num_kmers}x${k}mers-ck/frag_1.filtered.fastq")
         (( seqkit_ok )) && outputs+=("$output_dir/out-${num_kmers}x${k}mers-seqkit.fastq")
         (( back_ok )) && outputs+=("$output_dir/out-${num_kmers}x${k}mers-back_to_sequences.fastq")
+        (( k2rmini_ok )) && outputs+=("$output_dir/out-${num_kmers}x${k}mers-k2rmini.fasta")
         compare_outputs fastq "$output_dir/out-${num_kmers}x${k}mers-merkurio.fastq" "${outputs[@]}"
     else
         echo "Output comparison skipped because MerKurio timed out"
