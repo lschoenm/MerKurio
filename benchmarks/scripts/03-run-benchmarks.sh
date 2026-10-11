@@ -93,17 +93,25 @@ preflight_benchmark() {
     local name=$1
     local command=$2
     local benchmark_command="nice -20 taskset -c 0 $command"
+    local status
     BENCHMARK_ADDED=0
 
     echo "Checking $name..."
     if timeout --verbose --kill-after=5s "$TIMEOUT" bash -c "$benchmark_command"; then
         BENCHMARK_COMMANDS+=("$benchmark_command")
         BENCHMARK_ADDED=1
-    elif [[ $? -eq 124 ]]; then
-        echo "Skipping $name: exceeded the $TIMEOUT timeout"
     else
-        echo "$name failed during the preflight run" >&2
-        return 1
+        status=$?
+        if [[ $status -eq 124 ]]; then
+            echo "Skipping $name: exceeded the $TIMEOUT timeout"
+        else
+            echo "$name failed during the preflight run (exit $status)" >&2
+            echo "Command: $benchmark_command" >&2
+            if [[ $name == fgrep && $status -eq 1 ]]; then
+                echo "grep found no matches. Check that the text patterns match the FASTA queries and input reads; also check for CRLF line endings in the text patterns." >&2
+            fi
+            return "$status"
+        fi
     fi
 }
 
@@ -141,7 +149,7 @@ run_fasta_benchmarks() {
     echo -e "\n>>> Running benchmarks for ${num_kmers} x ${k} bp for FASTA"
     preflight_benchmark seqtool "$ST find -t 1 file:$pattern_file $data_file -o $output_dir/out-${num_kmers}x${k}mers-st.fasta -f"
     st_ok=$BENCHMARK_ADDED
-    preflight_benchmark fgrep "$GREP -f $pattern_txt $data_file -B 1 --no-group-separator > $output_dir/out-${num_kmers}x${k}mers-fgrep.fasta"
+    preflight_benchmark fgrep "$GREP -F -f $pattern_txt $data_file -B 1 --no-group-separator > $output_dir/out-${num_kmers}x${k}mers-fgrep.fasta"
     grep_ok=$BENCHMARK_ADDED
     preflight_benchmark seqkit "$SEQKIT grep -j 1 -P -s -f $pattern_txt $data_file > $output_dir/out-${num_kmers}x${k}mers-seqkit.fasta"
     seqkit_ok=$BENCHMARK_ADDED
@@ -185,7 +193,7 @@ run_fastq_benchmarks() {
     echo -e "\n>>> Running benchmarks for ${num_kmers} x ${k} bp for FASTQ"
     preflight_benchmark seqtool "$ST find -t 1 file:$pattern_file $data_file -o $output_dir/out-${num_kmers}x${k}mers-st.fastq --seqtype other -f"
     st_ok=$BENCHMARK_ADDED
-    preflight_benchmark fgrep "$GREP -f $pattern_txt $data_file -B 1 -A 2 --no-group-separator > $output_dir/out-${num_kmers}x${k}mers-fgrep.fastq"
+    preflight_benchmark fgrep "$GREP -F -f $pattern_txt $data_file -B 1 -A 2 --no-group-separator > $output_dir/out-${num_kmers}x${k}mers-fgrep.fastq"
     grep_ok=$BENCHMARK_ADDED
     preflight_benchmark Cookiecutter "$CK -i $data_file -f $pattern_txt -o $output_dir/out-${num_kmers}x${k}mers-ck"
     ck_ok=$BENCHMARK_ADDED
