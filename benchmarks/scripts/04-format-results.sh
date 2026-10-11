@@ -26,7 +26,8 @@ csv_to_markdown() {
     NR == 2 {
         # First data row, initialize min_mean
         cmd = $1
-        if (cmd ~ /merkurio/) cmd = "merkurio"
+        if (cmd ~ /K2Rmini|k2rmini/) cmd = "K2Rmini"
+        else if (cmd ~ /merkurio/) cmd = "merkurio"
         else if (cmd ~ /st-/) cmd = "seqtool"
         else if (cmd ~ /fetch/) cmd = "fetch_reads"
         else if (cmd ~ /seqkit/) cmd = "seqkit"
@@ -43,7 +44,8 @@ csv_to_markdown() {
     }
     NR > 2 {
         cmd = $1
-        if (cmd ~ /merkurio/) cmd = "merkurio"
+        if (cmd ~ /K2Rmini|k2rmini/) cmd = "K2Rmini"
+        else if (cmd ~ /merkurio/) cmd = "merkurio"
         else if (cmd ~ /st-/) cmd = "seqtool"
         else if (cmd ~ /fetch/) cmd = "fetch_reads"
         else if (cmd ~ /seqkit/) cmd = "seqkit"
@@ -106,7 +108,8 @@ for csv_file in ../results/*/*.csv; do
         }
         NR == 2 {
             cmd = $1
-            if (cmd ~ /merkurio/) cmd = "merkurio"
+            if (cmd ~ /K2Rmini|k2rmini/) cmd = "K2Rmini"
+        else if (cmd ~ /merkurio/) cmd = "merkurio"
             else if (cmd ~ /st-/) cmd = "seqtool"
             else if (cmd ~ /fetch/) cmd = "fetch_reads"
             else if (cmd ~ /seqkit/) cmd = "seqkit"
@@ -123,7 +126,8 @@ for csv_file in ../results/*/*.csv; do
         }
         NR > 2 {
             cmd = $1
-            if (cmd ~ /merkurio/) cmd = "merkurio"
+            if (cmd ~ /K2Rmini|k2rmini/) cmd = "K2Rmini"
+        else if (cmd ~ /merkurio/) cmd = "merkurio"
             else if (cmd ~ /st-/) cmd = "seqtool"
             else if (cmd ~ /fetch/) cmd = "fetch_reads"
             else if (cmd ~ /seqkit/) cmd = "seqkit"
