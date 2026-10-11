@@ -205,3 +205,17 @@ target.
 The code in this repository is licensed under the [MIT license](https://github.com/lschoenm/MerKurio/tree/master/LICENSE). 
 
 Test data and example files in the `tests/` and `example-minimal/` directories are licensed under the [CC0 1.0 Universal license](https://github.com/lschoenm/MerKurio/tree/master/example-minimal/LICENSE). 
+
+## Citation
+
+A pre-print is available on arXiv.org: <https://doi.org/10.48550/arXiv.2609.39830>. 
+
+> @misc{schönmann2026merkuriosequenceextractionannotation,
+      title={MerKurio: sequence extraction and annotation based on matching k-mers}, 
+      author={Lukas Schönmann and Heinz Himmelbauer and Juliane C. Dohm},
+      year={2026},
+      eprint={2609.39830},
+      archivePrefix={arXiv},
+      primaryClass={q-bio.GN},
+      url={https://arxiv.org/abs/2609.39830}, 
+}
